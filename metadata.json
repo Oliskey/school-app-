@@ -1,0 +1,8 @@
+{
+  "name": "Smart School App",
+  "description": "An integrated platform designed to connect parents, students, teachers, and administrators in real time—simplifying tasks, improving transparency, and creating a more connected school community.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "prompt": ""
+}
