@@ -7,7 +7,7 @@ import { CheckCircleIcon, ClockIcon, ChevronRightIcon } from '../../constants';
 
 const StatusIcon = ({ status }: { status: 'Graded' | 'Ungraded' }) => {
   if (status === 'Graded') {
-    return <CheckCircleIcon className="w-6 h-6 text-green-500" />;
+    return <CheckCircleIcon className="w-6 h-6 text-green-500 animate-checkmark-pop" />;
   }
   return <ClockIcon className="w-6 h-6 text-gray-400" />;
 };

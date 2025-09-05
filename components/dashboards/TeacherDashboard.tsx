@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { DashboardType, Teacher } from '../../types';
 import { THEME_CONFIG } from '../../constants';
@@ -46,6 +47,8 @@ import SelectTermForReportScreen from '../teacher/SelectTermForReportScreen';
 import ProfessionalDevelopmentScreen from '../teacher/ProfessionalDevelopmentScreen';
 import AIPerformanceSummaryScreen from '../teacher/AIPerformanceSummaryScreen';
 import EducationalGamesScreen from '../teacher/EducationalGamesScreen';
+import LessonContentScreen from '../teacher/LessonContentScreen';
+import AssignmentViewScreen from '../teacher/AssignmentViewScreen';
 
 
 interface ViewStackItem {
@@ -144,6 +147,8 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     teacherChangePassword: TeacherChangePasswordScreen,
     lessonPlanner: LessonPlannerScreen,
     lessonPlanDetail: LessonPlanDetailScreen,
+    lessonContent: LessonContentScreen,
+    assignmentView: AssignmentViewScreen,
     detailedLessonNote: DetailedLessonNoteScreen,
     notifications: (props: any) => <NotificationsScreen {...props} userType="teacher" />,
     selectTermForReport: SelectTermForReportScreen,

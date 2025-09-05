@@ -1,5 +1,3 @@
-
-
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
@@ -270,19 +268,36 @@ const LessonPlannerScreen: React.FC<{ navigateTo: (view: string, title: string, 
 
             const prompt = `As an expert curriculum designer for the Nigerian school system, generate educational resources for ${subject} for the class ${className}.
 
-**IMPORTANT RULE**: You MUST ONLY use the topics provided by the user in the schemes of work below. DO NOT invent, add, or generate any topics that are not explicitly listed.
+**Primary Directive: Content Generation from User Topics**
 
-User-provided schemes:
+Your function is to create educational materials based *exclusively* on the topics provided by the user for each week.
+
+**How to Handle User Input:**
+
+1.  **If a week has a Main Topic AND Sub-Topics:**
+    *   Your generated lesson plan, detailed notes, and assessment for that week **MUST** be based *only* on the provided Sub-Topics. Do not introduce any other concepts.
+
+2.  **If a week has ONLY a Main Topic (no sub-topics):**
+    *   This is a directive to expand on the Main Topic. You **MUST** generate a full lesson plan, detailed notes, and assessment by logically breaking down the Main Topic into relevant sections, steps, or concepts.
+    *   **Example 1:** User provides "Classification of Whole Numbers". Your lesson plan should include sections like "What are Whole Numbers?", "Prime vs. Composite Numbers", "Even vs. Odd Numbers", and "Factors and Multiples". This is considered *detailing* the topic, not inventing a new one.
+    *   **Example 2:** User provides "The Solar System". Your content should cover "The Sun", "The Inner Planets", "The Outer Planets", and "Asteroids and Comets".
+    *   **Crucial:** Failure to generate a lesson plan for a topic without sub-topics is a failure to follow instructions. You must always elaborate on single topics.
+
+**ABSOLUTE RESTRICTION**: Under no circumstances should you generate content for a topic the user has not provided in their scheme of work. Your scope is strictly limited to the topics listed for each week.
+
+**Additional Rule:**
+*   For EACH week that has a topic, generate ONE corresponding assessment (Test, Quiz, or Assignment). The assessment's "type" property must be named according to the week, for example: "Week 1 Test", "Week 2 Quiz".
+
+**User-provided schemes of work**:
 - First Term: ${JSON.stringify(term1Scheme)}
 - Second Term: ${JSON.stringify(term2Scheme)}
 - Third Term: ${JSON.stringify(term3Scheme)}
 
-For EACH term that has topics provided, generate:
-1.  **Weekly Lesson Plans**: Create a plan for each topic with objectives, materials, teaching steps, vocabulary, and assessment methods.
-2.  **One major Term Assessment**: Create a test or exam with multiple-choice, short-answer, and theory questions, including answers and explanations.
-3.  **Detailed Notes**: For each main topic provided, generate a comprehensive lesson note in Markdown format.
+**Your Task**:
+For EACH term that has topics provided in the user's scheme, generate the corresponding lessonPlans, assessments, and detailedNotes based on all rules above.
 
-Return a single JSON object matching the required schema. Ensure the 'schemeOfWork' in your response is a simplified list of week and topic for each term.`;
+Return a single JSON object matching the required schema. Ensure 'schemeOfWork' is a simplified list of week/topic, and that each assessment has a 'week' number.`;
+
 
             const responseSchema = {
                 type: Type.OBJECT,
@@ -332,6 +347,7 @@ Return a single JSON object matching the required schema. Ensure the 'schemeOfWo
                                     items: {
                                         type: Type.OBJECT,
                                         properties: {
+                                            week: { type: Type.INTEGER },
                                             type: { type: Type.STRING },
                                             totalMarks: { type: Type.INTEGER },
                                             questions: {
@@ -351,7 +367,7 @@ Return a single JSON object matching the required schema. Ensure the 'schemeOfWo
                                                 }
                                             }
                                         },
-                                        required: ['type', 'totalMarks', 'questions']
+                                        required: ['week', 'type', 'totalMarks', 'questions']
                                     }
                                 }
                             },

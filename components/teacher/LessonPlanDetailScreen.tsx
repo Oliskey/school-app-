@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -78,7 +76,9 @@ const AssessmentDisplay: React.FC<{ assessment: GeneratedAssessment, navigateTo:
 
 const AssessmentsTab: React.FC<{ assessments: TermResources['assessments'], navigateTo: (view: string, title: string, props?: any) => void; }> = ({ assessments, navigateTo }) => (
     <div className="space-y-4">
-        {assessments.map((ass, index) => <AssessmentDisplay key={index} assessment={ass} navigateTo={navigateTo} />)}
+        {assessments
+            .sort((a, b) => a.week - b.week)
+            .map((ass, index) => <AssessmentDisplay key={index} assessment={ass} navigateTo={navigateTo} />)}
     </div>
 );
 
@@ -107,18 +107,6 @@ const LessonPlanDetailScreen: React.FC<{ resources: GeneratedResources; navigate
     const [currentResources, setCurrentResources] = useState<GeneratedResources>(resources);
     const [activeTerm, setActiveTerm] = useState<string>(resources.terms[0]?.term || '');
     
-    const handlePrint = () => window.print();
-    const handleShare = () => {
-        if (navigator.share) {
-            navigator.share({
-                title: `Lesson Plan for ${resources.subject}`,
-                text: `Check out the AI-generated lesson plan for ${resources.subject} (${resources.className}).`,
-            }).catch(error => console.log('Error sharing:', error));
-        } else {
-            alert('Share feature not supported on this browser.');
-        }
-    };
-    
     const activeTermData = currentResources.terms.find(t => t.term === activeTerm);
 
     return (
@@ -126,14 +114,6 @@ const LessonPlanDetailScreen: React.FC<{ resources: GeneratedResources; navigate
             <div className="p-3 border-b border-gray-200 flex justify-between items-center flex-shrink-0 bg-white print:hidden">
                 <div>
                     <h2 className="text-lg font-bold text-gray-800">AI Plan: {resources.subject} ({resources.className})</h2>
-                </div>
-                <div className="flex items-center space-x-2">
-                    <button onClick={handleShare} className="flex items-center space-x-1.5 px-3 py-1.5 text-sm font-semibold text-sky-700 bg-sky-100 rounded-md hover:bg-sky-200">
-                        <ShareIcon className="w-4 h-4"/><span>Share</span>
-                    </button>
-                    <button onClick={handlePrint} className="flex items-center space-x-1.5 px-3 py-1.5 text-sm font-semibold text-purple-700 bg-purple-100 rounded-md hover:bg-purple-200">
-                        <DocumentTextIcon className="w-4 h-4"/><span>Print</span>
-                    </button>
                 </div>
             </div>
 

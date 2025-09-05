@@ -654,7 +654,8 @@ export interface AssessmentQuestion {
 }
 
 export interface GeneratedAssessment {
-  type: 'Test' | 'Assignment' | 'Exam';
+  week: number;
+  type: string;
   totalMarks: number;
   questions: AssessmentQuestion[];
 }

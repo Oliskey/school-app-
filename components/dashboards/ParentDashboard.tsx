@@ -123,15 +123,15 @@ const getHomeworkStatus = (assignment: StudentAssignment) => {
 
     if (assignment.submission) {
         if (assignment.submission.status === 'Graded') {
-            return { text: `Graded: ${assignment.submission.grade}/100`, icon: <CheckCircleIcon />, color: 'text-green-600', bg: 'bg-green-50' };
+            return { text: `Graded: ${assignment.submission.grade}/100`, icon: <CheckCircleIcon />, color: 'text-green-600', bg: 'bg-green-50', isComplete: true };
         }
-        return { text: 'Submitted', icon: <CheckCircleIcon />, color: 'text-sky-600', bg: 'bg-sky-50' };
+        return { text: 'Submitted', icon: <CheckCircleIcon />, color: 'text-sky-600', bg: 'bg-sky-50', isComplete: true };
     }
 
     if (dueDate < now) {
-        return { text: 'Overdue', icon: <ExclamationCircleIcon />, color: 'text-red-600', bg: 'bg-red-50' };
+        return { text: 'Overdue', icon: <ExclamationCircleIcon />, color: 'text-red-600', bg: 'bg-red-50', isComplete: false };
     }
-    return { text: 'Pending', icon: <ClockIcon />, color: 'text-amber-600', bg: 'bg-amber-50' };
+    return { text: 'Pending', icon: <ClockIcon />, color: 'text-amber-600', bg: 'bg-amber-50', isComplete: false };
 };
 
 const AcademicsTab = ({ student, navigateTo }: { student: Student; navigateTo: (view: string, title: string, props?: any) => void }) => {
@@ -228,7 +228,7 @@ const AcademicsTab = ({ student, navigateTo }: { student: Student; navigateTo: (
                                     <p className="text-sm text-gray-700">{hw.subject} &bull; Due {new Date(hw.dueDate).toLocaleDateString('en-GB')}</p>
                                 </div>
                                 <div className={`flex items-center space-x-2 text-xs font-semibold px-2 py-1 rounded-full ${status.bg} ${status.color}`}>
-                                    {React.cloneElement(status.icon, {className: 'h-4 w-4'})}
+                                    {React.cloneElement(status.icon, {className: `h-4 w-4 ${status.isComplete ? 'animate-checkmark-pop' : ''}`.trim()})}
                                     <span>{status.text}</span>
                                 </div>
                             </div>

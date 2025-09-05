@@ -32,15 +32,15 @@ const AssignmentsScreen: React.FC<StudentAssignmentsScreenProps> = ({ studentId,
 
         if (assignment.submission) {
             if (assignment.submission.status === 'Graded') {
-                return { text: `Graded: ${assignment.submission.grade}/100`, icon: <CheckCircleIcon />, color: 'text-green-600' };
+                return { text: `Graded: ${assignment.submission.grade}/100`, icon: <CheckCircleIcon />, color: 'text-green-600', isComplete: true };
             }
-            return { text: 'Submitted', icon: <CheckCircleIcon />, color: 'text-sky-600' };
+            return { text: 'Submitted', icon: <CheckCircleIcon />, color: 'text-sky-600', isComplete: true };
         }
 
         if (dueDate < now) {
-            return { text: 'Overdue', icon: <ExclamationCircleIcon />, color: 'text-red-600' };
+            return { text: 'Overdue', icon: <ExclamationCircleIcon />, color: 'text-red-600', isComplete: false };
         }
-        return { text: 'Pending', icon: <ClockIcon />, color: 'text-amber-600' };
+        return { text: 'Pending', icon: <ClockIcon />, color: 'text-amber-600', isComplete: false };
     };
 
     const getButtonInfo = (assignment: StudentAssignment) => {
@@ -99,7 +99,7 @@ const AssignmentsScreen: React.FC<StudentAssignmentsScreenProps> = ({ studentId,
                             </div>
                             <div className="bg-gray-50 px-4 py-3 flex justify-between items-center">
                                 <div className={`flex items-center space-x-2 text-sm font-semibold ${status.color}`}>
-                                    {React.cloneElement(status.icon, { className: "w-5 h-5" })}
+                                    {React.cloneElement(status.icon, { className: `w-5 h-5 ${status.isComplete ? 'animate-checkmark-pop' : ''}`.trim() })}
                                     <span>{status.text}</span>
                                 </div>
 

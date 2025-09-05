@@ -65,11 +65,12 @@ const ExtracurricularsScreen: React.FC = () => {
                         {filteredActivities.map(activity => {
                             const isSignedUp = signedUpActivities.has(activity.id);
                             const config = ACTIVITY_CATEGORY_CONFIG[activity.category];
+                            const Icon = activity.icon;
                             return (
                                 <div key={activity.id} className={`p-4 rounded-xl shadow-sm border-l-4 ${config.bg} ${config.color.replace('text-','border-')}`}>
                                     <div className="flex items-start space-x-3">
                                         <div className={`p-2 rounded-lg ${config.bg}`}>
-                                            <activity.icon className={`w-6 h-6 ${config.color}`} />
+                                            <Icon className={`w-6 h-6 ${config.color}`} />
                                         </div>
                                         <div className="flex-grow">
                                             <h3 className={`font-bold ${config.color}`}>{activity.name}</h3>
