@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { UsersIcon, ParentNavIcon, TeacherNavIcon, StudentNavIcon, AIIcon } from '../../constants';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -57,7 +56,6 @@ const CommunicationHub: React.FC = () => {
                         message: { type: Type.STRING, description: 'The full message body of the announcement, written in a clear, friendly, and professional tone. Use newline characters for paragraphs.' }
                     }
                 },
-                thinkingConfig: { thinkingBudget: 0 }, // Added for faster responses
             }
         });
         const jsonResponse = JSON.parse(response.text.trim());

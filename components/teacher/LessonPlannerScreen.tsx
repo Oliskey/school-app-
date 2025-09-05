@@ -268,18 +268,21 @@ const LessonPlannerScreen: React.FC<{ navigateTo: (view: string, title: string, 
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-            const prompt = `You are an expert curriculum and assessment designer for the Nigerian secondary school system. Based on the provided schemes of work for ${subject} in ${className}, generate a complete set of educational resources for the entire academic year (First, Second, and Third Terms).
+            const prompt = `As an expert curriculum designer for the Nigerian school system, generate educational resources for ${subject} for the class ${className}.
 
-For EACH of the three terms for which a scheme is provided, you must generate:
-1.  **A list of weekly Lesson Plans**: Each plan should have clear objectives, required materials, step-by-step teaching activities, key vocabulary, and assessment methods.
-2.  **A list of Assessments**: Create one major assessment for each term (e.g., a Test or Exam) with a variety of question types (multiple-choice, short-answer, theory), including correct answers and explanations.
+**IMPORTANT RULE**: You MUST ONLY use the topics provided by the user in the schemes of work below. DO NOT invent, add, or generate any topics that are not explicitly listed.
 
-Here is the user-provided scheme of work:
-First Term Topics: ${JSON.stringify(term1Scheme)}
-Second Term Topics: ${JSON.stringify(term2Scheme)}
-Third Term Topics: ${JSON.stringify(term3Scheme)}
+User-provided schemes:
+- First Term: ${JSON.stringify(term1Scheme)}
+- Second Term: ${JSON.stringify(term2Scheme)}
+- Third Term: ${JSON.stringify(term3Scheme)}
 
-Return the entire output in a single JSON object that strictly adheres to the provided schema. The 'schemeOfWork' in your response should be a simplified version containing just the week and main topic for each term provided.`;
+For EACH term that has topics provided, generate:
+1.  **Weekly Lesson Plans**: Create a plan for each topic with objectives, materials, teaching steps, vocabulary, and assessment methods.
+2.  **One major Term Assessment**: Create a test or exam with multiple-choice, short-answer, and theory questions, including answers and explanations.
+3.  **Detailed Notes**: For each main topic provided, generate a comprehensive lesson note in Markdown format.
+
+Return a single JSON object matching the required schema. Ensure the 'schemeOfWork' in your response is a simplified list of week and topic for each term.`;
 
             const responseSchema = {
                 type: Type.OBJECT,
@@ -355,8 +358,19 @@ Return the entire output in a single JSON object that strictly adheres to the pr
                             required: ['term', 'schemeOfWork', 'lessonPlans', 'assessments']
                         }
                     },
+                    detailedNotes: {
+                        type: Type.ARRAY,
+                        items: {
+                            type: Type.OBJECT,
+                            properties: {
+                                topic: { type: Type.STRING },
+                                note: { type: Type.STRING }
+                            },
+                            required: ['topic', 'note']
+                        }
+                    }
                 },
-                required: ['subject', 'className', 'terms']
+                required: ['subject', 'className', 'terms', 'detailedNotes']
             };
 
             const response = await ai.models.generateContent({
@@ -365,6 +379,7 @@ Return the entire output in a single JSON object that strictly adheres to the pr
                 config: {
                     responseMimeType: "application/json",
                     responseSchema: responseSchema,
+                    thinkingConfig: { thinkingBudget: 0 }
                 }
             });
 

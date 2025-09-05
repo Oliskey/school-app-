@@ -35,7 +35,6 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ dashboardType, onBack }) =>
             model: 'gemini-2.5-flash',
             config: { 
                 systemInstruction,
-                thinkingConfig: { thinkingBudget: 0 }, // Added for faster responses
             },
         });
     }, [dashboardType]);

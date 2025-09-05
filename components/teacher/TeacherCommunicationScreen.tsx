@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import { AIIcon, ANNOUNCEMENT_CATEGORY_CONFIG, PaperclipIcon, XCircleIcon, FileDocIcon, FilePdfIcon, FileImageIcon, DocumentTextIcon } from '../../constants';
@@ -63,7 +62,7 @@ const TeacherCommunicationScreen: React.FC = () => {
                     }
                 }
             });
-            const jsonResponse = JSON.parse(response.text);
+            const jsonResponse = JSON.parse(response.text.trim());
             setTitle(jsonResponse.title || '');
             setMessage(jsonResponse.message || '');
             setShowAiPrompt(false);
