@@ -1,17 +1,24 @@
+
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
-import { GeneratedResources, SchemeWeek, SavedScheme, HistoryEntry } from '../../types';
-import { AIIcon, BookOpenIcon, SparklesIcon, TrashIcon, PlusIcon, UserGroupIcon, XCircleIcon, CheckCircleIcon } from '../../constants';
+import ReactMarkdown from 'react-markdown';
+import { GeneratedResources, SchemeWeek, SavedScheme, HistoryEntry, GeneratedHistoryEntry } from '../../types';
+import { AIIcon, SparklesIcon, TrashIcon, PlusIcon, XCircleIcon, CheckCircleIcon } from '../../constants';
 
 const HistoryIcon = ({className}: {className?: string}) => <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${className || ''}`.trim()} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 8l0 4l2 2" /><path d="M3.05 11a9 9 0 1 1 .5 4m-3.55 -4a9 9 0 0 1 12.5 -5" /><path d="M3 4v4h4" /></svg>;
+const FolderIcon = ({className}: {className?: string}) => <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${className || ''}`.trim()} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2" /></svg>;
 
 
 // --- SUB-COMPONENTS ---
 
-const GeneratingScreen: React.FC = () => {
-    // ... Implementation from previous state ...
-    return <div className="p-6 text-center">Generating...</div>;
-};
+const GeneratingScreen: React.FC = () => (
+    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-50">
+        <SparklesIcon className="w-16 h-16 text-white animate-spin" />
+        <p className="text-white font-semibold mt-4 text-lg">Generating Your Resources...</p>
+        <p className="text-white/80 mt-2 text-sm max-w-xs text-center">This may take a moment as the AI builds everything for you.</p>
+    </div>
+);
 
 const SchemeInput: React.FC<{ scheme: SchemeWeek[]; setScheme: React.Dispatch<React.SetStateAction<SchemeWeek[]>> }> = ({ scheme, setScheme }) => {
   const handleTopicChange = (weekIndex: number, value: string) => {
@@ -105,6 +112,39 @@ const HistoryModal: React.FC<{ isOpen: boolean; onClose: () => void; history: Hi
     );
 };
 
+const GeneratedHistoryModal: React.FC<{ isOpen: boolean; onClose: () => void; history: GeneratedHistoryEntry[]; onLoad: (entry: GeneratedHistoryEntry) => void; onClear: () => void; }> = ({ isOpen, onClose, history, onLoad, onClear }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[80vh] flex flex-col">
+                <div className="p-4 border-b flex justify-between items-center">
+                    <h3 className="text-lg font-bold text-gray-800">Load Generated Plan</h3>
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><XCircleIcon className="w-7 h-7" /></button>
+                </div>
+                <div className="flex-grow p-4 space-y-2 overflow-y-auto">
+                    {history.length > 0 ? history.map(entry => (
+                        <div key={entry.lastUpdated} className="p-3 bg-gray-50 rounded-lg flex items-center justify-between">
+                            <div>
+                                <p className="font-bold text-gray-800">{entry.subject}</p>
+                                <p className="text-sm text-gray-600">{entry.className}</p>
+                                <p className="text-xs text-gray-400 mt-1">Generated: {new Date(entry.lastUpdated).toLocaleString()}</p>
+                            </div>
+                            <button onClick={() => onLoad(entry)} className="px-3 py-1.5 text-sm font-semibold bg-purple-600 text-white rounded-lg hover:bg-purple-700">View</button>
+                        </div>
+                    )) : <p className="text-center text-gray-500 py-8">No saved generated plans.</p>}
+                </div>
+                {history.length > 0 && (
+                    <div className="p-4 border-t">
+                        <button onClick={onClear} className="w-full py-2 text-sm text-red-600 bg-red-50 rounded-lg hover:bg-red-100">Clear Saved Plans</button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+
 const Toast: React.FC<{ message: string; onClear: () => void; }> = ({ message, onClear }) => {
     useEffect(() => {
         const timer = setTimeout(onClear, 3000);
@@ -129,22 +169,31 @@ const LessonPlannerScreen: React.FC<{ navigateTo: (view: string, title: string, 
     const [term3Scheme, setTerm3Scheme] = useState<SchemeWeek[]>([]);
     const [activeTerm, setActiveTerm] = useState<'term1' | 'term2' | 'term3'>('term1');
     const [isGenerating, setIsGenerating] = useState(false);
-    const [history, setHistory] = useState<HistoryEntry[]>([]);
-    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [schemeHistory, setSchemeHistory] = useState<HistoryEntry[]>([]);
+    const [generatedHistory, setGeneratedHistory] = useState<GeneratedHistoryEntry[]>([]);
+    const [isSchemeHistoryOpen, setIsSchemeHistoryOpen] = useState(false);
+    const [isGeneratedHistoryOpen, setIsGeneratedHistoryOpen] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
 
-    const LESSON_PLANNER_HISTORY_KEY = 'lessonPlannerHistory_v2';
+    const SCHEME_HISTORY_KEY = 'lessonPlannerHistory_v2';
+    const GENERATED_HISTORY_KEY = 'generatedLessonPlanHistory_v1';
 
     useEffect(() => {
         try {
-            const savedHistory = localStorage.getItem(LESSON_PLANNER_HISTORY_KEY);
-            if (savedHistory) {
-                setHistory(JSON.parse(savedHistory));
-            }
+            const savedSchemeHistory = localStorage.getItem(SCHEME_HISTORY_KEY);
+            if (savedSchemeHistory) setSchemeHistory(JSON.parse(savedSchemeHistory));
+            
+            const savedGeneratedHistory = localStorage.getItem(GENERATED_HISTORY_KEY);
+            if (savedGeneratedHistory) setGeneratedHistory(JSON.parse(savedGeneratedHistory));
         } catch (error) {
             console.error("Failed to parse history from localStorage", error);
         }
     }, []);
+
+    const hasSchemeContent = useMemo(() => {
+        const checkScheme = (scheme: SchemeWeek[]) => scheme.some(week => week.topic.trim() !== '');
+        return checkScheme(term1Scheme) || checkScheme(term2Scheme) || checkScheme(term3Scheme);
+    }, [term1Scheme, term2Scheme, term3Scheme]);
 
     const handleSaveScheme = useCallback(() => {
         if (!subject.trim() || !className.trim()) {
@@ -159,7 +208,7 @@ const LessonPlannerScreen: React.FC<{ navigateTo: (view: string, title: string, 
             term3Scheme,
             lastUpdated: new Date().toISOString()
         };
-        const newHistory = [...history];
+        const newHistory = [...schemeHistory];
         const existingIndex = newHistory.findIndex(h => h.subject.toLowerCase() === subject.toLowerCase() && h.className.toLowerCase() === className.toLowerCase());
         
         if (existingIndex > -1) {
@@ -168,27 +217,41 @@ const LessonPlannerScreen: React.FC<{ navigateTo: (view: string, title: string, 
             newHistory.push(newEntry);
         }
         
-        localStorage.setItem(LESSON_PLANNER_HISTORY_KEY, JSON.stringify(newHistory));
-        setHistory(newHistory);
+        localStorage.setItem(SCHEME_HISTORY_KEY, JSON.stringify(newHistory));
+        setSchemeHistory(newHistory);
         setToastMessage('Scheme of work saved!');
-    }, [subject, className, term1Scheme, term2Scheme, term3Scheme, history]);
+    }, [subject, className, term1Scheme, term2Scheme, term3Scheme, schemeHistory]);
     
-    const handleLoadFromHistory = useCallback((entry: HistoryEntry) => {
+    const handleLoadFromSchemeHistory = useCallback((entry: HistoryEntry) => {
         setSubject(entry.subject);
         setClassName(entry.className);
         setTerm1Scheme(entry.term1Scheme);
         setTerm2Scheme(entry.term2Scheme);
         setTerm3Scheme(entry.term3Scheme);
-        setIsHistoryOpen(false);
+        setIsSchemeHistoryOpen(false);
         setToastMessage(`Loaded scheme for ${entry.subject} - ${entry.className}.`);
     }, []);
 
-    const handleClearHistory = useCallback(() => {
+    const handleClearSchemeHistory = useCallback(() => {
         if (window.confirm("Are you sure you want to clear all saved schemes? This cannot be undone.")) {
-            localStorage.removeItem(LESSON_PLANNER_HISTORY_KEY);
-            setHistory([]);
-            setIsHistoryOpen(false);
-            setToastMessage('History cleared.');
+            localStorage.removeItem(SCHEME_HISTORY_KEY);
+            setSchemeHistory([]);
+            setIsSchemeHistoryOpen(false);
+            setToastMessage('Scheme history cleared.');
+        }
+    }, []);
+
+    const handleLoadFromGeneratedHistory = useCallback((entry: GeneratedHistoryEntry) => {
+        setIsGeneratedHistoryOpen(false);
+        navigateTo('lessonPlanDetail', `AI Plan: ${entry.subject}`, { resources: entry.resources });
+    }, [navigateTo]);
+
+    const handleClearGeneratedHistory = useCallback(() => {
+        if (window.confirm("Are you sure you want to clear all saved generated plans? This cannot be undone.")) {
+            localStorage.removeItem(GENERATED_HISTORY_KEY);
+            setGeneratedHistory([]);
+            setIsGeneratedHistoryOpen(false);
+            setToastMessage('Saved plans history cleared.');
         }
     }, []);
 
@@ -196,10 +259,141 @@ const LessonPlannerScreen: React.FC<{ navigateTo: (view: string, title: string, 
     const currentScheme = schemes[activeTerm];
     const setCurrentScheme = { term1: setTerm1Scheme, term2: setTerm2Scheme, term3: setTerm3Scheme }[activeTerm];
 
-    const handleGenerate = async () => { /* ... AI generation logic ... */ };
+    const handleGenerate = async () => {
+        if (!subject.trim() || !className.trim() || !hasSchemeContent) {
+            alert("Please provide a subject, class name, and at least one topic in a term's scheme of work.");
+            return;
+        }
+        setIsGenerating(true);
+        try {
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+            const prompt = `You are an expert curriculum and assessment designer for the Nigerian secondary school system. Based on the provided schemes of work for ${subject} in ${className}, generate a complete set of educational resources for the entire academic year (First, Second, and Third Terms).
+
+For EACH of the three terms for which a scheme is provided, you must generate:
+1.  **A list of weekly Lesson Plans**: Each plan should have clear objectives, required materials, step-by-step teaching activities, key vocabulary, and assessment methods.
+2.  **A list of Assessments**: Create one major assessment for each term (e.g., a Test or Exam) with a variety of question types (multiple-choice, short-answer, theory), including correct answers and explanations.
+
+Here is the user-provided scheme of work:
+First Term Topics: ${JSON.stringify(term1Scheme)}
+Second Term Topics: ${JSON.stringify(term2Scheme)}
+Third Term Topics: ${JSON.stringify(term3Scheme)}
+
+Return the entire output in a single JSON object that strictly adheres to the provided schema. The 'schemeOfWork' in your response should be a simplified version containing just the week and main topic for each term provided.`;
+
+            const responseSchema = {
+                type: Type.OBJECT,
+                properties: {
+                    subject: { type: Type.STRING },
+                    className: { type: Type.STRING },
+                    terms: {
+                        type: Type.ARRAY,
+                        items: {
+                            type: Type.OBJECT,
+                            properties: {
+                                term: { type: Type.STRING },
+                                schemeOfWork: {
+                                    type: Type.ARRAY,
+                                    items: {
+                                        type: Type.OBJECT,
+                                        properties: { week: { type: Type.INTEGER }, topic: { type: Type.STRING } },
+                                        required: ['week', 'topic']
+                                    }
+                                },
+                                lessonPlans: {
+                                    type: Type.ARRAY,
+                                    items: {
+                                        type: Type.OBJECT,
+                                        properties: {
+                                            week: { type: Type.INTEGER },
+                                            topic: { type: Type.STRING },
+                                            objectives: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                            materials: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                            teachingSteps: {
+                                                type: Type.ARRAY,
+                                                items: {
+                                                    type: Type.OBJECT,
+                                                    properties: { step: { type: Type.STRING }, description: { type: Type.STRING } },
+                                                    required: ['step', 'description']
+                                                }
+                                            },
+                                            duration: { type: Type.STRING },
+                                            keyVocabulary: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                            assessmentMethods: { type: Type.ARRAY, items: { type: Type.STRING } }
+                                        },
+                                        required: ['week', 'topic', 'objectives', 'materials', 'teachingSteps', 'duration', 'keyVocabulary', 'assessmentMethods']
+                                    }
+                                },
+                                assessments: {
+                                    type: Type.ARRAY,
+                                    items: {
+                                        type: Type.OBJECT,
+                                        properties: {
+                                            type: { type: Type.STRING },
+                                            totalMarks: { type: Type.INTEGER },
+                                            questions: {
+                                                type: Type.ARRAY,
+                                                items: {
+                                                    type: Type.OBJECT,
+                                                    properties: {
+                                                        id: { type: Type.INTEGER },
+                                                        question: { type: Type.STRING },
+                                                        type: { type: Type.STRING },
+                                                        options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                                                        answer: { type: Type.STRING },
+                                                        explanation: { type: Type.STRING },
+                                                        marks: { type: Type.INTEGER }
+                                                    },
+                                                    required: ['id', 'question', 'type', 'answer', 'marks']
+                                                }
+                                            }
+                                        },
+                                        required: ['type', 'totalMarks', 'questions']
+                                    }
+                                }
+                            },
+                            required: ['term', 'schemeOfWork', 'lessonPlans', 'assessments']
+                        }
+                    },
+                },
+                required: ['subject', 'className', 'terms']
+            };
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema,
+                }
+            });
+
+            const resources: GeneratedResources = JSON.parse(response.text.trim());
+            
+            const newGeneratedEntry: GeneratedHistoryEntry = {
+                subject: resources.subject,
+                className: resources.className,
+                lastUpdated: new Date().toISOString(),
+                resources: resources,
+            };
+
+            const newGeneratedHistory = [newGeneratedEntry, ...generatedHistory];
+            localStorage.setItem(GENERATED_HISTORY_KEY, JSON.stringify(newGeneratedHistory));
+            setGeneratedHistory(newGeneratedHistory);
+
+            navigateTo('lessonPlanDetail', `AI Plan: ${resources.subject}`, { resources });
+
+        } catch (error) {
+            console.error("AI Generation Error:", error);
+            alert("An error occurred while generating resources. The AI might be busy, or the request was too complex. Please try again with a simpler scheme.");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     return (
-        <div className="flex flex-col h-full bg-gray-100">
+        <div className="flex flex-col h-full bg-gray-100 relative">
+            {isGenerating && <GeneratingScreen />}
             <main className="flex-grow p-4 space-y-5 overflow-y-auto pb-24">
                 <div className="bg-gray-100 p-4 rounded-xl text-center border border-gray-200">
                     <SparklesIcon className="h-10 w-10 mx-auto text-gray-500 mb-2" />
@@ -218,10 +412,16 @@ const LessonPlannerScreen: React.FC<{ navigateTo: (view: string, title: string, 
                             <input id="className" type="text" value={className} onChange={e => setClassName(e.target.value)} required className="w-full p-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg"/>
                         </div>
                     </div>
-                    <button type="button" onClick={() => setIsHistoryOpen(true)} className="w-full flex items-center justify-center space-x-2 py-2 text-sm font-semibold text-gray-700 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400">
-                        <HistoryIcon className="w-4 h-4"/>
-                        <span>Load from History</span>
-                    </button>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button type="button" onClick={() => setIsSchemeHistoryOpen(true)} className="w-full flex items-center justify-center space-x-2 py-2 text-sm font-semibold text-gray-700 border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-100 hover:border-gray-400">
+                            <HistoryIcon className="w-4 h-4"/>
+                            <span>Load Scheme</span>
+                        </button>
+                        <button type="button" onClick={() => setIsGeneratedHistoryOpen(true)} className="w-full flex items-center justify-center space-x-2 py-2 text-sm font-semibold text-purple-700 border-2 border-dashed border-purple-300 rounded-lg hover:bg-purple-50 hover:border-purple-400">
+                            <FolderIcon className="w-4 h-4"/>
+                            <span>Saved Plans</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="bg-white p-4 rounded-xl shadow-sm">
@@ -236,12 +436,17 @@ const LessonPlannerScreen: React.FC<{ navigateTo: (view: string, title: string, 
             
             <footer className="p-4 bg-white/80 backdrop-blur-sm border-t border-gray-200 grid grid-cols-2 gap-3 sticky bottom-0">
                 <button type="button" onClick={handleSaveScheme} className="w-full py-3 px-4 font-medium text-gray-800 bg-gray-200 rounded-lg shadow-sm hover:bg-gray-300">Save Scheme</button>
-                <button type="button" onClick={handleGenerate} disabled={isGenerating || !subject || !className || term1Scheme.length === 0} className="w-full flex justify-center items-center space-x-2 py-3 px-4 font-medium text-white bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400">
+                <button 
+                    type="button" 
+                    onClick={handleGenerate} 
+                    disabled={isGenerating || !subject.trim() || !className.trim() || !hasSchemeContent}
+                    className="w-full flex justify-center items-center space-x-2 py-3 px-4 font-medium text-white bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400">
                     <SparklesIcon className="h-5 h-5" /><span>Generate Resources</span>
                 </button>
             </footer>
             
-            <HistoryModal isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} history={history} onLoad={handleLoadFromHistory} onClear={handleClearHistory} />
+            <HistoryModal isOpen={isSchemeHistoryOpen} onClose={() => setIsSchemeHistoryOpen(false)} history={schemeHistory} onLoad={handleLoadFromSchemeHistory} onClear={handleClearSchemeHistory} />
+            <GeneratedHistoryModal isOpen={isGeneratedHistoryOpen} onClose={() => setIsGeneratedHistoryOpen(false)} history={generatedHistory} onLoad={handleLoadFromGeneratedHistory} onClear={handleClearGeneratedHistory} />
             {toastMessage && <Toast message={toastMessage} onClear={() => setToastMessage('')} />}
         </div>
     );

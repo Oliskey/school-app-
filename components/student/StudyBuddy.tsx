@@ -40,6 +40,7 @@ const StudyBuddy: React.FC = () => {
             model: 'gemini-2.5-flash',
             config: {
                 systemInstruction: 'You are a friendly and encouraging study buddy for a high school student. Help them understand concepts without giving away the direct answer. Use simple language and lots of examples. Format your responses with markdown.',
+                thinkingConfig: { thinkingBudget: 0 }, // Added for faster responses
             },
         });
     }, []);

@@ -33,7 +33,10 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ dashboardType, onBack }) =>
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         chatRef.current = ai.chats.create({
             model: 'gemini-2.5-flash',
-            config: { systemInstruction },
+            config: { 
+                systemInstruction,
+                thinkingConfig: { thinkingBudget: 0 }, // Added for faster responses
+            },
         });
     }, [dashboardType]);
 

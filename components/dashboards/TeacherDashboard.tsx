@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { DashboardType, Teacher } from '../../types';
 import { THEME_CONFIG } from '../../constants';
@@ -38,9 +39,9 @@ import NewChatScreen from '../teacher/NewChatScreen';
 import TeacherReportCardPreviewScreen from '../teacher/TeacherReportCardPreviewScreen';
 import NotificationsScreen from '../shared/NotificationsScreen';
 import TeacherUnifiedAttendanceScreen from '../teacher/TeacherUnifiedAttendanceScreen';
-// FIX: Changed to default import as the component will be fixed to have a default export.
 import LessonPlannerScreen from '../teacher/LessonPlannerScreen';
 import LessonPlanDetailScreen from '../teacher/LessonPlanDetailScreen';
+import DetailedLessonNoteScreen from '../teacher/DetailedLessonNoteScreen';
 import SelectTermForReportScreen from '../teacher/SelectTermForReportScreen';
 import ProfessionalDevelopmentScreen from '../teacher/ProfessionalDevelopmentScreen';
 import AIPerformanceSummaryScreen from '../teacher/AIPerformanceSummaryScreen';
@@ -143,6 +144,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     teacherChangePassword: TeacherChangePasswordScreen,
     lessonPlanner: LessonPlannerScreen,
     lessonPlanDetail: LessonPlanDetailScreen,
+    detailedLessonNote: DetailedLessonNoteScreen,
     notifications: (props: any) => <NotificationsScreen {...props} userType="teacher" />,
     selectTermForReport: SelectTermForReportScreen,
     professionalDevelopment: ProfessionalDevelopmentScreen,

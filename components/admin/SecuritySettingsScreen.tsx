@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheckIcon, LoginIcon } from '../../constants';
 
-const SecuritySettingsScreen: React.FC<{ navigateTo: (view: string, props: any, title: string) => void; }> = ({ navigateTo }) => {
+const SecuritySettingsScreen: React.FC<{ navigateTo: (view: string, title: string, props?: any) => void; }> = ({ navigateTo }) => {
     const [twoFactor, setTwoFactor] = useState(false);
     const [passwordPolicy, setPasswordPolicy] = useState({
         minLength: 8,

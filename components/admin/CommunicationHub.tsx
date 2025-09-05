@@ -56,7 +56,8 @@ const CommunicationHub: React.FC = () => {
                         title: { type: Type.STRING, description: 'A concise and informative title for the announcement.' },
                         message: { type: Type.STRING, description: 'The full message body of the announcement, written in a clear, friendly, and professional tone. Use newline characters for paragraphs.' }
                     }
-                }
+                },
+                thinkingConfig: { thinkingBudget: 0 }, // Added for faster responses
             }
         });
         const jsonResponse = JSON.parse(response.text.trim());

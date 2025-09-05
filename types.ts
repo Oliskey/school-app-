@@ -1,3 +1,4 @@
+
 export enum DashboardType {
   Admin = 'Admin',
   Teacher = 'Teacher',
@@ -665,11 +666,25 @@ export interface TermResources {
   assessments: GeneratedAssessment[];
 }
 
+export interface DetailedNote {
+  topic: string;
+  note: string;
+}
+
 export interface GeneratedResources {
   subject: string;
   className: string;
   terms: TermResources[];
+  detailedNotes?: DetailedNote[];
 }
+
+export interface GeneratedHistoryEntry {
+  subject: string;
+  className: string;
+  lastUpdated: string; // ISO string
+  resources: GeneratedResources;
+}
+
 
 // For Health & Wellness Module
 export interface HealthLogEntry {
