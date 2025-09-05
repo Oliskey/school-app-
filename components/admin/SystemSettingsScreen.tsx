@@ -2,7 +2,7 @@ import React from 'react';
 import { ShieldCheckIcon, CalendarIcon, DollarSignIcon, MegaphoneIcon, BriefcaseIcon, PaintBrushIcon, ChevronRightIcon } from '../../constants';
 
 interface SystemSettingsScreenProps {
-  navigateTo: (view: string, props: any, title: string) => void;
+  navigateTo: (view: string, title: string, props?: any) => void;
 }
 
 const settingsCategories = [
@@ -20,7 +20,7 @@ const SystemSettingsScreen: React.FC<SystemSettingsScreenProps> = ({ navigateTo 
       {settingsCategories.map(cat => (
         <button
           key={cat.view}
-          onClick={() => navigateTo(cat.view, {}, cat.title)}
+          onClick={() => navigateTo(cat.view, cat.title, {})}
           className="w-full bg-white rounded-xl shadow-sm p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center space-x-4">

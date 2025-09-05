@@ -72,7 +72,7 @@ const AIParentingTipsScreen: React.FC<AIParentingTipsScreenProps> = ({ student }
                     }
                 });
 
-                const jsonResponse = JSON.parse(response.text);
+                const jsonResponse = JSON.parse(response.text.trim());
                 if (jsonResponse.tips) {
                     setTips(jsonResponse.tips);
                 } else {

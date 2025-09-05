@@ -1,13 +1,13 @@
-
 import React from 'react';
 import {
   BookOpenIcon,
   ChevronRightIcon,
   CalendarIcon,
-  CameraIcon,
   ViewGridIcon,
   TeacherAttendanceIcon,
-  ClipboardListIcon
+  ClipboardListIcon,
+  BriefcaseIcon,
+  GameControllerIcon
 } from '../../constants';
 import { ClassInfo, Teacher } from '../../types';
 import { THEME_CONFIG, SUBJECT_COLORS } from '../../constants';
@@ -32,10 +32,10 @@ const TeacherOverview: React.FC<TeacherOverviewProps> = ({ navigateTo }) => {
   const quickActions = [
       { label: 'Attendance', icon: <TeacherAttendanceIcon className="h-7 w-7"/>, action: () => navigateTo('unifiedAttendance', 'Mark Attendance') },
       { label: 'Assignments', icon: <ClipboardListIcon className="h-7 w-7"/>, action: () => navigateTo('assignmentsList', 'Manage Assignments') },
-      { label: 'Lesson Planner', icon: <BookOpenIcon className="h-7 w-7"/>, action: () => navigateTo('lessonPlanner', 'Lesson Planner') },
+      { label: 'AI Planner', icon: <BriefcaseIcon className="h-7 w-7"/>, action: () => navigateTo('lessonPlanner', 'AI Lesson Planner') },
+      { label: 'Games Library', icon: <GameControllerIcon className="h-7 w-7"/>, action: () => navigateTo('educationalGames', 'Educational Games') },
       { label: 'Timetable', icon: <ViewGridIcon className="h-7 w-7"/>, action: () => navigateTo('timetable', 'My Timetable') },
       { label: 'Calendar', icon: <CalendarIcon className="h-7 w-7"/>, action: () => navigateTo('calendar', 'School Calendar') },
-      { label: 'Gallery', icon: <CameraIcon className="h-7 w-7"/>, action: () => navigateTo('gallery', 'Photo Gallery') },
   ];
 
   return (
@@ -76,12 +76,12 @@ const TeacherOverview: React.FC<TeacherOverviewProps> = ({ navigateTo }) => {
           {teacherClasses.map(cls => (
             <button key={cls.id} onClick={() => navigateTo('classDetail', `Grade ${cls.grade}${cls.section}`, { classInfo: cls })} className="w-full flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:bg-purple-50 transition-colors">
               <div className="flex items-center space-x-4">
-                <div className={`w-12 h-12 rounded-lg ${SUBJECT_COLORS[cls.subject]} flex items-center justify-center font-bold text-xl`}>
-                    {cls.grade}{cls.section}
+                <div className={`w-12 h-12 rounded-lg ${SUBJECT_COLORS[cls.subject]} flex items-center justify-center`}>
+                  <BookOpenIcon className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                    <p className="font-bold text-gray-800 text-left">Grade {cls.grade}{cls.section}</p>
-                    <p className="text-sm text-gray-600 text-left">{cls.studentCount} Students</p>
+                  <p className="font-bold text-gray-800 text-left">{cls.subject}</p>
+                  <p className="text-sm text-gray-600 text-left">Grade {cls.grade}{cls.section} &bull; {cls.studentCount} Students</p>
                 </div>
               </div>
               <ChevronRightIcon className="text-gray-400" />

@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { StudentsIcon, ChevronRightIcon, gradeColors } from '../../constants';
 import { mockStudents } from '../../data';
 
 interface ClassListScreenProps {
-  navigateTo: (view: string, props: any, title: string) => void;
+  navigateTo: (view: string, title: string, props?: any) => void;
 }
 
 interface ClassData {
@@ -46,7 +45,7 @@ const ClassListScreen: React.FC<ClassListScreenProps> = ({ navigateTo }) => {
                                 {Object.keys(sections).sort().map(section => (
                                     <button 
                                         key={section}
-                                        onClick={() => navigateTo('studentList', { filter: { grade, section } }, `Grade ${grade}${section}`)}
+                                        onClick={() => navigateTo('studentList', `Grade ${grade}${section}`, { filter: { grade, section } })}
                                         className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                                         aria-label={`Manage Grade ${grade} Section ${section}`}
                                     >

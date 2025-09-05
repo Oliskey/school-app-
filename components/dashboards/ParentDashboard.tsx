@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { DashboardType, Student, BehaviorNote, StudentAttendance, AttendanceStatus, StudentAssignment } from '../../types';
 import { 
@@ -478,7 +477,8 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePa
     const [activeBottomNav, setActiveBottomNav] = useState('home');
 
     useEffect(() => {
-        setIsHomePage(viewStack.length === 1);
+        const currentView = viewStack[viewStack.length - 1];
+        setIsHomePage(currentView.view === 'dashboard');
     }, [viewStack, setIsHomePage]);
 
     const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('parent')).length;
@@ -567,11 +567,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePa
             />
             <div className="flex-grow overflow-y-auto" style={{marginTop: '-4rem'}}>
                 <div className="pt-16">
-                    {ComponentToRender ? (
-                        <ComponentToRender {...currentNavigation.props} {...commonProps} />
-                    ) : (
-                         <div className="p-6">View not found: {currentNavigation.view}</div>
-                    )}
+                    <div key={viewStack.length} className="animate-slide-in-up">
+                        {ComponentToRender ? (
+                            <ComponentToRender {...currentNavigation.props} {...commonProps} />
+                        ) : (
+                             <div className="p-6">View not found: {currentNavigation.view}</div>
+                        )}
+                    </div>
                 </div>
             </div>
              <ParentBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />

@@ -1,17 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
-import { DashboardType } from '../../types';
+import { DashboardType, Teacher } from '../../types';
 import { THEME_CONFIG } from '../../constants';
 import Header from '../ui/Header';
 import { TeacherBottomNav } from '../ui/DashboardBottomNav';
-import { mockNotifications } from '../../data';
+import { mockNotifications, mockTeachers } from '../../data';
 
 // Import all view components
 import TeacherOverview from '../teacher/TeacherOverview';
 import ClassDetailScreen from '../teacher/ClassDetailScreen';
 import StudentProfileScreen from '../teacher/StudentProfileScreen';
 import TeacherExamManagement from '../teacher/TeacherExamManagement';
-import TeacherAttendanceScreen from '../teacher/TeacherAttendanceScreen';
 import LibraryScreen from '../shared/LibraryScreen';
 import PhotoGalleryScreen from '../teacher/PhotoGalleryScreen';
 import AddExamScreen from '../admin/AddExamScreen';
@@ -40,9 +38,13 @@ import NewChatScreen from '../teacher/NewChatScreen';
 import TeacherReportCardPreviewScreen from '../teacher/TeacherReportCardPreviewScreen';
 import NotificationsScreen from '../shared/NotificationsScreen';
 import TeacherUnifiedAttendanceScreen from '../teacher/TeacherUnifiedAttendanceScreen';
+// FIX: Changed to default import as the component will be fixed to have a default export.
 import LessonPlannerScreen from '../teacher/LessonPlannerScreen';
 import LessonPlanDetailScreen from '../teacher/LessonPlanDetailScreen';
 import SelectTermForReportScreen from '../teacher/SelectTermForReportScreen';
+import ProfessionalDevelopmentScreen from '../teacher/ProfessionalDevelopmentScreen';
+import AIPerformanceSummaryScreen from '../teacher/AIPerformanceSummaryScreen';
+import EducationalGamesScreen from '../teacher/EducationalGamesScreen';
 
 
 interface ViewStackItem {
@@ -56,12 +58,15 @@ interface TeacherDashboardProps {
     setIsHomePage: (isHome: boolean) => void;
 }
 
+const LOGGED_IN_TEACHER_ID = 2;
+
 const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHomePage }) => {
   const [viewStack, setViewStack] = useState<ViewStackItem[]>([{ view: 'overview', title: 'Teacher Dashboard', props: {} }]);
   const [activeBottomNav, setActiveBottomNav] = useState('home');
 
   useEffect(() => {
-    setIsHomePage(viewStack.length === 1);
+    const currentView = viewStack[viewStack.length - 1];
+    setIsHomePage(currentView.view === 'overview');
   }, [viewStack, setIsHomePage]);
 
   const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('teacher')).length;
@@ -109,7 +114,6 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     classDetail: ClassDetailScreen,
     studentProfile: StudentProfileScreen,
     examManagement: TeacherExamManagement,
-    attendance: TeacherAttendanceScreen,
     unifiedAttendance: TeacherUnifiedAttendanceScreen,
     library: LibraryScreen,
     gallery: PhotoGalleryScreen,
@@ -128,7 +132,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     reportCardInput: ReportCardInputScreen,
     collaborationForum: CollaborationForumScreen,
     forumTopic: ForumTopicScreen,
-    timetable: TimetableScreen,
+    timetable: (props) => <TimetableScreen {...props} context={{ userType: 'teacher', userId: LOGGED_IN_TEACHER_ID }} />,
     chat: (props: any) => <ChatScreen {...props} currentUserId={2} />,
     reports: TeacherReportsScreen,
     reportCardPreview: TeacherReportCardPreviewScreen,
@@ -139,8 +143,11 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     teacherChangePassword: TeacherChangePasswordScreen,
     lessonPlanner: LessonPlannerScreen,
     lessonPlanDetail: LessonPlanDetailScreen,
-    notifications: (props: any) => <NotificationsScreen {...props} userType="teacher" navigateTo={navigateTo} />,
+    notifications: (props: any) => <NotificationsScreen {...props} userType="teacher" />,
     selectTermForReport: SelectTermForReportScreen,
+    professionalDevelopment: ProfessionalDevelopmentScreen,
+    aiPerformanceSummary: AIPerformanceSummaryScreen,
+    educationalGames: EducationalGamesScreen,
   };
 
   const currentNavigation = viewStack[viewStack.length - 1];
@@ -165,11 +172,13 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
       />
       <div className="flex-grow overflow-y-auto">
         <main className="min-h-full">
-            {ComponentToRender ? (
-                <ComponentToRender {...currentNavigation.props} {...commonProps} />
-            ) : (
-                 <div className="p-6">View not found: {currentNavigation.view}</div>
-            )}
+            <div key={viewStack.length} className="animate-slide-in-up">
+              {ComponentToRender ? (
+                  <ComponentToRender {...currentNavigation.props} {...commonProps} />
+              ) : (
+                   <div className="p-6">View not found: {currentNavigation.view}</div>
+              )}
+            </div>
         </main>
       </div>
       <TeacherBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />

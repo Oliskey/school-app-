@@ -1,29 +1,39 @@
-
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CameraIcon, UserIcon, MailIcon, PhoneIcon } from '../../constants';
+import { Student, Department } from '../../types';
 
-const FormInput = ({ id, label, placeholder, type = 'text', icon }: { id: string, label: string, placeholder: string, type?: string, icon: React.ReactNode }) => (
-    <div>
-        <label htmlFor={id} className="text-sm font-medium text-gray-600 sr-only">{label}</label>
-        <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                {icon}
-            </span>
-            <input
-                type={type}
-                name={id}
-                id={id}
-                className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500"
-                placeholder={placeholder}
-            />
-        </div>
-    </div>
-);
+interface AddStudentScreenProps {
+    studentToEdit?: Student;
+}
 
-const AddStudentScreen: React.FC = () => {
+const AddStudentScreen: React.FC<AddStudentScreenProps> = ({ studentToEdit }) => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [fullName, setFullName] = useState('');
+    const [age, setAge] = useState('');
+    const [gender, setGender] = useState('');
+    const [className, setClassName] = useState('');
+    const [section, setSection] = useState('');
+    const [department, setDepartment] = useState<Department | ''>('');
+    
+    // Guardian states can remain simple as they are not on the student object
+    const [guardianName, setGuardianName] = useState('');
+    const [guardianPhone, setGuardianPhone] = useState('');
+    const [guardianEmail, setGuardianEmail] = useState('');
+
+    const grade = useMemo(() => {
+        const match = className.match(/\d+/);
+        return match ? parseInt(match[0], 10) : 0;
+    }, [className]);
+
+    useEffect(() => {
+        if (studentToEdit) {
+            setSelectedImage(studentToEdit.avatarUrl);
+            setFullName(studentToEdit.name);
+            setClassName(`Grade ${studentToEdit.grade}`);
+            setSection(studentToEdit.section);
+            setDepartment(studentToEdit.department || '');
+        }
+    }, [studentToEdit]);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
@@ -36,9 +46,14 @@ const AddStudentScreen: React.FC = () => {
         }
     };
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        alert(`${studentToEdit ? 'Student Updated' : 'Student Saved'} Successfully!`);
+    }
+
     return (
         <div className="flex flex-col h-full bg-gray-50">
-            <form className="flex-grow flex flex-col">
+            <form onSubmit={handleSubmit} className="flex-grow flex flex-col">
                 <main className="flex-grow p-4 space-y-6 overflow-y-auto">
                     {/* Photo Upload */}
                     <div className="flex justify-center">
@@ -63,16 +78,22 @@ const AddStudentScreen: React.FC = () => {
                             <h3 className="font-bold text-sky-800">Student Information</h3>
                         </div>
                         <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
-                            <FormInput id="fullName" label="Full Name" placeholder="Adebayo Adewale" icon={<UserIcon className="w-5 h-5" />} />
+                            <div>
+                                <label htmlFor="fullName" className="text-sm font-medium text-gray-600 sr-only">Full Name</label>
+                                <div className="relative">
+                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><UserIcon className="w-5 h-5" /></span>
+                                    <input type="text" name="fullName" id="fullName" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Adebayo Adewale"/>
+                                </div>
+                            </div>
                             <div className="grid grid-cols-2 gap-4">
                                  <div>
                                     <label htmlFor="age" className="text-sm font-medium text-gray-600 sr-only">Age</label>
-                                    <input type="number" name="age" id="age" className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Age" />
+                                    <input type="number" name="age" id="age" value={age} onChange={e => setAge(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Age" />
                                 </div>
                                  <div>
                                     <label htmlFor="gender" className="text-sm font-medium text-gray-600 sr-only">Gender</label>
-                                    <select id="gender" name="gender" defaultValue="" className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
-                                        <option value="" disabled>Gender</option>
+                                    <select id="gender" name="gender" value={gender} onChange={e => setGender(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
+                                        <option value="">Gender</option>
                                         <option>Male</option>
                                         <option>Female</option>
                                     </select>
@@ -81,21 +102,32 @@ const AddStudentScreen: React.FC = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label htmlFor="class" className="text-sm font-medium text-gray-600 sr-only">Class</label>
-                                    <select id="class" name="class" defaultValue="" className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
-                                        <option value="" disabled>Select Class</option>
-                                        {[...Array(12).keys()].map(i => <option key={i+1}>Grade {i + 1}</option>)}
+                                    <select id="class" name="class" value={className} onChange={e => setClassName(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
+                                        <option value="">Select Class</option>
+                                        {[...Array(12).keys()].map(i => <option key={i+1} value={`Grade ${i + 1}`}>Grade {i + 1}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label htmlFor="section" className="text-sm font-medium text-gray-600 sr-only">Section</label>
-                                    <select id="section" name="section" defaultValue="" className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
-                                        <option value="" disabled>Select Section</option>
+                                    <select id="section" name="section" value={section} onChange={e => setSection(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
+                                        <option value="">Select Section</option>
                                         <option>A</option>
                                         <option>B</option>
                                         <option>C</option>
                                     </select>
                                 </div>
                             </div>
+                            {grade >= 10 && (
+                                <div>
+                                    <label htmlFor="department" className="text-sm font-medium text-gray-600 sr-only">Department</label>
+                                    <select id="department" name="department" value={department} onChange={e => setDepartment(e.target.value as Department | '')} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
+                                        <option value="">Select Department</option>
+                                        <option value="Science">Science</option>
+                                        <option value="Commercial">Commercial</option>
+                                        <option value="Arts">Arts</option>
+                                    </select>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -105,9 +137,18 @@ const AddStudentScreen: React.FC = () => {
                             <h3 className="font-bold text-green-800">Guardian Information</h3>
                         </div>
                         <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
-                            <FormInput id="guardianName" label="Guardian's Name" placeholder="Mr. Adewale" icon={<UserIcon className="w-5 h-5" />} />
-                            <FormInput id="guardianPhone" label="Guardian's Phone" placeholder="+234 801 234 5678" type="tel" icon={<PhoneIcon className="w-5 h-5" />} />
-                            <FormInput id="guardianEmail" label="Guardian's Email" placeholder="guardian@example.com" type="email" icon={<MailIcon className="w-5 h-5" />} />
+                             <div>
+                                <label htmlFor="guardianName" className="text-sm font-medium text-gray-600 sr-only">Guardian's Name</label>
+                                <div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><UserIcon className="w-5 h-5" /></span><input type="text" name="guardianName" id="guardianName" value={guardianName} onChange={e => setGuardianName(e.target.value)} className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Mr. Adewale"/></div>
+                            </div>
+                            <div>
+                                <label htmlFor="guardianPhone" className="text-sm font-medium text-gray-600 sr-only">Guardian's Phone</label>
+                                <div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><PhoneIcon className="w-5 h-5" /></span><input type="tel" name="guardianPhone" id="guardianPhone" value={guardianPhone} onChange={e => setGuardianPhone(e.target.value)} className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="+234 801 234 5678"/></div>
+                            </div>
+                            <div>
+                                <label htmlFor="guardianEmail" className="text-sm font-medium text-gray-600 sr-only">Guardian's Email</label>
+                                <div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><MailIcon className="w-5 h-5" /></span><input type="email" name="guardianEmail" id="guardianEmail" value={guardianEmail} onChange={e => setGuardianEmail(e.target.value)} className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="guardian@example.com"/></div>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -118,7 +159,7 @@ const AddStudentScreen: React.FC = () => {
                         type="submit"
                         className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-sky-500 hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
                     >
-                        Save Student
+                        {studentToEdit ? 'Update Student' : 'Save Student'}
                     </button>
                 </div>
             </form>

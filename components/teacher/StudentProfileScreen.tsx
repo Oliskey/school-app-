@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Student, BehaviorNote } from '../../types';
 import { DocumentTextIcon, BookOpenIcon, ClipboardListIcon, CheckCircleIcon, PlusIcon, SUBJECT_COLORS, ReportIcon } from '../../constants';
@@ -47,7 +48,7 @@ const StudentProfileScreen: React.FC<StudentProfileScreenProps> = ({ student, na
             </div>
             
             <button
-                onClick={() => navigateTo('reportCardInput', 'Input Report Card', { student })}
+                onClick={() => navigateTo('selectTermForReport', 'Select Term', { student })}
                 className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-purple-600 text-white font-semibold rounded-xl shadow-md hover:bg-purple-700 transition-colors"
             >
                 <ReportIcon className="w-5 h-5" />

@@ -1,4 +1,3 @@
-
 export enum DashboardType {
   Admin = 'Admin',
   Teacher = 'Teacher',
@@ -428,7 +427,7 @@ export interface Notification {
   summary: string;
   timestamp: string; // ISO String
   isRead: boolean;
-  audience: Array<'admin' | 'parent' | 'student' | 'teacher'>;
+  audience: Array<'all' | 'admin' | 'parent' | 'student' | 'teacher'>;
   studentId?: number; // Optional, to link to a specific child
   relatedId?: number; // e.g. parentId, eventId, etc.
 }
@@ -562,4 +561,109 @@ export interface LessonPlan {
     description: string;
   }[];
   assessment: string;
+}
+
+export interface PDResource {
+  id: number;
+  type: 'Article' | 'Video' | 'Workshop';
+  title: string;
+  source: string; // e.g., 'Edutopia', 'YouTube', 'School Admin'
+  summary: string;
+  url: string;
+}
+
+// For AI Adventure Quest
+export type AdventureDifficulty = 'Young Explorer (4-7 years)' | 'Brave Adventurer (8-11 years)' | 'Master Sage (12-15 years)';
+
+export interface AdventureQuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correct_answer: string;
+  explanation: string;
+  image_prompt: string;
+  background_theme: string;
+  generated_image_url?: string; // Will be populated later
+}
+
+export interface StudyGuideSection {
+  title: string;
+  content: string;
+}
+
+export interface StudyGuide {
+  title: string;
+  sections: StudyGuideSection[];
+}
+
+export interface AdventureData {
+  study_guide: StudyGuide;
+  quiz: AdventureQuizQuestion[];
+}
+
+export interface UserAnswer {
+  questionId: number;
+  answer: string;
+  isCorrect: boolean;
+}
+
+// For AI Lesson Planner
+export interface SchemeTopic {
+  week: number;
+  topic: string;
+}
+
+export interface GeneratedLessonPlan {
+  week: number;
+  topic: string;
+  objectives: string[];
+  materials: string[];
+  teachingSteps: { step: string; description: string }[];
+  duration: string;
+  keyVocabulary: string[];
+  assessmentMethods: string[];
+}
+
+export interface AssessmentQuestion {
+  id: number;
+  question: string;
+  type: 'multiple-choice' | 'short-answer' | 'theory' | 'practical';
+  options?: string[];
+  answer: string;
+  explanation?: string;
+  marks: number;
+}
+
+export interface GeneratedAssessment {
+  type: 'Test' | 'Assignment' | 'Exam';
+  totalMarks: number;
+  questions: AssessmentQuestion[];
+}
+
+export interface TermResources {
+  term: 'First Term' | 'Second Term' | 'Third Term';
+  schemeOfWork: SchemeTopic[];
+  lessonPlans: GeneratedLessonPlan[];
+  assessments: GeneratedAssessment[];
+}
+
+export interface GeneratedResources {
+  subject: string;
+  className: string;
+  terms: TermResources[];
+}
+
+// For Health & Wellness Module
+export interface HealthLogEntry {
+  id: number;
+  studentId: number;
+  studentName: string;
+  studentAvatar: string;
+  date: string; // ISO string
+  time: string;
+  reason: string; // e.g., 'Headache', 'Fever', 'Minor Injury'
+  notes: string;
+  medicationAdministered?: { name: string; dosage: string; };
+  parentNotified: boolean;
+  recordedBy: string; // Nurse/Admin name
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const PersonalSecuritySettingsScreen: React.FC<{ navigateTo: (view: string, props: any, title: string) => void; }> = ({ navigateTo }) => {
+const PersonalSecuritySettingsScreen: React.FC<{ navigateTo: (view: string, title: string, props?: any) => void; }> = ({ navigateTo }) => {
     const [twoFactor, setTwoFactor] = useState(false);
     return (
         <div className="p-4 space-y-4 bg-gray-50">
@@ -16,7 +16,7 @@ const PersonalSecuritySettingsScreen: React.FC<{ navigateTo: (view: string, prop
                     </button>
                 </div>
                 <div className="mt-4 pt-4 border-t">
-                     <button onClick={() => navigateTo('changePassword', {}, 'Change Password')} className="w-full text-left font-semibold text-gray-700 py-2 hover:text-sky-600">
+                     <button onClick={() => navigateTo('changePassword', 'Change Password', {})} className="w-full text-left font-semibold text-gray-700 py-2 hover:text-sky-600">
                         Change Your Password
                      </button>
                 </div>

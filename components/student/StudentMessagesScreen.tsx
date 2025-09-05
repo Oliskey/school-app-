@@ -38,6 +38,9 @@ const StudentMessagesScreen: React.FC<StudentMessagesScreenProps> = ({ navigateT
     const theme = THEME_CONFIG[DashboardType.Student];
 
     const filteredConversations = useMemo(() => {
+        // For student (Fatima Bello, ID 4), filter conversations where she is a participant.
+        // This logic is slightly mocked as we don't have a true multi-user context.
+        // We'll assume the mockConversations are already tailored for Fatima.
         return mockConversations
             .filter(convo => convo.participant.name.toLowerCase().includes(searchTerm.toLowerCase()))
             .sort((a, b) => new Date(b.lastMessage.timestamp).getTime() - new Date(a.lastMessage.timestamp).getTime());
@@ -66,33 +69,34 @@ const StudentMessagesScreen: React.FC<StudentMessagesScreenProps> = ({ navigateT
             <main className="flex-grow overflow-y-auto">
                 <ul className="divide-y divide-gray-100">
                     {filteredConversations.map(convo => (
-                        <li 
-                            key={convo.id} 
-                            onClick={() => navigateTo('chat', convo.participant.name, { conversation: convo })}
-                            className="p-4 flex items-center space-x-4 hover:bg-orange-50/50 transition-colors cursor-pointer"
-                        >
-                            <div className="relative flex-shrink-0">
-                                <img src={convo.participant.avatarUrl} alt={convo.participant.name} className="w-14 h-14 rounded-full object-cover" />
-                                {convo.unreadCount > 0 && (
-                                    <span className="absolute top-0 right-0 block h-4 w-4 rounded-full bg-red-500 border-2 border-white text-white text-[10px] flex items-center justify-center font-bold">
-                                        {convo.unreadCount}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex-grow overflow-hidden">
-                                <div className="flex justify-between items-center">
-                                    <p className="font-bold text-gray-800 truncate">{convo.participant.name}</p>
-                                    <p className="text-xs text-gray-500 flex-shrink-0 ml-2">{formatDistanceToNow(convo.lastMessage.timestamp)}</p>
+                        <li key={convo.id}>
+                            <button
+                                onClick={() => navigateTo('chat', convo.participant.name, { conversation: convo })}
+                                className="w-full text-left p-4 flex items-center space-x-4 hover:bg-orange-50/50 transition-colors"
+                            >
+                                <div className="relative flex-shrink-0">
+                                    <img src={convo.participant.avatarUrl} alt={convo.participant.name} className="w-14 h-14 rounded-full object-cover" />
+                                    {convo.unreadCount > 0 && (
+                                        <span className="absolute top-0 right-0 block h-5 w-5 rounded-full bg-red-500 border-2 border-white text-white text-[10px] flex items-center justify-center font-bold">
+                                            {convo.unreadCount > 9 ? '9+' : convo.unreadCount}
+                                        </span>
+                                    )}
                                 </div>
-                                <div className="flex justify-between items-start mt-1">
-                                    <p className={`text-sm text-gray-600 truncate ${convo.unreadCount > 0 ? 'font-bold' : 'font-normal'}`}>
-                                        {convo.lastMessage.text}
-                                    </p>
+                                <div className="flex-grow overflow-hidden">
+                                    <div className="flex justify-between items-center">
+                                        <p className="font-bold text-gray-800 truncate">{convo.participant.name}</p>
+                                        <p className="text-xs text-gray-500 flex-shrink-0 ml-2">{formatDistanceToNow(convo.lastMessage.timestamp)}</p>
+                                    </div>
+                                    <div className="flex justify-between items-start mt-1">
+                                        <p className={`text-sm text-gray-600 truncate ${convo.unreadCount > 0 ? 'font-bold' : 'font-normal'}`}>
+                                            {convo.lastMessage.text}
+                                        </p>
+                                    </div>
+                                     <div className="mt-1.5">
+                                        <RoleTag role={convo.participant.role} />
+                                     </div>
                                 </div>
-                                 <div className="mt-1.5">
-                                    <RoleTag role={convo.participant.role} />
-                                 </div>
-                            </div>
+                            </button>
                         </li>
                     ))}
                 </ul>

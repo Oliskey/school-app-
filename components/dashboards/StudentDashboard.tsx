@@ -1,10 +1,11 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { DashboardType, Student, StudentAssignment } from '../../types';
-import { THEME_CONFIG, ClockIcon, ClipboardListIcon, BellIcon, ChartBarIcon, ChevronRightIcon, SUBJECT_COLORS, BookOpenIcon, MegaphoneIcon, AttendanceSummaryIcon, CalendarIcon, ElearningIcon, StudyBuddyIcon, SparklesIcon, ReceiptIcon, AwardIcon, HelpIcon } from '../../constants';
+import { THEME_CONFIG, ClockIcon, ClipboardListIcon, BellIcon, ChartBarIcon, ChevronRightIcon, SUBJECT_COLORS, BookOpenIcon, MegaphoneIcon, AttendanceSummaryIcon, CalendarIcon, ElearningIcon, StudyBuddyIcon, SparklesIcon, ReceiptIcon, AwardIcon, HelpIcon, GameControllerIcon } from '../../constants';
 import Header from '../ui/Header';
 import { StudentBottomNav } from '../ui/DashboardBottomNav';
 import { mockStudents, mockTimetableData, mockAssignments, mockSubmissions, mockNotices, mockNotifications } from '../../data';
+import AdventureQuestHost from '../student/adventure/AdventureQuestHost';
+import ErrorBoundary from '../ui/ErrorBoundary';
 
 // Import all view components
 import StudyBuddy from '../student/StudyBuddy';
@@ -22,6 +23,7 @@ import ResultsScreen from '../student/ResultsScreen';
 import StudentFinanceScreen from '../student/StudentFinanceScreen';
 import AchievementsScreen from '../student/AchievementsScreen';
 import StudentMessagesScreen from '../student/StudentMessagesScreen';
+import NewMessageScreen from '../student/NewMessageScreen';
 import StudentProfileScreen from '../student/StudentProfileScreen';
 import VideoLessonScreen from '../student/VideoLessonScreen';
 import AssignmentSubmissionScreen from '../student/AssignmentSubmissionScreen';
@@ -32,6 +34,10 @@ import ExtracurricularsScreen from '../student/ExtracurricularsScreen';
 import NotificationsScreen from '../shared/NotificationsScreen';
 import QuizzesScreen from '../student/QuizzesScreen';
 import QuizPlayerScreen from '../student/QuizPlayerScreen';
+import GamesHubScreen from '../student/games/GamesHubScreen';
+import MathSprintLobbyScreen from '../student/games/MathSprintLobbyScreen';
+import MathSprintGameScreen from '../student/games/MathSprintGameScreen';
+import MathSprintResultsScreen from '../student/games/MathSprintResultsScreen';
 
 interface ViewStackItem {
   view: string;
@@ -64,7 +70,7 @@ const Overview: React.FC<{ navigateTo: (view: string, title: string, props?: any
     const quickAccessItems = [
         { label: 'Timetable', icon: <CalendarIcon />, action: () => navigateTo('timetable', 'Timetable') },
         { label: 'Attendance', icon: <AttendanceSummaryIcon />, action: () => navigateTo('attendance', 'My Attendance', { studentId: loggedInStudent.id }) },
-        { label: 'Quizzes', icon: <HelpIcon />, action: () => navigateTo('quizzes', 'Gamified Quizzes') },
+        { label: 'Games', icon: <GameControllerIcon />, action: () => navigateTo('gamesHub', 'Games Hub') },
         { label: 'Assignments', icon: <ClipboardListIcon />, action: () => navigateTo('assignments', 'Assignments', { studentId: loggedInStudent.id }) },
     ];
 
@@ -80,6 +86,17 @@ const Overview: React.FC<{ navigateTo: (view: string, title: string, props?: any
                 ))}
             </div>
             
+            <div className="bg-gradient-to-r from-teal-400 to-blue-500 p-4 rounded-2xl shadow-lg flex items-center justify-between text-white">
+                <div>
+                    <h3 className="font-bold text-lg">AI Adventure Quest</h3>
+                    <p className="text-sm opacity-90">Turn any text into a fun quiz!</p>
+                </div>
+                <button onClick={() => navigateTo('adventureQuest', 'AI Adventure Quest', {})} className="bg-white/20 px-4 py-2 rounded-lg font-semibold hover:bg-white/30 transition-colors flex items-center space-x-2">
+                    <SparklesIcon className="h-5 w-5"/>
+                    <span>Start Quest</span>
+                </button>
+            </div>
+
             <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 rounded-2xl shadow-lg flex items-center justify-between text-white">
                 <div>
                     <h3 className="font-bold text-lg">AI Study Buddy</h3>
@@ -154,7 +171,8 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
     const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('student')).length;
     
     useEffect(() => {
-        setIsHomePage(viewStack.length === 1);
+        const currentView = viewStack[viewStack.length - 1];
+        setIsHomePage(currentView.view === 'overview');
     }, [viewStack, setIsHomePage]);
     
     const navigateTo = (view: string, title: string, props: any = {}) => {
@@ -173,14 +191,14 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
             case 'home':
                 setViewStack([{ view: 'overview', title: 'Student Dashboard' }]);
                 break;
-            case 'elearning':
-                setViewStack([{ view: 'library', title: 'E-Learning Library' }]);
+            case 'results':
+                setViewStack([{ view: 'results', title: 'Academic Performance', props: { studentId: loggedInStudent.id } }]);
                 break;
-            case 'activities':
-                setViewStack([{ view: 'extracurriculars', title: 'Activities & Events' }]);
+            case 'games':
+                setViewStack([{ view: 'gamesHub', title: 'Games Hub' }]);
                 break;
-            case 'notifications':
-                setViewStack([{ view: 'notifications', title: 'Notifications' }]);
+            case 'messages':
+                setViewStack([{ view: 'messages', title: 'Messages' }]);
                 break;
             case 'profile':
                 setViewStack([{ view: 'profile', title: 'My Profile', props: { student: loggedInStudent } }]);
@@ -197,12 +215,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
     const viewComponents: { [key: string]: React.ComponentType<any> } = {
         overview: Overview,
         studyBuddy: StudyBuddy,
+        adventureQuest: AdventureQuestHost,
         examSchedule: ExamSchedule,
         noticeboard: (props: any) => <NoticeboardScreen {...props} userType="student" />,
         calendar: CalendarScreen,
         library: LibraryScreen,
         curriculum: CurriculumScreen,
-        timetable: TimetableScreen,
+        timetable: (props) => <TimetableScreen {...props} context={{ userType: 'student', userId: loggedInStudent.id }} />,
         assignments: AssignmentsScreen,
         subjects: SubjectsScreen,
         classroom: ClassroomScreen,
@@ -211,6 +230,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
         finances: StudentFinanceScreen,
         achievements: AchievementsScreen,
         messages: StudentMessagesScreen,
+        newMessage: NewMessageScreen,
         profile: StudentProfileScreen,
         videoLesson: VideoLessonScreen,
         assignmentSubmission: AssignmentSubmissionScreen,
@@ -221,6 +241,10 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
         notifications: (props: any) => <NotificationsScreen {...props} userType="student" navigateTo={navigateTo} />,
         quizzes: QuizzesScreen,
         quizPlayer: QuizPlayerScreen,
+        gamesHub: GamesHubScreen,
+        mathSprintLobby: MathSprintLobbyScreen,
+        mathSprintGame: MathSprintGameScreen,
+        mathSprintResults: MathSprintResultsScreen,
     };
 
     const currentNavigation = viewStack[viewStack.length - 1];
@@ -237,13 +261,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
                 onNotificationClick={handleNotificationClick}
                 notificationCount={notificationCount}
             />
-            <div className="flex-grow overflow-y-auto" style={{marginTop: '-4rem'}}>
-                <div className="pt-16">
-                    {ComponentToRender ? (
-                        <ComponentToRender {...currentNavigation.props} navigateTo={navigateTo} handleBack={handleBack} />
-                    ) : (
-                        <div className="p-6">View not found: {currentNavigation.view}</div>
-                    )}
+            <div className="flex-grow overflow-y-auto h-full" style={{marginTop: '-4rem'}}>
+                <div className="pt-16 h-full">
+                    <ErrorBoundary>
+                        <div key={viewStack.length} className="animate-slide-in-up h-full">
+                            {ComponentToRender ? (
+                                <ComponentToRender {...currentNavigation.props} studentId={loggedInStudent.id} navigateTo={navigateTo} handleBack={handleBack} />
+                            ) : (
+                                <div className="p-6">View not found: {currentNavigation.view}</div>
+                            )}
+                        </div>
+                    </ErrorBoundary>
                 </div>
             </div>
             <StudentBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />

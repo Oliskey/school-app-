@@ -1,26 +1,26 @@
 import React from 'react';
-import { StudentsIcon, StaffIcon, ReportIcon, ViewGridIcon, ReceiptIcon, CalendarIcon, ShieldCheckIcon, ClipboardListIcon, TeacherAttendanceIcon, ExamIcon, ChartBarIcon, BellIcon, ShoppingCartIcon, DocumentTextIcon, SettingsIcon } from '../../constants';
+import { StudentsIcon, StaffIcon, ReportIcon, ViewGridIcon, ReceiptIcon, CalendarIcon, ShieldCheckIcon, ClipboardListIcon, TeacherAttendanceIcon, ExamIcon, ChartBarIcon, BellIcon, ShoppingCartIcon, DocumentTextIcon, SettingsIcon, MessagesIcon, HeartIcon } from '../../constants';
 import { mockStudents, mockTeachers } from '../../data';
 import DonutChart from '../ui/DonutChart';
 
 interface DashboardOverviewProps {
-    navigateTo: (view: string, props: any, title: string) => void;
+    navigateTo: (view: string, title: string, props?: any) => void;
 }
 
 const DashboardOverview: React.FC<DashboardOverviewProps> = ({ navigateTo }) => {
   const gridItems = [
-    { label: 'Manage Classes', icon: <StudentsIcon />, action: () => navigateTo('classList', {}, 'Manage Classes') },
-    { label: 'Manage Staff', icon: <StaffIcon />, action: () => navigateTo('teacherList', {}, 'Teachers') },
-    { label: 'Analytics', icon: <ChartBarIcon />, action: () => navigateTo('analytics', {}, 'School Analytics') },
-    { label: 'Timetable', icon: <ViewGridIcon />, action: () => navigateTo('timetable', {}, 'Create Timetable') },
-    { label: 'Exams', icon: <ExamIcon />, action: () => navigateTo('examManagement', {}, 'Exam Management') },
-    { label: 'Announcements', icon: <BellIcon />, action: () => navigateTo('communicationHub', {}, 'Communication Hub') },
-    { label: 'Fee Management', icon: <ReceiptIcon />, action: () => navigateTo('feeManagement', {}, 'Fee Management') },
-    { label: 'Teacher Attendance', icon: <TeacherAttendanceIcon />, action: () => navigateTo('teacherAttendance', {}, 'Teacher Attendance') },
-    { label: 'System Settings', icon: <SettingsIcon />, action: () => navigateTo('systemSettings', {}, 'System Settings') },
-    { label: 'View Report Cards', icon: <DocumentTextIcon />, action: () => navigateTo('schoolReports', {}, 'School Reports') },
-    { label: 'Publish Reports', icon: <ReportIcon />, action: () => navigateTo('reportCardPublishing', {}, 'Publish Reports') },
-    { label: 'Online Store', icon: <ShoppingCartIcon />, action: () => navigateTo('onlineStore', {}, 'Online Store') },
+    { label: 'Manage Classes', icon: <StudentsIcon />, action: () => navigateTo('classList', 'Manage Classes') },
+    { label: 'Manage Staff', icon: <StaffIcon />, action: () => navigateTo('teacherList', 'Teachers') },
+    { label: 'Analytics', icon: <ChartBarIcon />, action: () => navigateTo('analytics', 'School Analytics') },
+    { label: 'Timetable', icon: <ViewGridIcon />, action: () => navigateTo('timetable', 'Create Timetable') },
+    { label: 'Exams', icon: <ExamIcon />, action: () => navigateTo('examManagement', 'Exam Management') },
+    { label: 'Announcements', icon: <BellIcon />, action: () => navigateTo('communicationHub', 'Communication Hub') },
+    { label: 'Fee Management', icon: <ReceiptIcon />, action: () => navigateTo('feeManagement', 'Fee Management') },
+    { label: 'Teacher Attendance', icon: <TeacherAttendanceIcon />, action: () => navigateTo('teacherAttendance', 'Teacher Attendance') },
+    { label: 'Health Log', icon: <HeartIcon />, action: () => navigateTo('healthLog', 'Health Log') },
+    { label: 'Publish Reports', icon: <ReportIcon />, action: () => navigateTo('reportCardPublishing', 'Publish Reports') },
+    { label: 'Online Store', icon: <ShoppingCartIcon />, action: () => navigateTo('onlineStore', 'Online Store') },
+    { label: 'System Settings', icon: <SettingsIcon />, action: () => navigateTo('systemSettings', 'System Settings') },
   ];
 
   const totalStudents = mockStudents.length;
@@ -32,15 +32,27 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ navigateTo }) => 
     <div className="p-4 space-y-5 bg-gray-100">
       {/* Stat Cards */}
       <div className="grid grid-cols-3 gap-4 text-center">
-        <div className="bg-white p-4 rounded-2xl shadow-sm">
+        <button 
+          onClick={() => navigateTo('studentList', 'Manage Students', {})}
+          className="bg-white p-4 rounded-2xl shadow-sm transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          aria-label={`View all ${totalStudents} students`}
+        >
           <p className="font-bold text-3xl text-indigo-600">{totalStudents}</p>
           <p className="text-sm text-gray-500 font-medium">Students</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl shadow-sm">
+        </button>
+        <button 
+          onClick={() => navigateTo('teacherList', 'Manage Teachers', {})}
+          className="bg-white p-4 rounded-2xl shadow-sm transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          aria-label={`View all ${totalTeachers} teachers`}
+        >
           <p className="font-bold text-3xl text-indigo-600">{totalTeachers}</p>
           <p className="text-sm text-gray-500 font-medium">Teachers</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center">
+        </button>
+        <button 
+          onClick={() => navigateTo('attendanceOverview', 'Attendance Overview', {})}
+          className="bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          aria-label={`View attendance, current student attendance is ${attendancePercentage} percent`}
+        >
             <div className="relative">
                 <DonutChart percentage={attendancePercentage} color="#4f46e5" size={40} strokeWidth={5} />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -48,7 +60,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ navigateTo }) => 
                 </div>
             </div>
             <p className="text-sm text-gray-500 font-medium mt-1">Attendance</p>
-        </div>
+        </button>
       </div>
 
       {/* Grid Menu */}

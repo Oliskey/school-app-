@@ -1,17 +1,24 @@
-
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { PlusIcon, EditIcon, TrashIcon, PublishIcon, EXAM_TYPE_COLORS } from '../../constants';
 import { Exam } from '../../types';
-import { mockExamsData } from '../../data';
+import { mockExamsData, mockTeachers } from '../../data';
 
-const ExamManagement: React.FC<{ navigateTo: (view: string, props: any, title: string) => void; }> = ({ navigateTo }) => {
+const ExamManagement: React.FC<{ navigateTo: (view: string, title: string, props?: any) => void; }> = ({ navigateTo }) => {
     const [exams, setExams] = useState<Exam[]>(mockExamsData);
+    const [selectedTeacherId, setSelectedTeacherId] = useState<string>('all');
+
+    const filteredExams = useMemo(() => {
+        if (selectedTeacherId === 'all') {
+            return exams;
+        }
+        return exams.filter(exam => exam.teacherId === parseInt(selectedTeacherId, 10));
+    }, [exams, selectedTeacherId]);
 
     const handleEdit = (exam: Exam) => {
         const onSave = (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => {
             setExams(prev => prev.map(e => e.id === exam.id ? { ...exam, ...examData } : e));
         };
-        navigateTo('addExam', { onSave, examToEdit: exam }, 'Edit Exam');
+        navigateTo('addExam', 'Edit Exam', { onSave, examToEdit: exam });
     };
 
     const handleDelete = (examId: number) => {
@@ -27,13 +34,28 @@ const ExamManagement: React.FC<{ navigateTo: (view: string, props: any, title: s
     const handleAddNew = () => {
          const onSave = (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => {
             const newId = Math.max(0, ...exams.map(e => e.id)) + 1;
-            setExams(prev => [...prev, { id: newId, ...examData, isPublished: false }]);
+            setExams(prev => [...prev, { id: newId, ...examData, isPublished: false, teacherId: parseInt(selectedTeacherId, 10) || undefined }]);
         };
-        navigateTo('addExam', { onSave }, 'Add New Exam');
+        navigateTo('addExam', 'Add New Exam', { onSave });
     };
 
     return (
         <div className="flex flex-col h-full bg-gray-100 relative">
+            <div className="p-4 bg-gray-100/80 backdrop-blur-sm sticky top-0 z-10 border-b border-gray-200">
+                <label htmlFor="teacher-filter" className="block text-sm font-medium text-gray-700 mb-1">Filter by Teacher</label>
+                <select
+                    id="teacher-filter"
+                    value={selectedTeacherId}
+                    onChange={e => setSelectedTeacherId(e.target.value)}
+                    className="w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500"
+                >
+                    <option value="all">All Teachers</option>
+                    {mockTeachers.map(teacher => (
+                        <option key={teacher.id} value={teacher.id.toString()}>{teacher.name}</option>
+                    ))}
+                </select>
+            </div>
+
             <main className="flex-grow p-4 space-y-3 overflow-y-auto pb-20">
                 {/* For larger screens: Table view */}
                 <div className="hidden sm:block bg-white rounded-xl shadow-sm overflow-hidden">
@@ -49,7 +71,7 @@ const ExamManagement: React.FC<{ navigateTo: (view: string, props: any, title: s
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {exams.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(exam => (
+                            {filteredExams.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(exam => (
                                 <tr key={exam.id}>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full border ${EXAM_TYPE_COLORS[exam.type] || 'bg-gray-100 text-gray-800 border-gray-300'}`}>
@@ -78,7 +100,7 @@ const ExamManagement: React.FC<{ navigateTo: (view: string, props: any, title: s
 
                 {/* For smaller screens: Card view */}
                 <div className="sm:hidden space-y-3">
-                     {exams.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(exam => (
+                     {filteredExams.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(exam => (
                         <div key={exam.id} className="bg-white rounded-xl shadow-sm p-4 space-y-3">
                             <div className="flex justify-between items-start">
                                 <div>
@@ -107,7 +129,7 @@ const ExamManagement: React.FC<{ navigateTo: (view: string, props: any, title: s
                     ))}
                 </div>
 
-                {exams.length === 0 && <p className="text-center text-gray-500 py-8">No exams scheduled.</p>}
+                {filteredExams.length === 0 && <p className="text-center text-gray-500 py-8">No exams found for this filter.</p>}
             </main>
 
             <div className="absolute bottom-6 right-6">

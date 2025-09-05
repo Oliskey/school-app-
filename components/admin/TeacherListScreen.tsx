@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { 
   SearchIcon,
@@ -10,7 +9,7 @@ import { Teacher } from '../../types';
 import { mockTeachers } from '../../data';
 
 interface TeacherListScreenProps {
-  navigateTo: (view: string, props: any, title: string) => void;
+  navigateTo: (view: string, title: string, props?: any) => void;
 }
 
 const TeacherCard: React.FC<{ teacher: Teacher, onSelect: (teacher: Teacher) => void }> = ({ teacher, onSelect }) => {
@@ -18,7 +17,7 @@ const TeacherCard: React.FC<{ teacher: Teacher, onSelect: (teacher: Teacher) => 
         <button 
             onClick={() => onSelect(teacher)}
             className="w-full bg-white rounded-xl shadow-sm p-4 flex flex-col space-y-3 text-left hover:shadow-md hover:ring-2 hover:ring-sky-200 transition-all duration-200"
-            aria-label={`View performance evaluation for ${teacher.name}`}
+            aria-label={`View details for ${teacher.name}`}
         >
             <div className="flex items-center space-x-4">
                 <img src={teacher.avatarUrl} alt={teacher.name} className="w-16 h-16 rounded-full object-cover" />
@@ -55,7 +54,7 @@ const TeacherListScreen: React.FC<TeacherListScreenProps> = ({ navigateTo }) => 
     ), [searchTerm]);
 
   const handleSelectTeacher = (teacher: Teacher) => {
-    navigateTo('teacherPerformance', { teacher }, 'Performance Evaluation');
+    navigateTo('teacherDetailAdminView', teacher.name, { teacher });
   };
 
   return (

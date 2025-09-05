@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { UsersIcon, ParentNavIcon, TeacherNavIcon, StudentNavIcon, AIIcon } from '../../constants';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -38,12 +37,17 @@ const CommunicationHub: React.FC = () => {
   
   const handleGenerate = async () => {
     if (!aiPrompt) return;
+    if (!selectedAudience) {
+        alert("Please select an audience first to generate a tailored announcement.");
+        return;
+    }
     setIsGenerating(true);
     try {
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const audienceText = selectedAudience === 'all' ? 'everyone (students, parents, and teachers)' : `the ${selectedAudience}`;
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: `Generate a school announcement. The topic is: "${aiPrompt}"`,
+            contents: `Generate a school announcement targeted at ${audienceText}. The topic is: "${aiPrompt}". The tone should be appropriate for the selected audience.`,
             config: {
                 responseMimeType: "application/json",
                 responseSchema: {
@@ -55,7 +59,7 @@ const CommunicationHub: React.FC = () => {
                 }
             }
         });
-        const jsonResponse = JSON.parse(response.text);
+        const jsonResponse = JSON.parse(response.text.trim());
         setTitle(jsonResponse.title || '');
         setMessage(jsonResponse.message || '');
         setShowAiPrompt(false);

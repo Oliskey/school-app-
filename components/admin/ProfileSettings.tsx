@@ -10,15 +10,15 @@ import {
 
 interface ProfileSettingsProps {
   onLogout: () => void;
-  navigateTo: (view: string, props: any, title: string) => void;
+  navigateTo: (view: string, title: string, props?: any) => void;
 }
 
 const ProfileSettings: React.FC<ProfileSettingsProps> = ({ onLogout, navigateTo }) => {
 
   const settingsItems = [
-    { icon: <EditIcon />, label: 'Edit Profile', color: 'bg-blue-100 text-blue-500', action: () => navigateTo('editProfile', {}, 'Edit Profile') },
-    { icon: <NotificationIcon />, label: 'Notifications', color: 'bg-green-100 text-green-500', action: () => navigateTo('notificationsSettings', {}, 'Notification Settings') },
-    { icon: <SecurityIcon />, label: 'My Security', color: 'bg-orange-100 text-orange-500', action: () => navigateTo('personalSecuritySettings', {}, 'My Security Settings') },
+    { icon: <EditIcon />, label: 'Edit Profile', color: 'bg-blue-100 text-blue-500', action: () => navigateTo('editProfile', 'Edit Profile') },
+    { icon: <NotificationIcon />, label: 'Notifications', color: 'bg-green-100 text-green-500', action: () => navigateTo('notificationsSettings', 'Notification Settings') },
+    { icon: <SecurityIcon />, label: 'My Security', color: 'bg-orange-100 text-orange-500', action: () => navigateTo('personalSecuritySettings', 'My Security Settings') },
     { icon: <HelpIcon />, label: 'Help & Support', color: 'bg-purple-100 text-purple-500', action: () => alert('Help Center clicked') },
   ];
 

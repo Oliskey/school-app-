@@ -5,7 +5,7 @@ import { ChevronRightIcon } from '../../constants';
 
 interface AdminStudentListForReportProps {
   classInfo: { grade: number; section: string; };
-  navigateTo: (view: string, props: any, title: string) => void;
+  navigateTo: (view: string, title: string, props?: any) => void;
 }
 
 const AdminStudentListForReport: React.FC<AdminStudentListForReportProps> = ({ classInfo, navigateTo }) => {
@@ -19,7 +19,7 @@ const AdminStudentListForReport: React.FC<AdminStudentListForReportProps> = ({ c
         {studentsInClass.map(student => (
           <button 
             key={student.id} 
-            onClick={() => navigateTo('viewStudentReport', { student }, `${student.name}'s Report`)}
+            onClick={() => navigateTo('viewStudentReport', `${student.name}'s Report`, { student })}
             className="w-full bg-white rounded-xl shadow-sm p-3 flex items-center space-x-4 transition-all hover:shadow-md hover:ring-2 hover:ring-indigo-200"
             aria-label={`View report for ${student.name}`}
           >

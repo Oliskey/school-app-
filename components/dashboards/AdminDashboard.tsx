@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '../ui/Header';
 import { AdminBottomNav } from '../ui/DashboardBottomNav';
@@ -26,7 +25,7 @@ import AuditLogScreen from '../admin/AuditLogScreen';
 import ProfileSettings from '../admin/ProfileSettings';
 import CommunicationHub from '../admin/CommunicationHub';
 import ReportsScreen from '../admin/ReportsScreen';
-import StudentDetailReport from '../admin/StudentDetailReport';
+import StudentProfileAdminView from '../admin/StudentProfileAdminView';
 import EditProfileScreen from '../admin/EditProfileScreen';
 import NotificationsSettingsScreen from '../admin/NotificationsSettingsScreen';
 import SecuritySettingsScreen from '../admin/SecuritySettingsScreen';
@@ -42,6 +41,16 @@ import FinancialSettingsScreen from '../admin/FinancialSettingsScreen';
 import CommunicationSettingsScreen from '../admin/CommunicationSettingsScreen';
 import BrandingSettingsScreen from '../admin/BrandingSettingsScreen';
 import PersonalSecuritySettingsScreen from '../admin/PersonalSecuritySettingsScreen';
+import TeacherDetailAdminView from '../admin/TeacherDetailAdminView';
+import TeacherAttendanceDetail from '../admin/TeacherAttendanceDetail';
+import AttendanceOverviewScreen from '../admin/AttendanceOverviewScreen';
+import ClassAttendanceDetailScreen from '../admin/ClassAttendanceDetailScreen';
+import AdminSelectTermForReport from '../admin/AdminSelectTermForReport';
+import ReportCardInputScreen from '../teacher/ReportCardInputScreen';
+import AdminMessagesScreen from '../admin/AdminMessagesScreen';
+import AdminNewChatScreen from '../admin/AdminNewChatScreen';
+import ChatScreen from '../shared/ChatScreen';
+import HealthLogScreen from '../admin/HealthLogScreen';
 
 
 // Type for navigation stack item
@@ -66,7 +75,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
 
     const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('admin')).length;
 
-    const navigateTo = (view: string, props: any, title: string) => {
+    const navigateTo = (view: string, title: string, props: any = {}) => {
         setViewStack(stack => [...stack, { view, props, title }]);
     };
 
@@ -83,6 +92,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
             case 'home':
                 setViewStack([{ view: 'overview', props: {}, title: 'Admin Dashboard' }]);
                 break;
+            case 'messages':
+                setViewStack([{ view: 'adminMessages', props: {}, title: 'Messages' }]);
+                break;
             case 'communication':
                 setViewStack([{ view: 'communicationHub', props: {}, title: 'Communication Hub' }]);
                 break;
@@ -98,7 +110,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
     };
 
     const handleNotificationClick = () => {
-        navigateTo('notifications', {}, 'Notifications');
+        navigateTo('notifications', 'Notifications');
     };
 
     const viewComponents: { [key: string]: React.ComponentType<any> } = {
@@ -122,7 +134,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         feeDetails: FeeDetailsScreen,
         addExam: AddExamScreen,
         communicationHub: CommunicationHub,
-        studentDetailReport: StudentDetailReport,
+        studentProfileAdminView: StudentProfileAdminView,
         editProfile: EditProfileScreen,
         notificationsSettings: NotificationsSettingsScreen,
         securitySettings: SecuritySettingsScreen,
@@ -139,6 +151,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         communicationSettings: CommunicationSettingsScreen,
         brandingSettings: BrandingSettingsScreen,
         personalSecuritySettings: PersonalSecuritySettingsScreen,
+        teacherDetailAdminView: TeacherDetailAdminView,
+        teacherAttendanceDetail: TeacherAttendanceDetail,
+        // New Attendance Screens
+        attendanceOverview: AttendanceOverviewScreen,
+        classAttendanceDetail: ClassAttendanceDetailScreen,
+        // Report Card Editing
+        adminSelectTermForReport: AdminSelectTermForReport,
+        adminReportCardInput: (props: any) => <ReportCardInputScreen {...props} isAdmin={true} />,
+        // Messaging
+        adminMessages: AdminMessagesScreen,
+        adminNewChat: AdminNewChatScreen,
+        chat: (props: any) => <ChatScreen {...props} currentUserId={0} />,
+        healthLog: HealthLogScreen,
     };
     
     const currentNavigation = viewStack[viewStack.length - 1];
@@ -147,6 +172,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
     const commonProps = {
         navigateTo,
         onLogout,
+        handleBack,
     };
 
     return (
@@ -161,7 +187,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
                 notificationCount={notificationCount}
             />
             <div className="flex-grow overflow-y-auto">
-                {ComponentToRender ? <ComponentToRender {...currentNavigation.props} {...commonProps} /> : <div>View not found: {currentNavigation.view}</div>}
+                <div key={viewStack.length} className="animate-slide-in-up">
+                    {ComponentToRender ? <ComponentToRender {...currentNavigation.props} {...commonProps} /> : <div>View not found: {currentNavigation.view}</div>}
+                </div>
             </div>
             <AdminBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />
         </div>

@@ -121,8 +121,15 @@ const AcademicReportScreen: React.FC<AcademicReportScreenProps> = ({ studentId }
                     <h4 className="font-bold text-gray-800">Teacher's Remarks</h4>
                 </div>
                 <div className="space-y-3">
+                    {(student.academicPerformance || []).filter(r => r.teacherRemark).map(record => (
+                         <div key={record.subject} className="bg-orange-50 p-3 rounded-lg">
+                            <p className="font-semibold text-orange-800">{record.subject}</p>
+                            <p className="text-sm text-gray-700 italic">"{record.teacherRemark}"</p>
+                         </div>
+                    ))}
                     {(student.behaviorNotes && student.behaviorNotes.length > 0) ? student.behaviorNotes.map(note => (
                          <div key={note.id} className="bg-orange-50 p-3 rounded-lg">
+                            <p className="font-semibold text-orange-800">{note.title} ({note.type})</p>
                             <p className="text-sm text-gray-700">{note.note}</p>
                             <p className="text-xs text-gray-500 text-right mt-1">- {note.by} on {new Date(note.date).toLocaleDateString()}</p>
                          </div>

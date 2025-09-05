@@ -11,7 +11,11 @@ interface TeacherWithAttendance extends Teacher {
     attendanceStatus: AttendanceStatus;
 }
 
-const TeacherAttendanceScreen: React.FC = () => {
+interface TeacherAttendanceScreenProps {
+    navigateTo: (view: string, title: string, props?: any) => void;
+}
+
+const TeacherAttendanceScreen: React.FC<TeacherAttendanceScreenProps> = ({ navigateTo }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const theme = THEME_CONFIG[DashboardType.Admin];
     const [teachers, setTeachers] = useState<TeacherWithAttendance[]>(() => 
@@ -94,18 +98,20 @@ const TeacherAttendanceScreen: React.FC = () => {
                     {filteredTeachers.length > 0 ? (
                         filteredTeachers.map(teacher => (
                             <div key={teacher.id} className="bg-white rounded-xl shadow-sm p-3 flex items-center space-x-3">
-                                <img src={teacher.avatarUrl} alt={teacher.name} className="w-12 h-12 rounded-full object-cover" />
-                                <div className="flex-grow">
-                                    <p className="font-bold text-gray-800">{teacher.name}</p>
-                                    <p className={`text-sm font-semibold ${statusStyles[teacher.attendanceStatus].text}`}>
-                                        Status: {teacher.attendanceStatus}
-                                    </p>
-                                </div>
+                                <button onClick={() => navigateTo('teacherAttendanceDetail', `${teacher.name}'s Attendance`, { teacher })} className="flex items-center space-x-3 flex-grow text-left">
+                                    <img src={teacher.avatarUrl} alt={teacher.name} className="w-12 h-12 rounded-full object-cover" />
+                                    <div className="flex-grow">
+                                        <p className="font-bold text-gray-800">{teacher.name}</p>
+                                        <p className={`text-sm font-semibold ${statusStyles[teacher.attendanceStatus].text}`}>
+                                            Status: {teacher.attendanceStatus}
+                                        </p>
+                                    </div>
+                                </button>
                                 <div className="flex items-center space-x-2">
                                     {(['Present', 'Absent', 'Leave'] as AttendanceStatus[]).map(status => (
                                         <button
                                             key={status}
-                                            onClick={() => handleStatusChange(teacher.id, status)}
+                                            onClick={(e) => { e.stopPropagation(); handleStatusChange(teacher.id, status)}}
                                             className={`w-10 h-8 rounded-lg text-xs font-bold transition-transform transform hover:scale-110 ${
                                                 teacher.attendanceStatus === status 
                                                 ? statusStyles[status].button

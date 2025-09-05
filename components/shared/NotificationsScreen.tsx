@@ -20,7 +20,7 @@ const formatDistanceToNow = (isoDate: string): string => {
 };
 
 interface NotificationsScreenProps {
-  userType: 'admin' | 'parent' | 'student';
+  userType: 'admin' | 'parent' | 'student' | 'teacher';
   navigateTo: (view: string, title: string, props?: any) => void;
 }
 
@@ -28,7 +28,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ userType, nav
 
   const relevantNotifications = useMemo(() =>
     mockNotifications
-      .filter(n => n.audience.includes(userType))
+      .filter(n => n.audience.includes('all') || n.audience.includes(userType))
       .sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()),
     [userType]
   );

@@ -1,4 +1,5 @@
 
+
 import { CurriculumSubject, Department, CurriculumSubjectCategory } from './types';
 
 const curriculum: { [stage: string]: any } = {
@@ -209,7 +210,7 @@ const curriculum: { [stage: string]: any } = {
       { name: 'General Mathematics', category: 'Compulsory' },
       { name: 'Civic Education', category: 'Compulsory' },
       { name: 'Computer Studies/ICT', category: 'Compulsory' },
-      { name: 'One Trade/Entrepreneurship Subject', category: 'Compulsory' },
+      { name: 'Entrepreneurship', category: 'Compulsory' },
     ],
     departments: {
       Science: {

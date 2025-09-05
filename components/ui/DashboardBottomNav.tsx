@@ -1,5 +1,5 @@
 import React from 'react';
-import { HomeIcon, BellIcon, ProfileIcon, DocumentTextIcon, PhoneIcon, PlayIcon, AnalyticsIcon, MegaphoneIcon, SettingsIcon, MessagesIcon, ElearningIcon, SparklesIcon, UserGroupIcon } from '../../constants';
+import { HomeIcon, BellIcon, ProfileIcon, DocumentTextIcon, PhoneIcon, PlayIcon, AnalyticsIcon, MegaphoneIcon, SettingsIcon, MessagesIcon, ElearningIcon, SparklesIcon, UserGroupIcon, GameControllerIcon, ChartBarIcon } from '../../constants';
 
 const NavItem = ({ icon, label, isActive, onClick, activeColor }: { icon: React.ReactElement<{ className?: string }>, label: string, isActive: boolean, onClick: () => void, activeColor: string }) => (
   <button onClick={onClick} className={`flex-1 flex flex-col items-center justify-center space-y-1 transition-colors duration-200 ${isActive ? activeColor : 'text-gray-500'}`}>
@@ -11,6 +11,7 @@ const NavItem = ({ icon, label, isActive, onClick, activeColor }: { icon: React.
 export const AdminBottomNav = ({ activeScreen, setActiveScreen }: { activeScreen: string, setActiveScreen: (screen: string) => void }) => {
   const navItems = [
     { id: 'home', icon: <HomeIcon />, label: 'Home' },
+    { id: 'messages', icon: <MessagesIcon />, label: 'Messages' },
     { id: 'communication', icon: <MegaphoneIcon />, label: 'Announce' },
     { id: 'analytics', icon: <AnalyticsIcon className="h-6 w-6"/>, label: 'Analytics' },
     { id: 'settings', icon: <SettingsIcon />, label: 'Settings' },
@@ -60,9 +61,9 @@ export const ParentBottomNav = ({ activeScreen, setActiveScreen }: { activeScree
 export const StudentBottomNav = ({ activeScreen, setActiveScreen }: { activeScreen: string, setActiveScreen: (screen: string) => void }) => {
   const navItems = [
     { id: 'home', icon: <HomeIcon />, label: 'Home' },
-    { id: 'elearning', icon: <ElearningIcon />, label: 'Library' },
-    { id: 'activities', icon: <SparklesIcon />, label: 'Activities' },
-    { id: 'notifications', icon: <BellIcon />, label: 'Alerts' },
+    { id: 'results', icon: <ChartBarIcon />, label: 'Results' },
+    { id: 'games', icon: <GameControllerIcon />, label: 'Games' },
+    { id: 'messages', icon: <MessagesIcon />, label: 'Messages' },
     { id: 'profile', icon: <ProfileIcon />, label: 'Profile' },
   ];
   return (

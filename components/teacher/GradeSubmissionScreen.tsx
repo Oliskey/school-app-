@@ -1,9 +1,12 @@
 
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Submission, Assignment } from '../../types';
 import { SparklesIcon, AIIcon } from '../../constants';
 import { GoogleGenAI, Type } from "@google/genai";
+
+// A custom microphone icon
+const MicrophoneIcon = ({className}: {className?: string}) => <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${className || ''}`.trim()} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" /><path d="M5 10a7 7 0 0 0 14 0" /><path d="M8 21l8 0" /><path d="M12 17l0 4" /></svg>;
+
 
 interface GradeSubmissionScreenProps {
   submission: Submission;
@@ -16,6 +19,46 @@ const GradeSubmissionScreen: React.FC<GradeSubmissionScreenProps> = ({ submissio
   const [feedback, setFeedback] = useState<string>(submission.feedback || '');
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = React.useRef<any>(null);
+
+  useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        setFeedback(prev => prev + finalTranscript);
+      };
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+      };
+    }
+  }, []);
+
+  const handleToggleRecording = () => {
+    if (!recognitionRef.current) {
+      alert("Voice recognition is not supported in your browser.");
+      return;
+    }
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current.start();
+      setIsRecording(true);
+    }
+  };
 
   const handleGenerateFeedback = async () => {
     if (!grade) {
@@ -51,7 +94,7 @@ const GradeSubmissionScreen: React.FC<GradeSubmissionScreenProps> = ({ submissio
         }
       });
       
-      const jsonResponse = JSON.parse(response.text);
+      const jsonResponse = JSON.parse(response.text.trim());
       if (jsonResponse.suggestions && Array.isArray(jsonResponse.suggestions)) {
         setAiSuggestions(jsonResponse.suggestions);
       } else {
@@ -122,14 +165,26 @@ const GradeSubmissionScreen: React.FC<GradeSubmissionScreenProps> = ({ submissio
             </div>
             <div>
               <label htmlFor="feedback-input" className="block text-sm font-medium text-gray-700 mb-1">Feedback</label>
-              <textarea
-                id="feedback-input"
-                value={feedback}
-                onChange={e => setFeedback(e.target.value)}
-                rows={6}
-                placeholder="Provide constructive feedback for the student..."
-                className="w-full px-3 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
-              />
+               <div className="relative">
+                 <textarea
+                    id="feedback-input"
+                    value={feedback}
+                    onChange={e => setFeedback(e.target.value)}
+                    rows={6}
+                    placeholder="Provide constructive feedback for the student..."
+                    className="w-full px-3 py-2 pr-12 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                  />
+                  {recognitionRef.current && (
+                    <button 
+                      type="button" 
+                      onClick={handleToggleRecording} 
+                      className={`absolute top-2 right-2 p-2 rounded-full transition-colors ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                      aria-label={isRecording ? 'Stop recording' : 'Start recording feedback'}
+                    >
+                      <MicrophoneIcon className="h-5 w-5" />
+                    </button>
+                  )}
+               </div>
             </div>
             
             {/* AI Feedback Section */}

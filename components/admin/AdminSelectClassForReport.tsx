@@ -3,7 +3,7 @@ import { StudentsIcon, ChevronRightIcon, gradeColors } from '../../constants';
 import { mockStudents } from '../../data';
 
 interface AdminSelectClassForReportProps {
-  navigateTo: (view: string, props: any, title: string) => void;
+  navigateTo: (view: string, title: string, props?: any) => void;
 }
 
 interface ClassData {
@@ -49,7 +49,7 @@ const AdminSelectClassForReport: React.FC<AdminSelectClassForReportProps> = ({ n
                                 {Object.keys(sections).sort().map(section => (
                                     <button 
                                         key={section}
-                                        onClick={() => navigateTo('studentListForReport', { classInfo: { grade, section } }, `Reports: Grade ${grade}${section}`)}
+                                        onClick={() => navigateTo('studentListForReport', `Reports: Grade ${grade}${section}`, { classInfo: { grade, section } })}
                                         className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                                         aria-label={`View reports for Grade ${grade} Section ${section}`}
                                     >

@@ -11,7 +11,7 @@ const statusStyles: { [key in StudentFeeInfo['status']]: { bg: string, text: str
 
 const formatter = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 });
 
-const FeeManagement: React.FC<{ navigateTo: (view: string, props: any, title: string) => void; }> = ({ navigateTo }) => {
+const FeeManagement: React.FC<{ navigateTo: (view: string, title: string, props?: any) => void; }> = ({ navigateTo }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'All' | 'Paid' | 'Unpaid' | 'Overdue'>('All');
 
@@ -72,7 +72,7 @@ const FeeManagement: React.FC<{ navigateTo: (view: string, props: any, title: st
 
         <div className="flex-grow p-4 space-y-3 overflow-y-auto">
           {filteredStudents.map(student => (
-            <button key={student.id} onClick={() => navigateTo('feeDetails', { student }, 'Fee Details')} className="w-full bg-white rounded-xl shadow-sm p-3 flex flex-col space-y-2 text-left hover:ring-2 hover:ring-sky-200">
+            <button key={student.id} onClick={() => navigateTo('feeDetails', 'Fee Details', { student })} className="w-full bg-white rounded-xl shadow-sm p-3 flex flex-col space-y-2 text-left hover:ring-2 hover:ring-sky-200">
               <div className="flex items-center space-x-3">
                 <img src={student.avatarUrl} alt={student.name} className="w-10 h-10 rounded-full object-cover" />
                 <div className="flex-grow">

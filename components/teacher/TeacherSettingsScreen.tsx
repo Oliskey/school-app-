@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   EditIcon, 
@@ -7,7 +8,8 @@ import {
   LogoutIcon,
   ChevronRightIcon,
   MailIcon,
-  PhoneIcon
+  PhoneIcon,
+  TrendingUpIcon
 } from '../../constants';
 import { THEME_CONFIG } from '../../constants';
 import { DashboardType } from '../../types';
@@ -30,6 +32,7 @@ const TeacherSettingsScreen: React.FC<TeacherSettingsScreenProps> = ({ onLogout,
 
   const settingsItems = [
     { icon: <EditIcon />, label: 'Edit Profile', color: 'bg-blue-100 text-blue-500', action: () => navigateTo('editTeacherProfile', 'Edit Profile') },
+    { icon: <TrendingUpIcon />, label: 'Professional Development', color: 'bg-teal-100 text-teal-500', action: () => navigateTo('professionalDevelopment', 'PD Hub', {}) },
     { icon: <NotificationIcon />, label: 'Notifications', color: 'bg-green-100 text-green-500', action: () => navigateTo('teacherNotificationSettings', 'Notification Settings') },
     { icon: <SecurityIcon />, label: 'Security & Password', color: 'bg-orange-100 text-orange-500', action: () => navigateTo('teacherSecurity', 'Security Settings') },
     { icon: <HelpIcon />, label: 'Help & Support', color: 'bg-purple-100 text-purple-500', action: () => alert('Help Center clicked') },
