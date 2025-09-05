@@ -1,6 +1,7 @@
 import React from 'react';
 import { Exam, Notice, CalendarEvent, Book, Driver, PickupPoint, Role, AuditLog, Photo, ClassInfo, Student, BehaviorNote, AcademicRecord, Assignment, Submission, Department, Teacher, StudentFeeInfo, Conversation, TimetableEntry, DigitalResource, StudentPerformanceData, SubjectAverage, AttendanceCorrelationPoint, StudentAttendance, Message, VideoLesson, Activity, ExtracurricularEvent, Badge, Certificate, Award, FeeBreakdownItem, PaymentHistoryItem, ProgressReport, BehaviorAlert, Parent, Complaint, Notification, PTAMeeting, LearningResource, SchoolPolicy, VolunteeringOpportunity, PermissionSlip, StoreProduct, StoreOrder, ForumTopic, AppointmentSlot, Quiz, LessonPlan, PDResource, HealthLogEntry } from './types';
-import { AdminIcon, TeacherNavIcon, ParentNavIcon, StudentNavIcon, FootballIcon, PaintBrushIcon, MusicNoteIcon, BookOpenIcon, BeakerIcon, TrophyIcon, MaskIcon, PerfectAttendanceIcon, StarStudentIcon, ScienceFairWinnerIcon, SportsmanshipIcon, ReadingChallengeIcon, HelpingHandIcon, MegaphoneIcon } from './constants';
+// FIX: Added UserGroupIcon to imports for use in new mock data.
+import { AdminIcon, TeacherNavIcon, ParentNavIcon, StudentNavIcon, FootballIcon, PaintBrushIcon, MusicNoteIcon, BookOpenIcon, BeakerIcon, TrophyIcon, MaskIcon, PerfectAttendanceIcon, StarStudentIcon, ScienceFairWinnerIcon, SportsmanshipIcon, ReadingChallengeIcon, HelpingHandIcon, MegaphoneIcon, UserGroupIcon } from './constants';
 import { getCurriculum } from './curriculumData';
 
 export const getSubjectsForStudent = (student: Student): string[] => {
@@ -664,6 +665,40 @@ For every action, there is an equal and opposite reaction.`,
     }
 ];
 
+export const mockActivities: Activity[] = [
+    { id: 1, name: 'Debate Club', category: 'Club', description: 'Hone your public speaking and argumentation skills.', icon: UserGroupIcon },
+    { id: 2, name: 'School Football Team', category: 'Sport', description: 'Join the school team and compete in local tournaments.', icon: FootballIcon },
+    { id: 3, name: 'Drama & Theatre Club', category: 'Cultural', description: 'Express yourself through acting and stage performance.', icon: MaskIcon },
+    { id: 4, name: 'Science Club', category: 'Club', description: 'Explore fascinating experiments and scientific concepts beyond the curriculum.', icon: BeakerIcon },
+    { id: 5, name: 'Art Club', category: 'Cultural', description: 'Develop your artistic talents in painting, drawing, and sculpture.', icon: PaintBrushIcon },
+    { id: 6, name: 'Basketball Team', category: 'Sport', description: 'Practice your dribbling and shooting with the school team.', icon: TrophyIcon },
+];
+
+export const mockExtracurricularEvents: ExtracurricularEvent[] = [
+    { id: 1, title: 'Inter-House Football Match', date: '2024-08-10', category: 'Sport' },
+    { id: 2, title: 'Debate Club Tryouts', date: '2024-08-05', category: 'Club' },
+    { id: 3, title: 'Annual Stage Play Auditions', date: '2024-08-12', category: 'Cultural' },
+    { id: 4, title: 'Science Club Project Showcase', date: '2024-08-22', category: 'Club' },
+];
+
+export const mockBadges: Badge[] = [
+    { id: 1, name: 'Perfect Attendance', description: 'Awarded for not missing a single day of school in a term.', icon: PerfectAttendanceIcon, color: 'bg-green-100 text-green-800' },
+    { id: 2, name: 'Star Student', description: 'Achieved an overall average of 90% or higher.', icon: StarStudentIcon, color: 'bg-yellow-100 text-yellow-800' },
+    { id: 3, name: 'Science Fair Winner', description: 'First place in the annual school science fair.', icon: ScienceFairWinnerIcon, color: 'bg-blue-100 text-blue-800' },
+    { id: 4, name: 'Sportsmanship Award', description: 'Demonstrated exceptional fairness and respect in sports.', icon: SportsmanshipIcon, color: 'bg-red-100 text-red-800' },
+    { id: 5, name: 'Reading Challenge', description: 'Read over 20 books in one term.', icon: ReadingChallengeIcon, color: 'bg-indigo-100 text-indigo-800' },
+    { id: 6, name: 'Helping Hand', description: 'Recognized for outstanding helpfulness to peers and teachers.', icon: HelpingHandIcon, color: 'bg-purple-100 text-purple-800' },
+];
+
+export const mockCertificates: Certificate[] = [
+    { id: 1, name: 'Certificate of Excellence in Mathematics', issuedDate: '2024-07-20', issuer: 'Smart School Academy', fileUrl: '#' },
+    { id: 2, name: 'Participation in National Debate Championship', issuedDate: '2024-06-15', issuer: 'National Education Board', fileUrl: '#' },
+];
+
+export const mockAwards: Award[] = [
+    { id: 1, name: 'Principal\'s Honor Roll', date: '2024-07-22', description: 'Awarded for outstanding academic achievement and character in the second term.' },
+    { id: 2, name: 'Most Valuable Player (Football)', date: '2024-03-18', description: 'Recognized as the MVP during the inter-house sports competition.' },
+];
 
 export const mockDriver: Driver = {
   name: 'Mr. Bamidele',
@@ -731,265 +766,240 @@ export const mockRolesAndPermissions: Role[] = [
 ];
 
 export const mockAuditLogs: AuditLog[] = [
-  { id: 1, user: { name: 'Adekunle Ciroma', avatarUrl: 'https://i.pravatar.cc/150?u=admin', role: 'Admin' }, action: 'Logged into the system', timestamp: minutesAgo(2), type: 'login' },
-  { id: 2, user: { name: 'Mrs. Funke Akintola', avatarUrl: 'https://i.pravatar.cc/150?u=funke', role: 'Teacher' }, action: 'Created new exam: English Mid-term', timestamp: minutesAgo(35), type: 'create' },
-  { id: 3, user: { name: 'Mr. Adewale (Parent)', avatarUrl: 'https://i.pravatar.cc/150?u=parent1', role: 'Parent' }, action: 'Made a fee payment of N50,000 for Adebayo', timestamp: hoursAgo(1), type: 'payment' },
-  { id: 4, user: { name: 'Adekunle Ciroma', avatarUrl: 'https://i.pravatar.cc/150?u=admin', role: 'Admin' }, action: 'Published all report cards for Grade 10', timestamp: hoursAgo(3), type: 'publish' },
-  { id: 5, user: { name: 'Fatima Bello', avatarUrl: 'https://i.pravatar.cc/150?u=fatima', role: 'Student' }, action: 'Logged into the system', timestamp: hoursAgo(4), type: 'login' },
-  { id: 6, user: { name: 'Dr. Tunde Bello', avatarUrl: 'https://i.pravatar.cc/150?u=tunde_bello', role: 'Teacher' }, action: 'Updated grades for Physics Final Exam', timestamp: daysAgo(1), type: 'update' },
-  { id: 7, user: { name: 'Adekunle Ciroma', avatarUrl: 'https://i.pravatar.cc/150?u=admin', role: 'Admin' }, action: 'Deleted user account: John Doe (student)', timestamp: daysAgo(2), type: 'delete' },
+  { id: 1, user: { name: 'Adekunle Ciroma', avatarUrl: 'https://i.pravatar.cc/150?u=admin', role: 'Admin' }, action: 'Logged into the system.', timestamp: minutesAgo(5), type: 'login' },
+  { id: 2, user: { name: 'Mrs. Funke Akintola', avatarUrl: 'https://i.pravatar.cc/150?u=funke', role: 'Teacher' }, action: 'Published exam "Mid-term" for Grade 9A English.', timestamp: minutesAgo(30), type: 'publish' },
+  { id: 3, user: { name: 'Admin Finance', avatarUrl: 'https://i.pravatar.cc/150?u=finance', role: 'Admin' }, action: 'Recorded a fee payment of ₦50,000 for Musa Ibrahim.', timestamp: hoursAgo(1), type: 'payment' },
+  { id: 4, user: { name: 'Adekunle Ciroma', avatarUrl: 'https://i.pravatar.cc/150?u=admin', role: 'Admin' }, action: 'Updated student profile for Fatima Bello.', timestamp: hoursAgo(3), type: 'update' },
+  { id: 5, user: { name: 'Dr. Tunde Bello', avatarUrl: 'https://i.pravatar.cc/150?u=tunde_bello', role: 'Teacher' }, action: 'Created new assignment "Newtonian Physics Problems".', timestamp: daysAgo(1), type: 'create' },
 ];
 
 export const mockPhotos: Photo[] = [
-  { id: 1, imageUrl: 'https://picsum.photos/seed/gallery1/500/500', caption: 'Annual Sports Day 2024' },
-  { id: 2, imageUrl: 'https://picsum.photos/seed/gallery2/500/500', caption: 'Science Fair Winners' },
-  { id: 3, imageUrl: 'https://picsum.photos/seed/gallery3/500/500', caption: 'Cultural Day Celebrations' },
-  { id: 4, imageUrl: 'https://picsum.photos/seed/gallery4/500/500', caption: 'Inter-house Football Match' },
-  { id: 5, imageUrl: 'https://picsum.photos/seed/gallery5/500/500', caption: 'Art & Craft Exhibition' },
-  { id: 6, imageUrl: 'https://picsum.photos/seed/gallery6/500/500', caption: 'Graduation Ceremony' },
+    { id: 1, imageUrl: 'https://picsum.photos/seed/sports1/500/500', caption: 'Annual Sports Day Heats' },
+    { id: 2, imageUrl: 'https://picsum.photos/seed/science1/500/500', caption: 'Science Fair Winners' },
+    { id: 3, imageUrl: 'https://picsum.photos/seed/culture1/500/500', caption: 'Cultural Day Celebration' },
+    { id: 4, imageUrl: 'https://picsum.photos/seed/class1/500/500', caption: 'Grade 10A in Chemistry Lab' },
+    { id: 5, imageUrl: 'https://picsum.photos/seed/debate1/500/500', caption: 'Inter-School Debate Team' },
+    { id: 6, imageUrl: 'https://picsum.photos/seed/art1/500/500', caption: 'Art Exhibition' },
 ];
 
 export const mockStudentFees: StudentFeeInfo[] = [
-    { id: 1, name: 'Adebayo Adewale', avatarUrl: 'https://i.pravatar.cc/150?u=adebayo', grade: 10, section: 'A', totalFee: 150000, paidAmount: 150000, dueDate: '2024-07-31', status: 'Paid' },
-    { id: 2, name: 'Chidinma Okoro', avatarUrl: 'https://i.pravatar.cc/150?u=chidinma', grade: 10, section: 'B', totalFee: 150000, paidAmount: 120000, dueDate: '2024-07-31', status: 'Unpaid' },
-    { id: 3, name: 'Musa Ibrahim', avatarUrl: 'https://i.pravatar.cc/150?u=musa', grade: 9, section: 'A', totalFee: 140000, paidAmount: 140000, dueDate: '2024-07-31', status: 'Paid' },
-    { id: 4, name: 'Fatima Bello', avatarUrl: 'https://i.pravatar.cc/150?u=fatima', grade: 11, section: 'C', totalFee: 160000, paidAmount: 100000, dueDate: '2024-07-15', status: 'Overdue' },
-    { id: 5, name: 'Emeka Nwosu', avatarUrl: 'https://i.pravatar.cc/150?u=emeka', grade: 12, section: 'A', totalFee: 170000, paidAmount: 170000, dueDate: '2024-07-31', status: 'Paid' },
-    { id: 6, name: 'Yusuf Aliyu', avatarUrl: 'https://i.pravatar.cc/150?u=yusuf', grade: 9, section: 'B', totalFee: 140000, paidAmount: 0, dueDate: '2024-07-10', status: 'Overdue' },
-    { id: 7, name: 'Ngozi Eze', avatarUrl: 'https://i.pravatar.cc/150?u=ngozi', grade: 11, section: 'A', totalFee: 160000, paidAmount: 160000, dueDate: '2024-07-31', status: 'Paid' },
-    { id: 8, name: 'Bolanle Ojo', avatarUrl: 'https://i.pravatar.cc/150?u=bolanle', grade: 10, section: 'C', totalFee: 150000, paidAmount: 75000, dueDate: '2024-08-15', status: 'Unpaid' },
+  { id: 3, name: 'Musa Ibrahim', avatarUrl: 'https://i.pravatar.cc/150?u=musa', grade: 9, section: 'A', totalFee: 150000, paidAmount: 100000, dueDate: '2024-08-01', status: 'Unpaid' },
+  { id: 4, name: 'Fatima Bello', avatarUrl: 'https://i.pravatar.cc/150?u=fatima', grade: 11, section: 'C', totalFee: 180000, paidAmount: 180000, dueDate: '2024-07-25', status: 'Paid' },
+  { id: 1, name: 'Adebayo Adewale', avatarUrl: 'https://i.pravatar.cc/150?u=adebayo', grade: 10, section: 'A', totalFee: 165000, paidAmount: 165000, dueDate: '2024-07-25', status: 'Paid' },
+  { id: 2, name: 'Chidinma Okoro', avatarUrl: 'https://i.pravatar.cc/150?u=chidinma', grade: 10, section: 'B', totalFee: 165000, paidAmount: 0, dueDate: '2024-07-15', status: 'Overdue' },
 ];
 
 export const mockTimetableData: TimetableEntry[] = [
-  // Monday
-  { day: 'Monday', startTime: '09:00', endTime: '09:45', subject: 'Mathematics', className: 'Grade 10A' },
-  { day: 'Monday', startTime: '09:45', endTime: '10:30', subject: 'English', className: 'Grade 10A' },
-  { day: 'Monday', startTime: '10:45', endTime: '11:30', subject: 'Physics', className: 'Grade 10A' },
-  { day: 'Monday', startTime: '11:30', endTime: '12:15', subject: 'English', className: 'Grade 7A' },
-
-  // Tuesday
-  { day: 'Tuesday', startTime: '09:00', endTime: '09:45', subject: 'English', className: 'Grade 11C' },
-  { day: 'Tuesday', startTime: '09:45', endTime: '10:30', subject: 'Chemistry', className: 'Grade 11C' },
-  { day: 'Tuesday', startTime: '10:45', endTime: '11:30', subject: 'English', className: 'Grade 8A' },
-  { day: 'Tuesday', startTime: '13:45', endTime: '14:30', subject: 'English', className: 'Grade 9A' },
-  
-  // Wednesday
-  { day: 'Wednesday', startTime: '09:00', endTime: '10:30', subject: 'Biology', className: 'Grade 11C' },
-  { day: 'Wednesday', startTime: '11:30', endTime: '12:15', subject: 'English', className: 'Grade 12A' },
-  
-  // Friday
-  { day: 'Friday', startTime: '11:30', endTime: '12:15', subject: 'History', className: 'Grade 9A' },
-  { day: 'Friday', startTime: '09:00', endTime: '09:45', subject: 'English', className: 'Grade 11A' },
+  // Fatima Bello - Grade 11C, Science
+  { day: 'Monday', startTime: '09:00', endTime: '10:00', subject: 'Chemistry', className: 'Grade 11C' },
+  { day: 'Monday', startTime: '10:00', endTime: '11:00', subject: 'Physics', className: 'Grade 11C' },
+  { day: 'Tuesday', startTime: '09:00', endTime: '10:00', subject: 'English', className: 'Grade 11C' },
+  { day: 'Tuesday', startTime: '11:00', endTime: '12:00', subject: 'Biology', className: 'Grade 11C' },
+  // Adebayo Adewale - Grade 10A, Science
+  { day: 'Monday', startTime: '09:00', endTime: '10:00', subject: 'Mathematics', className: 'Grade 10A' },
+  { day: 'Wednesday', startTime: '11:00', endTime: '12:00', subject: 'Physics', className: 'Grade 10A' },
 ];
 
-export const mockStudentAttendance: StudentAttendance[] = [
-  { studentId: 3, date: '2024-07-22', status: 'Present' },
-  { studentId: 3, date: '2024-07-23', status: 'Absent' },
-  { studentId: 3, date: '2024-07-24', status: 'Present' },
-  { studentId: 4, date: '2024-07-22', status: 'Present' },
-  { studentId: 4, date: '2024-07-23', status: 'Present' },
-  { studentId: 4, date: '2024-07-24', status: 'Late' },
+export const mockStudentPerformanceData: StudentPerformanceData[] = [
+  { id: 1, name: 'Adebayo Adewale', avatarUrl: 'https://i.pravatar.cc/150?u=adebayo', grade: 10, section: 'A', averageScore: 87 },
+  { id: 2, name: 'Chidinma Okoro', avatarUrl: 'https://i.pravatar.cc/150?u=chidinma', grade: 10, section: 'B', averageScore: 78 },
+  { id: 3, name: 'Musa Ibrahim', avatarUrl: 'https://i.pravatar.cc/150?u=musa', grade: 9, section: 'A', averageScore: 68 },
+  { id: 4, name: 'Fatima Bello', avatarUrl: 'https://i.pravatar.cc/150?u=fatima', grade: 11, section: 'C', averageScore: 92 },
+  { id: 5, name: 'Emeka Nwosu', avatarUrl: 'https://i.pravatar.cc/150?u=emeka', grade: 12, section: 'A', averageScore: 91 },
 ];
 
-export const mockProgressData: ProgressReport[] = [
-  {
-    studentId: 3,
-    strengths: ['Shows great creativity in Art projects.', 'Improving in team collaboration during class activities.'],
-    areasForImprovement: ['Needs to be more consistent with homework submission for Mathematics.', 'Should participate more actively in class discussions.'],
-    generalRemark: "Musa is a pleasant student with a lot of potential. Focusing on consistency will greatly boost his academic performance."
-  }
-];
-
-export const mockNotifications: Notification[] = [
-  { id: 1, category: 'Fees', title: 'Fee Reminder', summary: 'The second term school fee for Fatima Bello is now overdue.', timestamp: daysAgo(2), isRead: false, audience: ['parent'], studentId: 4 },
-  { id: 2, category: 'Attendance', title: 'Absence Alert', summary: 'Musa Ibrahim was marked absent today.', timestamp: hoursAgo(5), isRead: false, audience: ['parent'], studentId: 3 },
-  { id: 3, category: 'Message', title: 'New Message from Mrs. Akintola', summary: "Hello, I'd like to discuss Fatima's recent English essay...", timestamp: hoursAgo(8), isRead: true, audience: ['parent'], studentId: 4 },
-  { id: 4, category: 'Event', title: 'Sports Day Next Week!', summary: "Don't forget the Annual Sports Day is next Saturday. Come cheer on the students!", timestamp: daysAgo(3), isRead: true, audience: ['all'] },
-  { id: 5, category: 'Homework', title: 'New Assignment Posted', summary: 'A new assignment "Macbeth Analysis" has been posted for Grade 11C.', timestamp: hoursAgo(1), isRead: false, audience: ['student'], studentId: 4 },
-  { id: 6, category: 'Volunteering', title: 'Volunteers Needed', summary: 'We need parent volunteers for the upcoming bake sale.', timestamp: daysAgo(1), isRead: false, audience: ['parent'] },
-];
-
-export const mockEnrollmentData: { year: number, count: number }[] = [
-    { year: 2020, count: 450 },
-    { year: 2021, count: 480 },
-    { year: 2022, count: 520 },
-    { year: 2023, count: 550 },
-    { year: 2024, count: 580 },
-];
+export const mockTopStudents: StudentPerformanceData[] = mockStudentPerformanceData.sort((a,b) => b.averageScore - a.averageScore).slice(0,3);
 
 export const mockSubjectAverages: SubjectAverage[] = [
   { subject: 'Mathematics', averageScore: 82 },
-  { subject: 'English', averageScore: 88 },
-  { subject: 'Physics', averageScore: 78 },
-  { subject: 'Chemistry', averageScore: 75 },
-  { subject: 'Biology', averageScore: 80 },
-  { subject: 'History', averageScore: 72 },
+  { subject: 'English', averageScore: 85 },
+  { subject: 'Physics', averageScore: 88 },
+  { subject: 'Chemistry', averageScore: 84 },
+  { subject: 'Biology', averageScore: 81 },
+  { subject: 'History', averageScore: 75 },
 ];
 
-export const mockTopStudents: StudentPerformanceData[] = [
-    { id: 11, name: 'Chioma Adekunle', avatarUrl: 'https://i.pravatar.cc/150?u=chioma', grade: 10, section: 'A', averageScore: 93 },
-    { id: 4, name: 'Fatima Bello', avatarUrl: 'https://i.pravatar.cc/150?u=fatima', grade: 11, section: 'C', averageScore: 92 },
+export const mockEnrollmentData = [
+  { year: 2020, count: 450 },
+  { year: 2021, count: 480 },
+  { year: 2022, count: 510 },
+  { year: 2023, count: 550 },
+  { year: 2024, count: 580 },
 ];
 
 export const mockAttendanceCorrelation: AttendanceCorrelationPoint[] = [
-    { attendanceBracket: '70-80%', averageScore: 72 },
-    { attendanceBracket: '80-90%', averageScore: 78 },
-    { attendanceBracket: '90-100%', averageScore: 85 },
+  { attendanceBracket: '60-70%', averageScore: 62 },
+  { attendanceBracket: '70-80%', averageScore: 71 },
+  { attendanceBracket: '80-90%', averageScore: 80 },
+  { attendanceBracket: '90-100%', averageScore: 89 },
 ];
 
-export const mockActivities: Activity[] = [
-    { id: 1, name: 'Debate Club', category: 'Club', description: 'Hone your public speaking and argumentation skills.', icon: MegaphoneIcon },
-    { id: 2, name: 'Football Team', category: 'Sport', description: 'Join the school football team for practice and competitions.', icon: FootballIcon },
-    { id: 3, name: 'Art Club', category: 'Cultural', description: 'Explore your creativity with painting, drawing, and sculpture.', icon: PaintBrushIcon },
-    { id: 4, name: 'School Choir', category: 'Cultural', description: 'Lend your voice to our acclaimed school choir.', icon: MusicNoteIcon },
-    { id: 5, name: 'Press Club', category: 'Club', description: 'Report on school events and learn about journalism.', icon: BookOpenIcon },
-    { id: 6, name: 'Basketball Team', category: 'Sport', description: 'Join the school basketball team.', icon: TrophyIcon },
+// More detailed mock attendance
+export const mockStudentAttendance: StudentAttendance[] = [
+    // Fatima Bello (ID 4)
+    { studentId: 4, date: '2024-07-29', status: 'Present' },
+    { studentId: 4, date: '2024-07-26', status: 'Present' },
+    { studentId: 4, date: '2024-07-25', status: 'Present' },
+    { studentId: 4, date: '2024-07-24', status: 'Present' },
+    { studentId: 4, date: '2024-07-23', status: 'Late' },
+    { studentId: 4, date: '2024-07-22', status: 'Present' },
+    { studentId: 4, date: '2024-07-19', status: 'Absent' },
+    // Musa Ibrahim (ID 3)
+    { studentId: 3, date: '2024-07-29', status: 'Present' },
+    { studentId: 3, date: '2024-07-26', status: 'Absent' },
+    { studentId: 3, date: '2024-07-25', status: 'Absent' },
+    { studentId: 3, date: '2024-07-24', status: 'Present' },
+    { studentId: 3, date: '2024-07-23', status: 'Present' },
 ];
 
-export const mockExtracurricularEvents: ExtracurricularEvent[] = [
-    { id: 1, title: 'Debate Club Tryouts', date: '2024-08-05', category: 'Club' },
-    { id: 2, title: 'Football Match vs. City High', date: '2024-08-12', category: 'Sport' },
-    { id: 3, title: 'Annual Art Exhibition', date: '2024-08-20', category: 'Cultural' },
+export const mockProgressData: ProgressReport[] = [
+    {
+        studentId: 3, // Musa Ibrahim
+        strengths: ["Shows great enthusiasm during group discussions.", "Has a creative approach to problem-solving in non-core subjects.", "Polite and respectful towards teachers and peers."],
+        areasForImprovement: ["Consistency in completing Math homework.", "Maintaining focus during individual seat-work.", "Improving organizational skills for materials."],
+        generalRemark: "Musa is a bright student with a wonderful personality. With improved focus on core academic routines, his performance will surely see a significant boost."
+    },
+    {
+        studentId: 4, // Fatima Bello
+        strengths: ["Excellent grasp of scientific concepts and exceptional analytical skills.", "Demonstrates leadership qualities in group projects.", "Consistently submits high-quality work and meets deadlines."],
+        areasForImprovement: ["Could be encouraged to participate more in class-wide discussions, not just within her group.", "Exploring creative writing to complement her analytical English skills."],
+        generalRemark: "Fatima is an exemplary student whose dedication is commendable. She is a natural leader and a role model for her peers."
+    }
 ];
 
 export const mockFeeBreakdown: FeeBreakdownItem[] = [
-    { item: 'Tuition Fee', amount: 112000 },
-    { item: 'Bus Service', amount: 16000 },
-    { item: 'Lab Fee', amount: 16000 },
-    { item: 'Library Fee', amount: 16000 },
+    { item: 'Tuition Fee', amount: 120000 },
+    { item: 'Bus Service', amount: 20000 },
+    { item: 'Extracurriculars', amount: 15000 },
+    { item: 'Uniform & Books', amount: 25000 },
 ];
 
 export const mockPaymentHistory: PaymentHistoryItem[] = [
-    { id: 'TXN456', date: '2024-06-20', amount: 100000, method: 'Card' },
-];
-
-export const mockBadges: Badge[] = [
-    { id: 1, name: 'Perfect Attendance', description: 'Attended every school day in a term.', icon: PerfectAttendanceIcon, color: 'bg-green-100 text-green-800' },
-    { id: 2, name: 'Star Student', description: 'Top of the class for the term.', icon: StarStudentIcon, color: 'bg-yellow-100 text-yellow-800' },
-    { id: 3, name: 'Science Fair Winner', description: 'First place in the annual science fair.', icon: ScienceFairWinnerIcon, color: 'bg-blue-100 text-blue-800' },
-    { id: 4, name: 'Sportsmanship', description: 'Demonstrated exceptional sportsmanship.', icon: SportsmanshipIcon, color: 'bg-red-100 text-red-800' },
-    { id: 5, name: 'Reading Challenge', description: 'Read over 20 books in a term.', icon: ReadingChallengeIcon, color: 'bg-indigo-100 text-indigo-800' },
-    { id: 6, name: 'Helping Hand', description: 'Recognized for helping peers.', icon: HelpingHandIcon, color: 'bg-sky-100 text-sky-800' },
-];
-
-export const mockCertificates: Certificate[] = [
-    { id: 1, name: 'Certificate of Excellence in Mathematics', issuedDate: '2024-04-15', issuer: 'Mathematics Department', fileUrl: '#' },
-    { id: 2, name: 'Participation in Inter-School Debate', issuedDate: '2024-03-22', issuer: 'Literary & Debating Society', fileUrl: '#' },
-];
-
-export const mockAwards: Award[] = [
-    { id: 1, name: 'Principal\'s Award for Academic Excellence', date: '2024-07-20', description: 'Awarded for achieving the highest overall score in Grade 11 for the session.' },
+    { id: 'TXN12345', date: '2024-07-01', amount: 180000, method: 'Card' },
 ];
 
 export const mockParents: Parent[] = [
-    { id: 1001, name: 'Mr. & Mrs. Bello', email: 'bello.family@example.com', phone: '08023456789', avatarUrl: 'https://i.pravatar.cc/150?u=parent1', childIds: [4] },
-    { id: 1002, name: 'Mr. Ibrahim', email: 'm.ibrahim@example.com', phone: '08034567890', avatarUrl: 'https://i.pravatar.cc/150?u=parent2', childIds: [3] },
+    { id: 1001, name: "Mrs. Bello", email: 'bello.f@example.com', phone: '080-111-2222', avatarUrl: 'https://i.pravatar.cc/150?u=parent1', childIds: [4] },
+    { id: 1002, name: "Mr. Ibrahim", email: 'ibrahim.m@example.com', phone: '080-333-4444', avatarUrl: 'https://i.pravatar.cc/150?u=parent2', childIds: [3] },
 ];
 
 export const mockComplaints: Complaint[] = [
     {
-        id: 'C001',
+        id: 'C-001',
         category: 'Bus Service',
         rating: 2,
-        comment: 'The school bus is consistently late in the mornings, causing my child to miss the assembly.',
+        comment: "The school bus is consistently late for pickup in the mornings. This has made my child late for school on multiple occasions.",
         timeline: [
-            { timestamp: daysAgo(5), status: 'Submitted', comment: 'Feedback submitted by you.', by: 'You' },
-            { timestamp: daysAgo(4), status: 'In Progress', comment: 'We are looking into the bus schedule and driver punctuality.', by: 'Admin' },
+            { timestamp: daysAgo(5), status: 'Submitted', comment: "Initial complaint submitted.", by: 'You' },
+            { timestamp: daysAgo(4), status: 'In Progress', comment: "We are looking into the route timing. Thank you for your feedback.", by: 'Admin' },
         ]
     },
     {
-        id: 'C002',
+        id: 'C-002',
         category: 'Academics',
-        rating: 5,
-        comment: 'Mrs. Akintola has been an amazing English teacher for my daughter. Her grades have improved significantly!',
+        rating: 4,
+        comment: "Just wanted to say the new AI Study Buddy is fantastic! My daughter Fatima is really enjoying it.",
         timeline: [
-            { timestamp: daysAgo(10), status: 'Submitted', comment: 'Feedback submitted by you.', by: 'You' },
-            { timestamp: daysAgo(9), status: 'Resolved', comment: 'Thank you for your kind words. We have passed on your feedback to Mrs. Akintola and the school management.', by: 'Admin' },
-            { timestamp: daysAgo(8), status: 'Closed', comment: 'Feedback marked as closed.', by: 'Admin' },
+            { timestamp: daysAgo(2), status: 'Submitted', comment: "Initial feedback submitted.", by: 'You' },
+            { timestamp: daysAgo(1), status: 'Resolved', comment: "Thank you for the positive feedback! We're glad to hear it's helpful.", by: 'Admin' },
+            { timestamp: daysAgo(0), status: 'Closed', comment: "Case closed.", by: 'Admin' },
         ]
     }
 ];
 
-export const mockLearningResources: LearningResource[] = [
-    { id: 1, title: 'Helping Your Child with Homework', type: 'PDF', subject: 'General', description: 'A guide for parents on creating a positive homework environment.', url: '#', thumbnailUrl: 'https://picsum.photos/seed/lr1/400/225' },
-    { id: 2, title: 'Understanding Adolescent Behavior', type: 'Video', subject: 'General', description: 'A 15-minute video from a child psychologist.', url: '#', thumbnailUrl: 'https://picsum.photos/seed/lr2/400/225' },
-    { id: 3, title: 'Key Concepts in JSS 2 Mathematics', type: 'PDF', subject: 'Mathematics', description: 'A summary sheet of important formulas and concepts for parents to review with their child.', url: '#', thumbnailUrl: 'https://picsum.photos/seed/lr3/400/225' },
-];
-
-export const mockSchoolPolicies: SchoolPolicy[] = [
-    { id: 1, title: 'Student Code of Conduct', description: 'Guidelines for student behavior, discipline, and expectations.', url: '#' },
-    { id: 2, title: 'Academic Integrity Policy', description: 'Rules regarding plagiarism, cheating, and academic honesty.', url: '#' },
-    { id: 3, title: 'Health and Safety Policy', description: 'Protocols for medical emergencies, campus safety, and student well-being.', url: '#' },
+export const mockNotifications: Notification[] = [
+    // Parent Notifications
+    { id: 1, category: 'Fees', title: 'Fee Payment Due', summary: "Your child's second term fees are due soon. Please pay to avoid late charges.", timestamp: daysAgo(3), isRead: false, audience: ['parent'], studentId: 3 },
+    { id: 2, category: 'Attendance', title: 'Absence Alert', summary: "Musa Ibrahim was marked absent today. Please contact the school office.", timestamp: hoursAgo(5), isRead: false, audience: ['parent'], studentId: 3 },
+    { id: 3, category: 'Event', title: 'PTA Meeting Reminder', summary: "A reminder that the PTA meeting is scheduled for this Saturday.", timestamp: daysAgo(1), isRead: true, audience: ['parent'] },
+    // Student Notifications
+    { id: 4, category: 'Homework', title: 'New Assignment Posted', summary: "Mrs. Akintola has posted a new English assignment, due next Friday.", timestamp: hoursAgo(2), isRead: false, audience: ['student'], studentId: 4 },
+    { id: 5, category: 'Message', title: 'New Message from Mrs. Akintola', summary: "You have a new message regarding your last submission.", timestamp: minutesAgo(30), isRead: false, audience: ['student'], studentId: 4 },
+    // Teacher Notifications
+    { id: 6, category: 'Message', title: 'New Message from Admin', summary: "Please submit all report card drafts by the end of the week.", timestamp: daysAgo(1), isRead: false, audience: ['teacher'] },
+    // Admin Notifications
+    { id: 7, category: 'Volunteering', title: 'New Volunteer Sign-up', summary: "Mrs. Bello has signed up for the Sports Day event.", timestamp: hoursAgo(1), isRead: false, audience: ['admin'] },
 ];
 
 export const mockPtaMeetings: PTAMeeting[] = [
     {
         id: 1,
-        title: 'End of Term Review & Planning',
-        date: '2024-08-03T10:00:00Z',
-        time: '10:00 AM',
-        isPast: false,
+        title: "Second Term Review & Planning",
+        date: "2024-08-03T10:00:00Z",
+        time: "10:00 AM - 12:00 PM",
         agenda: [
-            { title: 'Welcome Address', presenter: 'Principal' },
-            { title: 'Review of Last Term\'s Performance', presenter: 'Head of Academics' },
-            { title: 'New School Policies', presenter: 'Admin Head' },
-            { title: 'Open Forum / Q&A', presenter: 'All' },
+            { title: "Welcome Address", presenter: "Principal" },
+            { title: "Review of First Term Academics", presenter: "VP Academics" },
+            { title: "Upcoming Events (Sports Day)", presenter: "Mr. Pwajok" },
+            { title: "Open Forum / Q&A", presenter: "All" },
         ],
-    },
+        isPast: false,
+    }
+];
+
+export const mockLearningResources: LearningResource[] = [
+    { id: 1, title: 'Guide to Acing Your Exams', type: 'PDF', subject: 'General', description: 'Tips and tricks for effective study habits and exam preparation.', url: '#', thumbnailUrl: 'https://picsum.photos/seed/guide1/400/225' },
+    { id: 2, title: 'Understanding Photosynthesis', type: 'Video', subject: 'Biology', description: 'An animated video explaining the process of photosynthesis for junior secondary students.', url: '#', thumbnailUrl: 'https://picsum.photos/seed/guide2/400/225' },
+    { id: 3, title: 'The Importance of Digital Literacy', type: 'PDF', subject: 'General', description: 'An article for parents on navigating the digital world with your child.', url: '#', thumbnailUrl: 'https://picsum.photos/seed/guide3/400/225' },
+];
+
+export const mockSchoolPolicies: SchoolPolicy[] = [
+    { id: 1, title: "Student Code of Conduct", description: "Outlines the expected behavior, dress code, and disciplinary procedures.", url: "#" },
+    { id: 2, title: "Anti-Bullying Policy", description: "Our commitment to providing a safe and respectful environment for all students.", url: "#" },
+    { id: 3, title: "Academic Integrity Policy", description: "Information on plagiarism, cheating, and promoting honest academic work.", url: "#" },
 ];
 
 export const mockVolunteeringOpportunities: VolunteeringOpportunity[] = [
-    { id: 1, title: 'Annual Sports Day Chaperone', description: 'Help supervise students and manage events during our annual sports day.', date: '2024-08-10', spotsAvailable: 10, spotsFilled: 7 },
-    { id: 2, title: 'Library Book Sorting', description: 'Assist our librarian in sorting and cataloging new books.', date: '2024-09-05', spotsAvailable: 5, spotsFilled: 5 },
-    { id: 3, title: 'Annual Bake Sale Fundraiser', description: 'Help bake or sell goods to raise funds for new library books.', date: '2024-09-15', spotsAvailable: 15, spotsFilled: 8 },
+    { id: 1, title: 'Annual Sports Day Event Staff', description: 'Help manage events, distribute water, and guide student groups during our annual sports day.', date: '2024-08-10T09:00:00Z', spotsAvailable: 15, spotsFilled: 11 },
+    { id: 2, title: 'Library Book Sorting Day', description: 'Assist our librarian in sorting, labeling, and shelving new books for the upcoming term.', date: '2024-09-02T10:00:00Z', spotsAvailable: 8, spotsFilled: 8 },
 ];
 
 export const mockPermissionSlip: PermissionSlip = {
     id: 1,
-    title: 'Excursion to National Museum',
-    description: 'We are planning an educational excursion to the National Museum. This trip will enhance students\' understanding of our national heritage. Please review and provide your consent.',
-    date: '2024-10-05T09:00:00Z',
-    location: 'National Museum, Lagos',
-    status: 'Pending',
+    title: "Excursion to National Museum",
+    description: "Our Grade 9 students will be visiting the National Museum for their History class. This trip will provide an immersive experience to complement their curriculum. Transportation will be via the school bus, and students are required to bring a packed lunch. Please sign below to grant permission for your child, Musa Ibrahim, to attend.",
+    date: '2024-10-15T09:00:00Z',
+    location: "National Museum, Lagos",
+    status: 'Pending'
 };
 
 export const mockStoreProducts: StoreProduct[] = [
-    { id: 1, name: 'School Blazer (Size M)', category: 'Uniform', price: 15000, imageUrl: 'https://picsum.photos/seed/blazer/400/400', stock: 25 },
-    { id: 2, name: 'Senior Maths Textbook', category: 'Book', price: 3500, imageUrl: 'https://picsum.photos/seed/mathsbook/400/400', stock: 50 },
-    { id: 3, name: 'Pack of 12 Pencils', category: 'Stationery', price: 1200, imageUrl: 'https://picsum.photos/seed/pencils/400/400', stock: 100 },
-    { id: 4, name: 'PE Shorts (Size L)', category: 'Uniform', price: 5000, imageUrl: 'https://picsum.photos/seed/shorts/400/400', stock: 0 },
+    { id: 1, name: 'Senior Boys Uniform (Set)', category: 'Uniform', price: 15000, imageUrl: 'https://picsum.photos/seed/uniform1/300/300', stock: 50 },
+    { id: 2, name: 'New General Mathematics for SS1', category: 'Book', price: 3500, imageUrl: 'https://picsum.photos/seed/book1/300/300', stock: 120 },
+    { id: 3, name: 'School Branded Notebooks (Pack of 5)', category: 'Stationery', price: 2000, imageUrl: 'https://picsum.photos/seed/stat1/300/300', stock: 85 },
+    { id: 4, name: 'Junior Girls PE Wear', category: 'Uniform', price: 8000, imageUrl: 'https://picsum.photos/seed/uniform2/300/300', stock: 25 },
 ];
 
 export const mockStoreOrders: StoreOrder[] = [
-    { id: 'ORD-001', customerName: 'Mrs. Bello', items: [{ productName: 'School Blazer (Size M)', quantity: 1 }], totalAmount: 15000, status: 'Delivered', orderDate: '2024-07-20T10:00:00Z' },
-    { id: 'ORD-002', customerName: 'Mr. Ibrahim', items: [{ productName: 'Senior Maths Textbook', quantity: 1 }, { productName: 'Pack of 12 Pencils', quantity: 2 }], totalAmount: 5900, status: 'Shipped', orderDate: '2024-07-22T14:30:00Z' },
-    { id: 'ORD-003', customerName: 'Mr. Adewale', items: [{ productName: 'PE Shorts (Size L)', quantity: 2 }], totalAmount: 10000, status: 'Pending', orderDate: '2024-07-24T09:15:00Z' },
+    { id: 'ORD-001', customerName: 'Mrs. Bello', items: [{ productName: 'Senior Boys Uniform (Set)', quantity: 1 }], totalAmount: 15000, status: 'Delivered', orderDate: daysAgo(3) },
+    { id: 'ORD-002', customerName: 'Mr. Ibrahim', items: [{ productName: 'New General Mathematics for SS1', quantity: 1 }, { productName: 'School Branded Notebooks (Pack of 5)', quantity: 2 }], totalAmount: 7500, status: 'Shipped', orderDate: daysAgo(1) },
+    { id: 'ORD-003', customerName: 'Admin Purchase', items: [{ productName: 'Junior Girls PE Wear', quantity: 5 }], totalAmount: 40000, status: 'Pending', orderDate: hoursAgo(2) },
 ];
 
 export const mockForumTopics: ForumTopic[] = [
     {
         id: 1,
-        title: 'Strategies for Teaching Shakespeare to JSS 2 Students',
-        authorName: 'Mrs. Funke Akintola',
-        createdAt: '2024-07-20T10:00:00Z',
-        postCount: 2,
-        lastActivity: '2024-07-21T11:30:00Z',
+        title: "Strategies for Teaching Shakespeare to Grade 9",
+        authorName: "Mrs. Funke Akintola",
+        createdAt: daysAgo(5),
         posts: [
-            { id: 101, author: { name: 'Mrs. Funke Akintola', avatarUrl: 'https://i.pravatar.cc/150?u=funke' }, content: "I'm looking for some fresh ideas to make Macbeth more engaging for my JSS 2 class. What has worked for you all?", timestamp: '2024-07-20T10:00:00Z' },
-            { id: 102, author: { name: 'Mr. David Audu', avatarUrl: 'https://i.pravatar.cc/150?u=david_audu' }, content: "Have you tried acting out key scenes? My students loved it last year. We even used simple props. It really brought the text to life.", timestamp: '2024-07-21T11:30:00Z' },
-        ]
+            { id: 1, author: { name: 'Mrs. Funke Akintola', avatarUrl: mockTeachers[1].avatarUrl }, content: "I'm looking for some fresh ideas to make Macbeth more engaging for my Grade 9 students. What has worked for you all?", timestamp: daysAgo(5) },
+            { id: 2, author: { name: 'Mr. Emeka Obi', avatarUrl: mockTeachers[4].avatarUrl }, content: "Have you tried the 'Shakespeare in Shorts' animated videos? They're a great primer before diving into the actual text.", timestamp: daysAgo(4) },
+        ],
+        postCount: 2,
+        lastActivity: daysAgo(4),
     },
     {
         id: 2,
-        title: 'Best Resources for Teaching Basic Coding Concepts',
-        authorName: 'Mrs. Linda Ibeh',
-        createdAt: '2024-07-18T15:00:00Z',
-        postCount: 1,
-        lastActivity: '2024-07-18T15:00:00Z',
+        title: "Best Online Resources for Physics Practicals",
+        authorName: "Dr. Tunde Bello",
+        createdAt: daysAgo(2),
         posts: [
-            { id: 201, author: { name: 'Mrs. Linda Ibeh', avatarUrl: 'https://i.pravatar.cc/150?u=linda' }, content: "Looking for recommendations on online platforms or offline activities for introducing programming logic to SSS 1 students. Any suggestions?", timestamp: '2024-07-18T15:00:00Z' },
-        ]
-    }
+             { id: 1, author: { name: 'Dr. Tunde Bello', avatarUrl: mockTeachers[2].avatarUrl }, content: "Does anyone have recommendations for good virtual lab simulations for Physics? Especially for topics like electricity and magnetism.", timestamp: daysAgo(2) },
+        ],
+        postCount: 1,
+        lastActivity: daysAgo(2),
+    },
 ];
 
 export const mockAppointmentSlots: AppointmentSlot[] = [
@@ -999,42 +1009,43 @@ export const mockAppointmentSlots: AppointmentSlot[] = [
     { time: '10:30 AM', isBooked: false },
     { time: '11:00 AM', isBooked: true },
     { time: '11:30 AM', isBooked: false },
-    { time: '01:00 PM', isBooked: false },
-    { time: '01:30 PM', isBooked: false },
-    { time: '02:00 PM', isBooked: true },
 ];
 
 export const mockQuizzes: Quiz[] = [
     {
         id: 1,
-        subject: 'Chemistry',
-        title: 'The Periodic Table Challenge',
+        subject: 'Biology',
+        title: 'The Human Cell',
         questionCount: 5,
-        points: 100,
+        points: 500,
         questions: [
-            { question: 'What is the symbol for Gold?', options: ['Ag', 'Au', 'G', 'Go'], correctAnswer: 'Au' },
-            { question: 'Which element is a noble gas?', options: ['Oxygen', 'Nitrogen', 'Neon', 'Carbon'], correctAnswer: 'Neon' },
-            { question: 'What is the atomic number of Hydrogen?', options: ['1', '2', '3', '4'], correctAnswer: '1' },
-            { question: 'Which of these is a Halogen?', options: ['Sodium', 'Chlorine', 'Calcium', 'Iron'], correctAnswer: 'Chlorine' },
-            { question: 'What does "Fe" stand for?', options: ['Fluorine', 'Fermium', 'Iron', 'Francium'], correctAnswer: 'Iron' },
+            { question: "What is the powerhouse of the cell?", options: ["Nucleus", "Ribosome", "Mitochondrion"], correctAnswer: "Mitochondrion" },
+            { question: "Which part of the cell contains the genetic material?", options: ["Cytoplasm", "Nucleus", "Cell Membrane"], correctAnswer: "Nucleus" },
+            { question: "What is the function of the cell membrane?", options: ["To control what enters and leaves the cell", "To produce energy", "To create proteins"], correctAnswer: "To control what enters and leaves the cell" },
+            { question: "Which of these is NOT found in an animal cell?", options: ["Vacuole", "Cell Wall", "Cytoplasm"], correctAnswer: "Cell Wall" },
+            { question: "What are ribosomes responsible for?", options: ["Energy production", "Waste removal", "Protein synthesis"], correctAnswer: "Protein synthesis" },
         ]
     },
     {
         id: 2,
         subject: 'English',
-        title: 'Literary Devices Quiz',
+        title: 'Literary Devices',
         questionCount: 3,
-        points: 50,
+        points: 300,
         questions: [
-            { question: '"The wind whispered through the trees" is an example of:', options: ['Metaphor', 'Simile', 'Personification', 'Hyperbole'], correctAnswer: 'Personification' },
-            { question: 'Which is a figure of speech involving an exaggeration?', options: ['Irony', 'Hyperbole', 'Oxymoron', 'Onomatopoeia'], correctAnswer: 'Hyperbole' },
-            { question: 'What is a comparison using "like" or "as"?', options: ['Metaphor', 'Simile', 'Alliteration', 'Assonance'], correctAnswer: 'Simile' },
+            { question: "'The wind whispered through the trees' is an example of...", options: ["Metaphor", "Personification", "Simile"], correctAnswer: "Personification" },
+            { question: "What is a comparison using 'like' or 'as' called?", options: ["Simile", "Alliteration", "Metaphor"], correctAnswer: "Simile" },
+            { question: "The repetition of the same sound at the beginning of words is...", options: ["Onomatopoeia", "Hyperbole", "Alliteration"], correctAnswer: "Alliteration" },
         ]
     }
 ];
 
+export const mockLessonPlans: LessonPlan[] = [
+    // ... can be populated if needed
+];
+
 export const mockPdResources: PDResource[] = [
-    { id: 1, type: 'Article', title: '5 Ways to Foster a Growth Mindset in the Classroom', source: 'Edutopia', summary: 'Practical strategies to help students embrace challenges and see effort as a path to mastery.', url: '#' },
-    { id: 2, type: 'Video', title: 'Using Technology for Differentiated Instruction', source: 'YouTube', summary: 'A 15-minute video showcasing digital tools to cater to diverse learning needs in your classroom.', url: '#' },
-    { id: 3, type: 'Workshop', title: 'Upcoming: Project-Based Learning Seminar', source: 'School Admin', summary: 'Join us next month for a hands-on workshop on implementing PBL in your subject area. Registration required.', url: '#' },
+    { id: 1, type: 'Article', title: '5 Effective Strategies for Classroom Management', source: 'Edutopia', summary: 'Practical tips for maintaining a positive and productive learning environment.', url: '#' },
+    { id: 2, type: 'Video', title: 'The Flipped Classroom Model Explained', source: 'YouTube', summary: 'A short animated video explaining the benefits and implementation of a flipped classroom.', url: '#' },
+    { id: 3, type: 'Workshop', title: 'AI in Education (Internal Training)', source: 'School Admin', summary: 'Join our upcoming workshop on leveraging AI tools for lesson planning and student engagement.', url: '#' },
 ];

@@ -608,6 +608,24 @@ export interface UserAnswer {
 }
 
 // For AI Lesson Planner
+export interface SchemeWeek {
+  week: number;
+  topic: string;
+  subTopics: string[];
+}
+
+export interface SavedScheme {
+  subject: string;
+  className: string;
+  term1Scheme: SchemeWeek[];
+  term2Scheme: SchemeWeek[];
+  term3Scheme: SchemeWeek[];
+}
+
+export type HistoryEntry = SavedScheme & {
+  lastUpdated: string;
+};
+
 export interface SchemeTopic {
   week: number;
   topic: string;
