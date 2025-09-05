@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { 
   MailIcon, 
@@ -80,8 +79,9 @@ const TeacherProfile: React.FC<TeacherProfileProps> = ({ navigateTo }) => {
         <div>
             <h3 className="text-md font-bold text-gray-600 px-2 mb-2">Quick Actions</h3>
             <div className="grid grid-cols-3 gap-3">
-                {quickActions.map(action => (
-                    <QuickActionCard key={action.label} {...action} />
+{/* FIX: Replaced spread operator with explicit props to resolve the TypeScript error. */}
+                {quickActions.map(item => (
+                    <QuickActionCard key={item.label} icon={item.icon} label={item.label} bgColor={item.bgColor} action={item.action} />
                 ))}
             </div>
         </div>

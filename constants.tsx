@@ -96,6 +96,21 @@ export const SUBJECTS_LIST = [
     { id: 19, name: 'Basic Science' }, { id: 20, name: 'Business Studies' }, { id: 21, name: 'Social Studies' }
 ];
 
+// --- CLASS NAME FORMATTER ---
+export const getFormattedClassName = (grade: number, section: string, withSection: boolean = true): string => {
+    let level = '';
+    if (grade >= 10) level = `SSS ${grade - 9}`;
+    else if (grade >= 7) level = `JSS ${grade - 6}`;
+    else if (grade >= 1) level = `Primary ${grade}`;
+    else if (grade === 0) level = 'Nursery 2';
+    else if (grade === -1) level = 'Nursery 1';
+    else if (grade === -2) level = 'Pre-Nursery';
+    else level = `Grade ${grade}`; // Fallback
+
+    return withSection ? `${level}${section}` : level;
+};
+
+
 // --- ICONS ---
 
 // FIX: Added all missing icon components to resolve import errors throughout the application.

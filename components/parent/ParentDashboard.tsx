@@ -445,9 +445,9 @@ const Dashboard = ({ navigateTo }: { navigateTo: (view: string, title: string, p
 
             {/* Children Cards */}
             <div className="space-y-4">
-{/* FIX: Removed redundant 'key' prop from ChildStatCard component call. */}
+{/* FIX: The 'key' prop is required for elements in a list. Added student.id as a unique key. */}
                 {childrenData.map((data, index) => (
-                    <ChildStatCard data={data} navigateTo={navigateTo} colorTheme={childColorThemes[index % childColorThemes.length]} />
+                    <ChildStatCard key={data.student.id} data={data} navigateTo={navigateTo} colorTheme={childColorThemes[index % childColorThemes.length]} />
                 ))}
             </div>
             

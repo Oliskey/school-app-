@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import { DashboardType, Teacher } from '../../types';
 import { THEME_CONFIG } from '../../constants';
@@ -39,7 +40,9 @@ import TeacherChangePasswordScreen from '../teacher/TeacherChangePasswordScreen'
 import NewChatScreen from '../teacher/NewChatScreen';
 import TeacherReportCardPreviewScreen from '../teacher/TeacherReportCardPreviewScreen';
 import NotificationsScreen from '../shared/NotificationsScreen';
-import TeacherUnifiedAttendanceScreen from '../teacher/TeacherUnifiedAttendanceScreen';
+import TeacherSelectClassForAttendance from '../teacher/TeacherUnifiedAttendanceScreen';
+// FIX: Corrected import path for TeacherMarkAttendanceScreen. The component was aliased incorrectly.
+import TeacherMarkAttendanceScreen from '../teacher/TeacherAttendanceScreen';
 import LessonPlannerScreen from '../teacher/LessonPlannerScreen';
 import LessonPlanDetailScreen from '../teacher/LessonPlanDetailScreen';
 import DetailedLessonNoteScreen from '../teacher/DetailedLessonNoteScreen';
@@ -47,8 +50,8 @@ import SelectTermForReportScreen from '../teacher/SelectTermForReportScreen';
 import ProfessionalDevelopmentScreen from '../teacher/ProfessionalDevelopmentScreen';
 import AIPerformanceSummaryScreen from '../teacher/AIPerformanceSummaryScreen';
 import EducationalGamesScreen from '../teacher/EducationalGamesScreen';
-import LessonContentScreen from './LessonContentScreen';
-import AssignmentViewScreen from './AssignmentViewScreen';
+import LessonContentScreen from '../teacher/LessonContentScreen';
+import AssignmentViewScreen from '../teacher/AssignmentViewScreen';
 
 
 interface ViewStackItem {
@@ -118,7 +121,8 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     classDetail: ClassDetailScreen,
     studentProfile: StudentProfileScreen,
     examManagement: TeacherExamManagement,
-    unifiedAttendance: TeacherUnifiedAttendanceScreen,
+    selectClassForAttendance: TeacherSelectClassForAttendance,
+    markAttendance: TeacherMarkAttendanceScreen,
     library: LibraryScreen,
     gallery: PhotoGalleryScreen,
     calendar: CalendarScreen,

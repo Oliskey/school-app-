@@ -39,7 +39,8 @@ import TeacherChangePasswordScreen from '../teacher/TeacherChangePasswordScreen'
 import NewChatScreen from '../teacher/NewChatScreen';
 import TeacherReportCardPreviewScreen from '../teacher/TeacherReportCardPreviewScreen';
 import NotificationsScreen from '../shared/NotificationsScreen';
-import TeacherUnifiedAttendanceScreen from '../teacher/TeacherUnifiedAttendanceScreen';
+import TeacherSelectClassForAttendance from '../teacher/TeacherUnifiedAttendanceScreen';
+import TeacherMarkAttendanceScreen from '../teacher/TeacherAttendanceScreen';
 import LessonPlannerScreen from '../teacher/LessonPlannerScreen';
 import LessonPlanDetailScreen from '../teacher/LessonPlanDetailScreen';
 import DetailedLessonNoteScreen from '../teacher/DetailedLessonNoteScreen';
@@ -118,7 +119,8 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     classDetail: ClassDetailScreen,
     studentProfile: StudentProfileScreen,
     examManagement: TeacherExamManagement,
-    unifiedAttendance: TeacherUnifiedAttendanceScreen,
+    selectClassForAttendance: TeacherSelectClassForAttendance,
+    markAttendance: TeacherMarkAttendanceScreen,
     library: LibraryScreen,
     gallery: PhotoGalleryScreen,
     calendar: CalendarScreen,

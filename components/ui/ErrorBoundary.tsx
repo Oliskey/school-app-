@@ -1,3 +1,4 @@
+
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
@@ -10,9 +11,12 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-  };
+// FIX: Refactored to use a constructor for state initialization and method binding, which is a more robust pattern for class components.
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+    this.handleGoBack = this.handleGoBack.bind(this);
+  }
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -22,7 +26,7 @@ class ErrorBoundary extends Component<Props, State> {
     console.error("Uncaught error:", error, errorInfo);
   }
   
-  private handleGoBack = () => {
+  private handleGoBack() {
     this.setState({ hasError: false, error: undefined });
     window.history.back();
   }

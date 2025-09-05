@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { UsersIcon, ParentNavIcon, TeacherNavIcon, StudentNavIcon, AIIcon } from '../../constants';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -90,10 +91,13 @@ const CommunicationHub: React.FC = () => {
             <div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2">1. Select Audience</h3>
                 <div className="grid grid-cols-4 gap-3">
+{/* FIX: Replaced spread operator with explicit props to avoid passing unexpected properties and resolve the TypeScript error. */}
                     {audiences.map(aud => (
                         <AudienceCard 
                             key={aud.id} 
-                            {...aud} 
+                            icon={aud.icon}
+                            label={aud.label}
+                            id={aud.id}
                             selected={selectedAudience === aud.id}
                             onSelect={() => setSelectedAudience(aud.id)}
                         />

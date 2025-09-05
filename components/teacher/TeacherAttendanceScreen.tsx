@@ -1,14 +1,13 @@
 
+
 import React, { useState, useMemo, useCallback } from 'react';
 import { CheckCircleIcon, XCircleIcon } from '../../constants';
 import { mockStudents } from '../../data';
 import DonutChart from '../ui/DonutChart';
 import { THEME_CONFIG } from '../../constants';
 import { DashboardType, Student, AttendanceStatus, ClassInfo } from '../../types';
+import { getFormattedClassName } from '../../constants';
 
-interface TeacherAttendanceScreenProps {
-  classInfo?: ClassInfo;
-}
 
 const AttendanceStatusButtons = ({ status, onStatusChange }: { status: AttendanceStatus, onStatusChange: (newStatus: AttendanceStatus) => void }) => {
     const statusOptions: AttendanceStatus[] = ['Present', 'Absent', 'Late', 'Leave'];
@@ -38,29 +37,17 @@ const AttendanceStatusButtons = ({ status, onStatusChange }: { status: Attendanc
     );
 };
 
-const TeacherAttendanceScreen: React.FC<TeacherAttendanceScreenProps> = ({ classInfo }) => {
+interface TeacherMarkAttendanceScreenProps {
+  classInfo: ClassInfo;
+}
+
+const TeacherMarkAttendanceScreen: React.FC<TeacherMarkAttendanceScreenProps> = ({ classInfo }) => {
     const theme = THEME_CONFIG[DashboardType.Teacher];
-
-    const availableClasses = useMemo(() => {
-        const classSet = new Set(mockStudents.map(s => `${s.grade}${s.section}`));
-        return Array.from(classSet).sort((a, b) => {
-            const gradeA = parseInt(a);
-            const gradeB = parseInt(b);
-            if (gradeA !== gradeB) return gradeA - gradeB;
-            return a.localeCompare(b);
-        });
-    }, []);
-
-    const [selectedClass, setSelectedClass] = useState(classInfo ? `${classInfo.grade}${classInfo.section}` : availableClasses[0] || '');
-    const [students, setStudents] = useState<Student[]>(mockStudents);
-
-    const studentsForClass = useMemo(() => {
-        if (!selectedClass) return [];
-        const grade = parseInt(selectedClass.match(/\d+/)?.[0] || '0');
-        const section = selectedClass.match(/[A-C]/)?.[0] || '';
-        return students.filter(s => s.grade === grade && s.section === section);
-    }, [selectedClass, students]);
     
+    const [students, setStudents] = useState<Student[]>(() => 
+        mockStudents.filter(s => s.grade === classInfo.grade && s.section === classInfo.section)
+    );
+
     const handleStatusChange = useCallback((studentId: number, status: AttendanceStatus) => {
         setStudents(currentStudents =>
             currentStudents.map(student => 
@@ -70,55 +57,33 @@ const TeacherAttendanceScreen: React.FC<TeacherAttendanceScreenProps> = ({ class
     }, []);
     
     const handleMarkAll = useCallback((status: 'Present' | 'Absent') => {
-        if (!selectedClass) return;
-        
-        const grade = parseInt(selectedClass.match(/\d+/)?.[0] || '0');
-        const section = selectedClass.match(/[A-C]/)?.[0] || '';
-
         setStudents(currentStudents =>
-            currentStudents.map(student => {
-                if (student.grade === grade && student.section === section) {
-                    return { ...student, attendanceStatus: status };
-                }
-                return student;
-            })
+            currentStudents.map(student => ({ ...student, attendanceStatus: status }))
         );
-    }, [selectedClass]);
+    }, []);
 
     const attendanceSummary = useMemo(() => {
-        const total = studentsForClass.length;
+        const total = students.length;
         if (total === 0) return { total: 0, present: 0, absent: 0, onLeave: 0, late: 0, presentPercentage: 0 };
         
-        const present = studentsForClass.filter(s => s.attendanceStatus === 'Present').length;
-        const absent = studentsForClass.filter(s => s.attendanceStatus === 'Absent').length;
-        const onLeave = studentsForClass.filter(s => s.attendanceStatus === 'Leave').length;
-        const late = studentsForClass.filter(s => s.attendanceStatus === 'Late').length;
+        const present = students.filter(s => s.attendanceStatus === 'Present').length;
+        const absent = students.filter(s => s.attendanceStatus === 'Absent').length;
+        const onLeave = students.filter(s => s.attendanceStatus === 'Leave').length;
+        const late = students.filter(s => s.attendanceStatus === 'Late').length;
         const presentPercentage = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
 
         return { total, present, absent, onLeave, late, presentPercentage };
-    }, [studentsForClass]);
+    }, [students]);
+    
+    const formattedClassName = getFormattedClassName(classInfo.grade, classInfo.section);
 
     return (
         <div className="flex flex-col h-full bg-gray-100">
-            <div className="p-4 bg-gray-100 border-b border-gray-200">
-                 <select 
-                    value={selectedClass} 
-                    onChange={(e) => setSelectedClass(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-lg text-sm font-semibold focus:ring-sky-500 focus:border-sky-500 bg-white"
-                >
-                    {availableClasses.map(className => (
-                        <option key={className} value={className}>
-                            Class {className}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
             {/* Summary */}
             <div className="p-4 bg-white border-b border-gray-200">
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="font-bold text-lg text-gray-800">Today's Overview</p>
+                        <p className="font-bold text-lg text-gray-800">Today's Overview for {formattedClassName}</p>
                         <p className="text-sm text-gray-500">
                             <span className="text-green-600 font-medium">{attendanceSummary.present} Present</span> &bull; 
                             <span className="text-blue-500 font-medium"> {attendanceSummary.late} Late</span> &bull; 
@@ -156,7 +121,7 @@ const TeacherAttendanceScreen: React.FC<TeacherAttendanceScreenProps> = ({ class
             {/* Student List */}
             <main className="flex-grow overflow-y-auto">
                 <ul className="divide-y divide-gray-200">
-                    {studentsForClass.map(student => (
+                    {students.map(student => (
                         <li key={student.id} className="p-4 flex items-center justify-between bg-white hover:bg-gray-50">
                             <div className="flex items-center space-x-4">
                                 <img src={student.avatarUrl} alt={student.name} className="w-12 h-12 rounded-full object-cover" />
@@ -168,7 +133,7 @@ const TeacherAttendanceScreen: React.FC<TeacherAttendanceScreenProps> = ({ class
                             <AttendanceStatusButtons status={student.attendanceStatus} onStatusChange={(newStatus) => handleStatusChange(student.id, newStatus)} />
                         </li>
                     ))}
-                    {studentsForClass.length === 0 && (
+                    {students.length === 0 && (
                         <div className="text-center py-10 bg-white">
                             <p className="text-gray-500">No students found for this class.</p>
                         </div>
@@ -179,8 +144,8 @@ const TeacherAttendanceScreen: React.FC<TeacherAttendanceScreenProps> = ({ class
             {/* Footer */}
             <div className="p-4 bg-white border-t border-gray-200">
                 <button
-                    onClick={() => alert(`Attendance for Class ${selectedClass} submitted!`)}
-                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm font-medium text-white bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                    onClick={() => alert(`Attendance for Class ${formattedClassName} submitted!`)}
+                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                 >
                     Submit Attendance
                 </button>
@@ -189,4 +154,4 @@ const TeacherAttendanceScreen: React.FC<TeacherAttendanceScreenProps> = ({ class
     );
 };
 
-export default TeacherAttendanceScreen;
+export default TeacherMarkAttendanceScreen;

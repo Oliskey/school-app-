@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { mockStudents } from '../../data';
 import { Student, ClassInfo } from '../../types';
 import { ChevronRightIcon, TeacherAttendanceIcon, ClipboardListIcon } from '../../constants';
+import { getFormattedClassName } from '../../constants';
 
 interface ClassDetailScreenProps {
   classInfo: ClassInfo;
@@ -15,17 +15,19 @@ const ClassDetailScreen: React.FC<ClassDetailScreenProps> = ({ classInfo, naviga
     student => student.grade === classInfo.grade && student.section === classInfo.section
   );
 
+  const formattedClassName = getFormattedClassName(classInfo.grade, classInfo.section);
+
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Header Info */}
       <div className="p-4 bg-white border-b border-gray-200">
-        <h3 className="font-bold text-lg text-gray-800">Students in Grade {classInfo.grade}{classInfo.section}</h3>
+        <h3 className="font-bold text-lg text-gray-800">Students in {formattedClassName}</h3>
         <p className="text-sm text-gray-500">{classInfo.studentCount} total students</p>
       </div>
 
       {/* Action Buttons */}
       <div className="p-4 grid grid-cols-2 gap-3 bg-white border-b border-gray-200">
-        <button onClick={() => navigateTo('attendance', 'Mark Attendance', { classInfo })} className="flex items-center justify-center space-x-2 py-3 px-4 bg-purple-600 text-white font-semibold rounded-xl shadow-md hover:bg-purple-700 transition-colors">
+        <button onClick={() => navigateTo('markAttendance', `Attendance: ${formattedClassName}`, { classInfo })} className="flex items-center justify-center space-x-2 py-3 px-4 bg-purple-600 text-white font-semibold rounded-xl shadow-md hover:bg-purple-700 transition-colors">
             <TeacherAttendanceIcon className="w-5 h-5" />
             <span>Attendance</span>
         </button>

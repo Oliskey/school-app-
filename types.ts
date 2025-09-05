@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 export enum DashboardType {
   Admin = 'Admin',
   Teacher = 'Teacher',

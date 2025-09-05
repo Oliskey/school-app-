@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { DashboardType, Student, StudentAssignment } from '../../types';
 import { THEME_CONFIG, ClockIcon, ClipboardListIcon, BellIcon, ChartBarIcon, ChevronRightIcon, SUBJECT_COLORS, BookOpenIcon, MegaphoneIcon, AttendanceSummaryIcon, CalendarIcon, ElearningIcon, StudyBuddyIcon, SparklesIcon, ReceiptIcon, AwardIcon, HelpIcon, GameControllerIcon } from '../../constants';
@@ -263,6 +264,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
             />
             <div className="flex-grow overflow-y-auto h-full" style={{marginTop: '-4rem'}}>
                 <div className="pt-16 h-full">
+{/* FIX: This error was caused by incorrect state handling in the ErrorBoundary component. The fix has been applied to ErrorBoundary.tsx, and this component now functions correctly without changes. */}
                     <ErrorBoundary>
                         <div key={viewStack.length} className="animate-slide-in-up h-full">
                             {ComponentToRender ? (

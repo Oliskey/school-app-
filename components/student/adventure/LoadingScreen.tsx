@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { SparklesIcon } from '../../../constants';
 
@@ -32,7 +31,6 @@ const LoadingScreen: React.FC = () => {
         <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-teal-400 to-blue-500 text-white p-4 text-center">
             <div className="relative">
                 <SparklesIcon className="w-24 h-24 text-white/50" />
-                {/* FIX: Replaced unsupported 'style' prop with 'animate-spin' class for animation. */}
                 <SparklesIcon className="w-16 h-16 text-white/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin" />
             </div>
             <h1 className="text-2xl font-bold mt-4">Crafting Your Adventure...</h1>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Student } from '../../types';
-import { DocumentTextIcon, BookOpenIcon, ClipboardListIcon, CheckCircleIcon, SUBJECT_COLORS, EditIcon, MailIcon } from '../../constants';
+import { DocumentTextIcon, BookOpenIcon, ClipboardListIcon, CheckCircleIcon, SUBJECT_COLORS, EditIcon, MailIcon, getFormattedClassName } from '../../constants';
 import DonutChart from '../ui/DonutChart';
 
 interface StudentProfileAdminViewProps {
@@ -43,6 +43,7 @@ const StudentProfileAdminView: React.FC<StudentProfileAdminViewProps> = ({ stude
     };
     const totalDays = Object.values(attendanceData).reduce((sum, val) => sum + val, 0);
     const presentPercentage = totalDays > 0 ? Math.round(((attendanceData.present + attendanceData.late) / totalDays) * 100) : 0;
+    const formattedClassName = getFormattedClassName(student.grade, student.section);
 
     return (
         <div className="flex flex-col h-full bg-gray-50">
@@ -53,7 +54,7 @@ const StudentProfileAdminView: React.FC<StudentProfileAdminViewProps> = ({ stude
                         <img src={student.avatarUrl} alt={student.name} className="w-20 h-20 rounded-full object-cover border-4 border-indigo-100"/>
                         <div>
                             <h3 className="text-xl font-bold text-gray-800">{student.name}</h3>
-                            <p className="text-gray-500 font-medium">Grade {student.grade}{student.section}{student.department && `, ${student.department}`}</p>
+                            <p className="text-gray-500 font-medium">{formattedClassName}{student.department && `, ${student.department}`}</p>
                         </div>
                     </div>
                 </div>

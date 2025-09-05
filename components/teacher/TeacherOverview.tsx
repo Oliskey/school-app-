@@ -7,10 +7,12 @@ import {
   TeacherAttendanceIcon,
   ClipboardListIcon,
   BriefcaseIcon,
-  GameControllerIcon
+  GameControllerIcon,
+  THEME_CONFIG,
+  SUBJECT_COLORS,
+  getFormattedClassName
 } from '../../constants';
 import { ClassInfo, Teacher } from '../../types';
-import { THEME_CONFIG, SUBJECT_COLORS } from '../../constants';
 import { DashboardType } from '../../types';
 import { mockTeachers, mockClasses, mockTimetableData } from '../../data';
 
@@ -30,12 +32,12 @@ const TeacherOverview: React.FC<TeacherOverviewProps> = ({ navigateTo }) => {
   const todaySchedule = mockTimetableData.filter(e => e.day === today && teacher.classes.includes(e.className.substring(e.className.length - 2))).slice(0, 2);
 
   const quickActions = [
-      { label: 'Attendance', icon: <TeacherAttendanceIcon className="h-7 w-7"/>, action: () => navigateTo('unifiedAttendance', 'Mark Attendance') },
-      { label: 'Assignments', icon: <ClipboardListIcon className="h-7 w-7"/>, action: () => navigateTo('assignmentsList', 'Manage Assignments') },
-      { label: 'AI Planner', icon: <BriefcaseIcon className="h-7 w-7"/>, action: () => navigateTo('lessonPlanner', 'AI Lesson Planner') },
-      { label: 'Games Library', icon: <GameControllerIcon className="h-7 w-7"/>, action: () => navigateTo('educationalGames', 'Educational Games') },
-      { label: 'Timetable', icon: <ViewGridIcon className="h-7 w-7"/>, action: () => navigateTo('timetable', 'My Timetable') },
-      { label: 'Calendar', icon: <CalendarIcon className="h-7 w-7"/>, action: () => navigateTo('calendar', 'School Calendar') },
+      { label: 'Attendance', icon: <TeacherAttendanceIcon className="h-7 w-7"/>, action: () => navigateTo('selectClassForAttendance', 'Select Class', {}) },
+      { label: 'Assignments', icon: <ClipboardListIcon className="h-7 w-7"/>, action: () => navigateTo('assignmentsList', 'Manage Assignments', {}) },
+      { label: 'AI Planner', icon: <BriefcaseIcon className="h-7 w-7"/>, action: () => navigateTo('lessonPlanner', 'AI Lesson Planner', {}) },
+      { label: 'Games Library', icon: <GameControllerIcon className="h-7 w-7"/>, action: () => navigateTo('educationalGames', 'Educational Games', {}) },
+      { label: 'Timetable', icon: <ViewGridIcon className="h-7 w-7"/>, action: () => navigateTo('timetable', 'My Timetable', {}) },
+      { label: 'Calendar', icon: <CalendarIcon className="h-7 w-7"/>, action: () => navigateTo('calendar', 'School Calendar', {}) },
   ];
 
   return (
@@ -74,14 +76,14 @@ const TeacherOverview: React.FC<TeacherOverviewProps> = ({ navigateTo }) => {
         <h3 className="text-lg font-bold text-gray-800 mb-2 px-1">My Classes</h3>
         <div className="space-y-3">
           {teacherClasses.map(cls => (
-            <button key={cls.id} onClick={() => navigateTo('classDetail', `Grade ${cls.grade}${cls.section}`, { classInfo: cls })} className="w-full flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:bg-purple-50 transition-colors">
+            <button key={cls.id} onClick={() => navigateTo('classDetail', `Class ${getFormattedClassName(cls.grade, cls.section)}`, { classInfo: cls })} className="w-full flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:bg-purple-50 transition-colors">
               <div className="flex items-center space-x-4">
                 <div className={`w-12 h-12 rounded-lg ${SUBJECT_COLORS[cls.subject]} flex items-center justify-center`}>
                   <BookOpenIcon className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <p className="font-bold text-gray-800 text-left">{cls.subject}</p>
-                  <p className="text-sm text-gray-600 text-left">Grade {cls.grade}{cls.section} &bull; {cls.studentCount} Students</p>
+                  <p className="text-sm text-gray-600 text-left">{getFormattedClassName(cls.grade, cls.section)} &bull; {cls.studentCount} Students</p>
                 </div>
               </div>
               <ChevronRightIcon className="text-gray-400" />
@@ -92,5 +94,4 @@ const TeacherOverview: React.FC<TeacherOverviewProps> = ({ navigateTo }) => {
     </div>
   );
 };
-
 export default TeacherOverview;

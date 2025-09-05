@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { 
   SearchIcon,
@@ -203,10 +204,11 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
     );
   }
 
-  const seniorCount = Object.values(studentsByStageAndClass.senior).reduce((sum, s) => sum + s.length, 0);
-  const juniorCount = Object.values(studentsByStageAndClass.junior).reduce((sum, s) => sum + s.length, 0);
-  const lowerPrimaryCount = Object.values(studentsByStageAndClass.primary.lower).reduce((sum, s) => sum + s.length, 0);
-  const upperPrimaryCount = Object.values(studentsByStageAndClass.primary.upper).reduce((sum, s) => sum + s.length, 0);
+{/* FIX: Replaced problematic `reduce` with `.flat().length` to avoid TypeScript type inference issues and correctly calculate counts. */}
+  const seniorCount = Object.values(studentsByStageAndClass.senior).flat().length;
+  const juniorCount = Object.values(studentsByStageAndClass.junior).flat().length;
+  const lowerPrimaryCount = Object.values(studentsByStageAndClass.primary.lower).flat().length;
+  const upperPrimaryCount = Object.values(studentsByStageAndClass.primary.upper).flat().length;
   const primaryCount = lowerPrimaryCount + upperPrimaryCount;
 
 
@@ -224,7 +226,8 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
       <main className="flex-grow px-4 pb-24 space-y-4 overflow-y-auto">
         {seniorCount > 0 && (
           <StageAccordion title="Senior Secondary" count={seniorCount}>
-            {Object.entries(studentsByStageAndClass.senior).map(([className, students]) => (
+{/* FIX: Added explicit types to map callback parameters to resolve 'unknown' type errors. */}
+            {Object.entries(studentsByStageAndClass.senior).map(([className, students]: [string, Student[]]) => (
               <SubStageAccordion key={className} title={className} count={students.length}>
                 {students.map(s => <StudentRow key={s.id} student={s} />)}
               </SubStageAccordion>
@@ -234,7 +237,8 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
         
         {juniorCount > 0 && (
           <StageAccordion title="Junior Secondary" count={juniorCount}>
-            {Object.entries(studentsByStageAndClass.junior).map(([className, students]) => (
+{/* FIX: Added explicit types to map callback parameters to resolve 'unknown' type errors. */}
+            {Object.entries(studentsByStageAndClass.junior).map(([className, students]: [string, Student[]]) => (
               <SubStageAccordion key={className} title={className} count={students.length}>
                 {students.map(s => <StudentRow key={s.id} student={s} />)}
               </SubStageAccordion>
@@ -246,7 +250,8 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
             <StageAccordion title="Primary School" count={primaryCount}>
                 {upperPrimaryCount > 0 && (
                     <SubStageAccordion title="Upper Primary (4-6)" count={upperPrimaryCount}>
-                        {Object.entries(studentsByStageAndClass.primary.upper).map(([className, students]) => (
+{/* FIX: Added explicit types to map callback parameters to resolve 'unknown' type errors. */}
+                        {Object.entries(studentsByStageAndClass.primary.upper).map(([className, students]: [string, Student[]]) => (
                             <ClassAccordion key={className} title={className} count={students.length}>
                                 {students.map(s => <StudentRow key={s.id} student={s} />)}
                             </ClassAccordion>
@@ -255,7 +260,8 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
                 )}
                 {lowerPrimaryCount > 0 && (
                     <SubStageAccordion title="Lower Primary (1-3)" count={lowerPrimaryCount}>
-                        {Object.entries(studentsByStageAndClass.primary.lower).map(([className, students]) => (
+{/* FIX: Added explicit types to map callback parameters to resolve 'unknown' type errors. */}
+                        {Object.entries(studentsByStageAndClass.primary.lower).map(([className, students]: [string, Student[]]) => (
                             <ClassAccordion key={className} title={className} count={students.length}>
                                 {students.map(s => <StudentRow key={s.id} student={s} />)}
                             </ClassAccordion>
