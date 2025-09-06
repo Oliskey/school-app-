@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, SUBJECT_COLORS, ViewGridIcon, ViewDayIcon } from '../../constants';
 import { mockTimetableData, mockStudents, mockTeachers } from '../../data';
@@ -75,36 +74,62 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ context }) => {
                 {/* Top-left empty cell */}
                 <div className="sticky top-0 left-0 bg-white z-30 border-b border-r border-gray-200"></div>
                 
-                {/* Period headers */}
+                {/* Period headers with improved styling */}
                 {PERIODS.map(period => (
-                    <div key={period.name} className="text-center font-bold text-gray-600 text-sm py-2 sticky top-0 bg-white z-20 border-b border-gray-200">
-                        {period.name}
-                        <div className="font-normal text-xs text-gray-500">{formatTime12Hour(period.start)} - {formatTime12Hour(period.end)}</div>
+                    <div key={period.name} className="text-center font-bold text-gray-700 text-sm py-3 sticky top-0 bg-white z-20 border-b border-gray-200 shadow-sm">
+                        <div className="text-gray-900">{period.name}</div>
+                        <div className="font-normal text-xs text-gray-500 mt-1">{formatTime12Hour(period.start)} - {formatTime12Hour(period.end)}</div>
                     </div>
                 ))}
                 
-                {/* Rows for each day */}
+                {/* Rows for each day with improved navigation */}
                 {daysOfWeek.map(day => (
                     <React.Fragment key={day}>
-                        <div className="sticky left-0 bg-white z-10 font-bold text-gray-600 text-sm flex items-center justify-center p-2 border-r border-gray-200">{day}</div>
+                        <div className="sticky left-0 bg-white z-10 font-bold text-gray-700 text-sm flex items-center justify-center p-3 border-r border-gray-200 shadow-sm">
+                            <button 
+                                onClick={() => {
+                                    setSelectedDay(day);
+                                    setViewMode('day');
+                                }}
+                                className="hover:text-blue-600 transition-colors"
+                            >
+                                {day}
+                            </button>
+                        </div>
                         {PERIODS.map(period => {
                             const key = `${day}-${period.start}`;
                             const entry = timetableGrid[key];
                             
                             if (period.isBreak) {
-                                return <div key={key} className="h-20 bg-gray-200 rounded-lg flex items-center justify-center font-semibold text-gray-500">{period.name}</div>;
+                                return (
+                                    <div key={key} className="h-20 bg-gray-100 rounded-lg flex items-center justify-center font-semibold text-gray-600 border border-gray-200">
+                                        {period.name}
+                                    </div>
+                                );
                             }
 
                             if (!entry) {
-                                return <div key={key} className="h-20 bg-white rounded-lg border border-gray-100"></div>;
+                                return (
+                                    <div key={key} className="h-20 bg-white rounded-lg border border-gray-100 flex items-center justify-center">
+                                        <span className="text-gray-300 text-sm">No class</span>
+                                    </div>
+                                );
                             }
                             
                             const colorClass = SUBJECT_COLORS[entry.subject] || 'bg-gray-200 text-gray-800';
                             return (
-                                <div key={key} className={`h-20 p-1`}>
-                                    <div className={`h-full w-full p-2 rounded-md flex flex-col justify-center text-white ${colorClass}`}>
+                                <div 
+                                    key={key} 
+                                    className={`h-20 p-1 cursor-pointer transition-transform hover:scale-[1.02]`}
+                                    onClick={() => {
+                                        setSelectedDay(day);
+                                        setViewMode('day');
+                                    }}
+                                >
+                                    <div className={`h-full w-full p-2 rounded-md flex flex-col justify-center text-white ${colorClass} shadow-sm`}>
                                         <p className="font-bold text-sm truncate">{entry.subject}</p>
-                                        {context.userType === 'teacher' && <p className="text-xs truncate">{entry.className}</p>}
+                                        <p className="text-xs truncate mt-1 opacity-90">{formatTime12Hour(entry.startTime)} - {formatTime12Hour(entry.endTime)}</p>
+                                        {context.userType === 'teacher' && <p className="text-xs truncate mt-1">{entry.className}</p>}
                                     </div>
                                 </div>
                             );
@@ -122,10 +147,16 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ context }) => {
         
         return (
             <div className="p-2 space-y-3">
-                 <div className="flex space-x-1">
+                 <div className="flex space-x-1 mb-4">
                     {daysOfWeek.map(day => (
-                        <button key={day} onClick={() => setSelectedDay(day)} className={`flex-1 py-2 text-xs font-semibold rounded-md transition-colors ${selectedDay === day ? `bg-${themeColor}-500 text-white shadow` : 'bg-white text-gray-600'}`}>
-                            {day.substring(0,3)}
+                        <button 
+                            key={day} 
+                            onClick={() => setSelectedDay(day)} 
+                            className={`flex-1 py-3 text-sm font-semibold rounded-md transition-colors ${
+                                selectedDay === day ? `bg-${themeColor}-500 text-white shadow` : 'bg-white text-gray-600 hover:bg-gray-100'
+                            }`}
+                        >
+                            {day}
                         </button>
                     ))}
                 </div>
@@ -140,14 +171,15 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ context }) => {
                                 <p className="text-xs text-gray-500">{formatTime12Hour(entry.endTime)}</p>
                             </div>
                             <div className={`w-1.5 h-12 rounded-full ${colorClass}`}></div>
-                            <div>
-                                <p className="font-bold text-gray-800">{entry.subject}</p>
-                                {context.userType === 'teacher' && <p className="text-sm text-gray-600">{entry.className}</p>}
+                            <div className="flex-grow">
+                                <p className="font-bold text-gray-800 text-lg">{entry.subject}</p>
+                                {context.userType === 'teacher' && <p className="text-sm text-gray-600 mt-1">{entry.className}</p>}
+                                <p className="text-xs text-gray-500 mt-1">Period: {entry.startTime} - {entry.endTime}</p>
                             </div>
                         </div>
                      )
                 }) : (
-                     <div className="text-center py-10 bg-white rounded-lg">
+                     <div className="text-center py-10 bg-white rounded-lg shadow-sm">
                         <p className="font-semibold text-gray-500">No classes scheduled for {selectedDay}.</p>
                     </div>
                 )}
@@ -159,11 +191,23 @@ const TimetableScreen: React.FC<TimetableScreenProps> = ({ context }) => {
         <div className="flex flex-col h-full bg-white rounded-t-3xl overflow-hidden">
             <div className="p-3 bg-gray-50 border-b border-gray-200">
                  <div className="flex space-x-1 bg-gray-200 p-1 rounded-lg">
-                    <button onClick={() => setViewMode('week')} className={`w-1/2 py-2 text-sm font-semibold rounded-md flex items-center justify-center space-x-2 transition-colors ${viewMode === 'week' ? `bg-white text-${themeColor}-600 shadow-sm` : 'text-gray-600'}`}>
-                        <ViewGridIcon /><span>Week</span>
+                    <button 
+                        onClick={() => setViewMode('week')} 
+                        className={`w-1/2 py-3 text-sm font-semibold rounded-md flex items-center justify-center space-x-2 transition-colors ${
+                            viewMode === 'week' ? `bg-white text-${themeColor}-600 shadow-sm` : 'text-gray-600'
+                        }`}
+                    >
+                        <ViewGridIcon className="w-5 h-5" />
+                        <span>Week View</span>
                     </button>
-                    <button onClick={() => setViewMode('day')} className={`w-1/2 py-2 text-sm font-semibold rounded-md flex items-center justify-center space-x-2 transition-colors ${viewMode === 'day' ? `bg-white text-${themeColor}-600 shadow-sm` : 'text-gray-600'}`}>
-                        <ViewDayIcon /><span>Day</span>
+                    <button 
+                        onClick={() => setViewMode('day')} 
+                        className={`w-1/2 py-3 text-sm font-semibold rounded-md flex items-center justify-center space-x-2 transition-colors ${
+                            viewMode === 'day' ? `bg-white text-${themeColor}-600 shadow-sm` : 'text-gray-600'
+                        }`}
+                    >
+                        <ViewDayIcon className="w-5 h-5" />
+                        <span>Day View</span>
                     </button>
                 </div>
             </div>
