@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DashboardType } from './types';
 import AdminDashboard from './components/dashboards/AdminDashboard';
@@ -43,18 +42,18 @@ const App: React.FC = () => {
   };
   
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 font-sans bg-gray-100 dark:bg-gray-900 print:p-0 print:bg-white">
-        <div className="relative mx-auto border-black dark:border-gray-800 bg-black border-[10px] rounded-[3rem] h-[852px] w-[393px] shadow-2xl print:border-none print:shadow-none print:h-auto print:w-full">
-            {/* Dynamic Island */}
-            <div className="absolute top-[10px] left-1/2 -translate-x-1/2 w-[120px] h-[30px] bg-black rounded-full z-20 flex justify-center items-center print:hidden">
-                <div className="w-2 h-2 bg-gray-700 rounded-full ml-10"></div> {/* Camera lens */}
+    <div className="flex flex-col items-center justify-center min-h-screen p-2 font-sans bg-gray-100 dark:bg-gray-900 print:p-0 print:bg-white">
+        <div className="relative mx-auto border-black dark:border-gray-800 bg-black border-[8px] rounded-[2.5rem] h-[874px] w-[402px] shadow-2xl print:border-none print:shadow-none print:h-auto print:w-full">
+            {/* Dynamic Island - slightly larger for iPhone 16 Pro */}
+            <div className="absolute top-[12px] left-1/2 -translate-x-1/2 w-[130px] h-[34px] bg-black rounded-full z-20 flex justify-center items-center print:hidden">
+                <div className="w-2.5 h-2.5 bg-gray-700 rounded-full ml-11"></div> {/* Camera lens */}
             </div>
-            {/* Side buttons */}
-            <div className="h-[60px] w-[4px] bg-gray-800 absolute -left-[14px] top-[120px] rounded-l-lg print:hidden"></div>
-            <div className="h-[60px] w-[4px] bg-gray-800 absolute -left-[14px] top-[190px] rounded-l-lg print:hidden"></div>
-            <div className="h-[90px] w-[4px] bg-gray-800 absolute -right-[14px] top-[160px] rounded-r-lg print:hidden"></div>
+            {/* Side buttons - adjusted for iPhone 16 Pro */}
+            <div className="h-[65px] w-[4px] bg-gray-800 absolute -left-[12px] top-[125px] rounded-l-lg print:hidden"></div>
+            <div className="h-[65px] w-[4px] bg-gray-800 absolute -left-[12px] top-[195px] rounded-l-lg print:hidden"></div>
+            <div className="h-[95px] w-[4px] bg-gray-800 absolute -right-[12px] top-[165px] rounded-r-lg print:hidden"></div>
             
-            <div className="rounded-[2.5rem] overflow-hidden w-full h-full bg-white flex flex-col print:rounded-none">
+            <div className="rounded-[2.25rem] overflow-hidden w-full h-full bg-white flex flex-col print:rounded-none">
                 {!isAuthenticated ? (
                   <Login onLogin={handleLogin} />
                 ) : isChatOpen ? (

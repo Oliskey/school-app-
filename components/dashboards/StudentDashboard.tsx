@@ -76,82 +76,82 @@ const Overview: React.FC<{ navigateTo: (view: string, title: string, props?: any
     ];
 
     return (
-        <div className="p-4 space-y-5 bg-gray-50">
+        <div className="p-3 space-y-4 bg-gray-50">
             {/* Quick Actions */}
-            <div className="grid grid-cols-4 gap-3 text-center">
+            <div className="grid grid-cols-4 gap-2 text-center">
                 {quickAccessItems.map(item => (
-                     <button key={item.label} onClick={item.action} className={`${theme.cardBg} p-3 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-2 hover:bg-orange-200 transition-colors`}>
-                        <div className={theme.iconColor}>{React.cloneElement(item.icon, { className: 'h-6 w-6' })}</div>
+                     <button key={item.label} onClick={item.action} className={`${theme.cardBg} p-2 rounded-xl shadow-sm flex flex-col items-center justify-center space-y-1 hover:bg-orange-200 transition-colors`}>
+                        <div className={theme.iconColor}>{React.cloneElement(item.icon, { className: 'h-5 w-5' })}</div>
                         <span className={`font-semibold ${theme.textColor} text-center text-xs`}>{item.label}</span>
                     </button>
                 ))}
             </div>
             
-            <div className="bg-gradient-to-r from-teal-400 to-blue-500 p-4 rounded-2xl shadow-lg flex items-center justify-between text-white">
+            <div className="bg-gradient-to-r from-teal-400 to-blue-500 p-3 rounded-xl shadow-lg flex items-center justify-between text-white">
                 <div>
-                    <h3 className="font-bold text-lg">AI Adventure Quest</h3>
-                    <p className="text-sm opacity-90">Turn any text into a fun quiz!</p>
+                    <h3 className="font-bold text-base">AI Adventure Quest</h3>
+                    <p className="text-xs opacity-90">Turn text into a fun quiz!</p>
                 </div>
-                <button onClick={() => navigateTo('adventureQuest', 'AI Adventure Quest', {})} className="bg-white/20 px-4 py-2 rounded-lg font-semibold hover:bg-white/30 transition-colors flex items-center space-x-2">
-                    <SparklesIcon className="h-5 w-5"/>
-                    <span>Start Quest</span>
+                <button onClick={() => navigateTo('adventureQuest', 'AI Adventure Quest', {})} className="bg-white/20 px-3 py-1.5 rounded-md font-semibold hover:bg-white/30 transition-colors flex items-center space-x-1">
+                    <SparklesIcon className="h-4 w-4"/>
+                    <span className="text-sm">Start</span>
                 </button>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-4 rounded-2xl shadow-lg flex items-center justify-between text-white">
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 p-3 rounded-xl shadow-lg flex items-center justify-between text-white">
                 <div>
-                    <h3 className="font-bold text-lg">AI Study Buddy</h3>
-                    <p className="text-sm opacity-90">Stuck on a problem? Ask me!</p>
+                    <h3 className="font-bold text-base">AI Study Buddy</h3>
+                    <p className="text-xs opacity-90">Stuck on a problem? Ask me!</p>
                 </div>
-                <button onClick={() => navigateTo('studyBuddy', 'Study Buddy')} className="bg-white/20 px-4 py-2 rounded-lg font-semibold hover:bg-white/30 transition-colors flex items-center space-x-2">
-                    <SparklesIcon className="h-5 w-5"/>
-                    <span>Start</span>
+                <button onClick={() => navigateTo('studyBuddy', 'Study Buddy')} className="bg-white/20 px-3 py-1.5 rounded-md font-semibold hover:bg-white/30 transition-colors flex items-center space-x-1">
+                    <SparklesIcon className="h-4 w-4"/>
+                    <span className="text-sm">Start</span>
                 </button>
             </div>
             
             <button 
                 onClick={() => navigateTo('subjects', 'My Subjects')}
-                className="w-full bg-white p-4 rounded-xl shadow-sm flex justify-between items-center hover:bg-orange-50 transition-colors"
+                className="w-full bg-white p-3 rounded-lg shadow-sm flex justify-between items-center hover:bg-orange-50 transition-colors"
             >
-                <div className="flex items-center space-x-4">
-                    <div className="bg-orange-100 p-3 rounded-lg">
-                        <BookOpenIcon className="h-6 w-6 text-orange-600"/>
+                <div className="flex items-center space-x-3">
+                    <div className="bg-orange-100 p-2 rounded-lg">
+                        <BookOpenIcon className="h-5 w-5 text-orange-600"/>
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-800">My Subjects</h3>
-                        <p className="text-sm text-gray-500">View all your courses and materials</p>
+                        <h3 className="font-bold text-gray-800 text-sm">My Subjects</h3>
+                        <p className="text-xs text-gray-500">View courses and materials</p>
                     </div>
                 </div>
-                <ChevronRightIcon className="text-gray-400"/>
+                <ChevronRightIcon className="text-gray-400 h-5 w-5"/>
             </button>
 
             {/* Today's Schedule */}
             <div>
-                 <h3 className="text-lg font-bold text-gray-800 mb-2 px-1">Today's Schedule</h3>
-                 <div className="bg-white p-4 rounded-xl shadow-sm space-y-3">
+                 <h3 className="text-base font-bold text-gray-800 mb-2 px-1">Today's Schedule</h3>
+                 <div className="bg-white p-3 rounded-lg shadow-sm space-y-2">
                     {todaySchedule.length > 0 ? todaySchedule.map((entry, i) => (
-                        <div key={i} className="flex items-center space-x-3">
-                            <div className="w-16 text-right">
-                                <p className="font-semibold text-sm text-gray-700">{entry.startTime}</p>
+                        <div key={i} className="flex items-center space-x-2">
+                            <div className="w-14 text-right">
+                                <p className="font-semibold text-xs text-gray-700">{entry.startTime}</p>
                             </div>
-                            <div className={`w-1 h-10 rounded-full ${SUBJECT_COLORS[entry.subject]}`}></div>
-                            <p className="font-semibold text-gray-800">{entry.subject}</p>
+                            <div className={`w-1 h-8 rounded-full ${SUBJECT_COLORS[entry.subject]}`}></div>
+                            <p className="font-semibold text-gray-800 text-sm">{entry.subject}</p>
                         </div>
-                    )) : <p className="text-center text-gray-500">No classes scheduled for today.</p>}
+                    )) : <p className="text-center text-gray-500 text-sm">No classes scheduled for today.</p>}
                 </div>
             </div>
 
             {/* Upcoming Assignments */}
             <div>
-                 <h3 className="text-lg font-bold text-gray-800 mb-2 px-1">Upcoming Assignments</h3>
-                 <div className="space-y-3">
+                 <h3 className="text-base font-bold text-gray-800 mb-2 px-1">Upcoming Assignments</h3>
+                 <div className="space-y-2">
                     {upcomingAssignments.map(hw => (
-                        <div key={hw.id} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center">
+                        <div key={hw.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center">
                             <div>
-                                <p className="font-bold text-gray-800">{hw.title}</p>
-                                <p className="text-sm text-gray-500">{hw.subject} &bull; Due {new Date(hw.dueDate).toLocaleDateString('en-GB')}</p>
+                                <p className="font-bold text-gray-800 text-sm">{hw.title}</p>
+                                <p className="text-xs text-gray-500">{hw.subject} &bull; Due {new Date(hw.dueDate).toLocaleDateString('en-GB')}</p>
                             </div>
-                            <ChevronRightIcon className="text-gray-400"/>
+                            <ChevronRightIcon className="text-gray-400 h-5 w-5"/>
                         </div>
                     ))}
                  </div>

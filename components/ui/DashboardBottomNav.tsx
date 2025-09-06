@@ -1,12 +1,11 @@
-
 import React from 'react';
 // FIX: Corrected import for MessagesIcon and added HomeIcon and SettingsIcon.
 import { HomeIcon, BellIcon, UserIcon as ProfileIcon, DocumentTextIcon, PhoneIcon, PlayIcon, AnalyticsIcon, MegaphoneIcon, SettingsIcon, MessagesIcon, ElearningIcon, SparklesIcon, UserGroupIcon, GameControllerIcon, ChartBarIcon } from '../../constants';
 
 const NavItem = ({ icon, label, isActive, onClick, activeColor }: { icon: React.ReactElement<{ className?: string }>, label: string, isActive: boolean, onClick: () => void, activeColor: string }) => (
-  <button onClick={onClick} className={`flex-1 flex flex-col items-center justify-center space-y-1 transition-colors duration-200 ${isActive ? activeColor : 'text-gray-500'}`}>
-    {React.cloneElement(icon, { className: `h-6 w-6`})}
-    <span className="text-xs font-medium">{label}</span>
+  <button onClick={onClick} className={`flex-1 flex flex-col items-center justify-center space-y-0.5 transition-colors duration-200 ${isActive ? activeColor : 'text-gray-500'}`}>
+    {React.cloneElement(icon, { className: `h-5 w-5`})}
+    <span className="text-[10px] font-medium">{label}</span>
   </button>
 );
 
@@ -15,11 +14,11 @@ export const AdminBottomNav = ({ activeScreen, setActiveScreen }: { activeScreen
     { id: 'home', icon: <HomeIcon />, label: 'Home' },
     { id: 'messages', icon: <MessagesIcon />, label: 'Messages' },
     { id: 'communication', icon: <MegaphoneIcon />, label: 'Announce' },
-    { id: 'analytics', icon: <AnalyticsIcon className="h-6 w-6"/>, label: 'Analytics' },
+    { id: 'analytics', icon: <AnalyticsIcon className="h-5 w-5"/>, label: 'Analytics' },
     { id: 'settings', icon: <SettingsIcon />, label: 'Settings' },
   ];
   return (
-    <div className="w-full bg-white/95 backdrop-blur-sm border-t border-gray-100 p-2 flex justify-around items-center print:hidden">
+    <div className="w-full bg-white/95 backdrop-blur-sm border-t border-gray-100 p-1.5 flex justify-around items-center print:hidden">
 {/* FIX: Replaced spread operator with explicit props to prevent passing the unhandled 'id' prop to the NavItem component. */}
       {navItems.map(item => (
         <NavItem key={item.id} icon={item.icon} label={item.label} isActive={activeScreen === item.id} onClick={() => setActiveScreen(item.id)} activeColor="text-indigo-600" />
@@ -37,7 +36,7 @@ export const TeacherBottomNav = ({ activeScreen, setActiveScreen }: { activeScre
     { id: 'settings', icon: <SettingsIcon />, label: 'Settings' },
   ];
   return (
-    <div className="w-full bg-white/95 backdrop-blur-sm border-t border-gray-100 p-2 flex justify-around items-center print:hidden">
+    <div className="w-full bg-white/95 backdrop-blur-sm border-t border-gray-100 p-1.5 flex justify-around items-center print:hidden">
 {/* FIX: Replaced spread operator with explicit props to prevent passing the unhandled 'id' prop to the NavItem component. */}
       {navItems.map(item => (
         <NavItem key={item.id} icon={item.icon} label={item.label} isActive={activeScreen === item.id} onClick={() => setActiveScreen(item.id)} activeColor="text-[#7B61FF]" />
@@ -50,11 +49,11 @@ export const ParentBottomNav = ({ activeScreen, setActiveScreen }: { activeScree
   const navItems = [
     { id: 'home', icon: <HomeIcon />, label: 'Home' },
     { id: 'reports', icon: <DocumentTextIcon />, label: 'Reports' },
-    { id: 'notifications', icon: <BellIcon />, label: 'Notifications' },
+    { id: 'notifications', icon: <BellIcon />, label: 'Notify' },
     { id: 'more', icon: <ProfileIcon />, label: 'More' },
   ];
   return (
-    <div className="w-full bg-white/95 backdrop-blur-sm border-t border-gray-100 p-2 flex justify-around items-center print:hidden">
+    <div className="w-full bg-white/95 backdrop-blur-sm border-t border-gray-100 p-1.5 flex justify-around items-center print:hidden">
 {/* FIX: Replaced spread operator with explicit props to prevent passing the unhandled 'id' prop to the NavItem component. */}
       {navItems.map(item => (
         <NavItem key={item.id} icon={item.icon} label={item.label} isActive={activeScreen === item.id} onClick={() => setActiveScreen(item.id)} activeColor="text-[#4CAF50]" />
@@ -72,7 +71,7 @@ export const StudentBottomNav = ({ activeScreen, setActiveScreen }: { activeScre
     { id: 'profile', icon: <ProfileIcon />, label: 'Profile' },
   ];
   return (
-    <div className="w-full bg-white/95 backdrop-blur-sm border-t border-gray-100 p-2 flex justify-around items-center print:hidden">
+    <div className="w-full bg-white/95 backdrop-blur-sm border-t border-gray-100 p-1.5 flex justify-around items-center print:hidden">
 {/* FIX: Replaced spread operator with explicit props to prevent passing the unhandled 'id' prop to the NavItem component. */}
       {navItems.map(item => (
         <NavItem key={item.id} icon={item.icon} label={item.label} isActive={activeScreen === item.id} onClick={() => setActiveScreen(item.id)} activeColor="text-[#FF9800]" />

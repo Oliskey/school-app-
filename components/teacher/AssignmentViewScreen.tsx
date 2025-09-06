@@ -48,14 +48,18 @@ const AssignmentViewScreen: React.FC<AssignmentViewScreenProps> = ({ assessment 
             
             <main className="flex-grow overflow-y-auto p-4">
                 <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg printable-area font-sans">
-                    <header className="flex justify-between items-center border-b-2 border-gray-300 pb-4 mb-6">
-                        <div>
+                    <header className="flex flex-col border-b-2 border-gray-300 pb-4 mb-6">
+                        <div className="mb-2">
                             <h1 className="text-2xl font-bold text-gray-800">Smart School Academy</h1>
-                            <p className="font-semibold text-gray-600">{subject} - {className}</p>
                         </div>
-                        <div className="text-right">
-                             <h2 className="text-xl font-bold text-gray-800">{assessment.type}</h2>
-                             <p className="font-semibold text-gray-600">Total Marks: {assessment.totalMarks}</p>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="font-semibold text-gray-600">{subject} - {className}</p>
+                            </div>
+                            <div className="text-right">
+                                <h2 className="text-xl font-bold text-gray-800">{assessment.type}</h2>
+                                <p className="font-semibold text-gray-600">Total Marks: {assessment.totalMarks}</p>
+                            </div>
                         </div>
                     </header>
                     
