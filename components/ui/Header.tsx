@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { LogoutIcon, ChevronLeftIcon, NotificationIcon } from '../../constants';
 
@@ -14,10 +13,24 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ title, avatarUrl, bgColor, onLogout, onBack, onNotificationClick, notificationCount }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const Avatar = () => (
     <div className="w-12 h-12 rounded-full bg-white/30 p-1 flex-shrink-0">
-      <img src={avatarUrl} alt="avatar" className="rounded-full w-full h-full object-cover" />
+      {imageError ? (
+        <div className="rounded-full w-full h-full bg-gray-200 flex items-center justify-center">
+          <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+          </svg>
+        </div>
+      ) : (
+        <img 
+          src={avatarUrl} 
+          alt="avatar" 
+          className="rounded-full w-full h-full object-cover" 
+          onError={() => setImageError(true)}
+        />
+      )}
     </div>
   );
 
@@ -35,40 +48,47 @@ const Header: React.FC<HeaderProps> = ({ title, avatarUrl, bgColor, onLogout, on
         <div className="flex items-center space-x-4">
           {onNotificationClick && (
             <button onClick={onNotificationClick} className="relative p-2 rounded-full hover:bg-white/10" aria-label={`View notifications. ${notificationCount || 0} unread.`}>
-              <NotificationIcon className="h-7 w-7 text-white" />
+              <NotificationIcon className="h-6 w-6 text-white" />
               {notificationCount && notificationCount > 0 && (
-                <span className="absolute top-1 right-1 block h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold border-2 border-white">
+                <span className="absolute top-0 right-0 block h-5 w-5 rounded-full bg-red-500 border-2 border-white text-white text-[10px] flex items-center justify-center font-bold">
                   {notificationCount > 9 ? '9+' : notificationCount}
                 </span>
               )}
             </button>
           )}
-          {onLogout ? (
-            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} aria-expanded={isDropdownOpen} aria-haspopup="true" aria-label="Open user menu">
-              <Avatar />
-            </button>
-          ) : (
-            <Avatar />
+          {onLogout && (
+            <div className="relative">
+              <button 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
+                className="focus:outline-none"
+                aria-label="User menu"
+                aria-haspopup="true"
+                aria-expanded={isDropdownOpen}
+              >
+                <Avatar />
+              </button>
+              {isDropdownOpen && (
+                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        onLogout();
+                        setIsDropdownOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <div className="flex items-center">
+                        <LogoutIcon className="mr-2 h-4 w-4" />
+                        Logout
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
-       {isDropdownOpen && onLogout && (
-          <div 
-            className="absolute right-6 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 ring-1 ring-black ring-opacity-5"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="user-menu-button"
-          >
-            <button
-              onClick={onLogout}
-              className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem"
-            >
-              <LogoutIcon className="mr-3 h-5 w-5 text-gray-500" />
-              <span>Logout</span>
-            </button>
-          </div>
-        )}
     </header>
   );
 };

@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   MailIcon, 
   PhoneIcon, 
@@ -36,6 +35,7 @@ const QuickActionCard = ({ icon: Icon, label, bgColor, action }: { icon: React.C
 const TeacherProfile: React.FC<TeacherProfileProps> = ({ navigateTo }) => {
     const theme = THEME_CONFIG[DashboardType.Teacher];
     const subjectColor = SUBJECT_COLORS[mockTeacher.subject] || 'bg-gray-100 text-gray-800';
+    const [imageError, setImageError] = useState(false);
 
     const quickActions = [
         { label: 'Attendance', icon: AttendanceIcon, bgColor: 'bg-green-500', action: () => navigateTo('attendance', 'Mark Attendance', {}) },
@@ -48,54 +48,52 @@ const TeacherProfile: React.FC<TeacherProfileProps> = ({ navigateTo }) => {
       <main className="flex-grow p-4 space-y-5 overflow-y-auto">
         {/* Profile Info */}
         <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col items-center space-y-3">
-          <img 
-            src={mockTeacher.avatarUrl} 
-            alt={mockTeacher.name} 
-            className="w-28 h-28 rounded-full object-cover border-4 border-purple-200 shadow-md"
-          />
+          {imageError ? (
+            <div className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center">
+              <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+              </svg>
+            </div>
+          ) : (
+            <img 
+              src={mockTeacher.avatarUrl} 
+              alt={mockTeacher.name} 
+              className="w-28 h-28 rounded-full object-cover border-4 border-purple-200 shadow-md"
+              onError={() => setImageError(true)}
+            />
+          )}
           <h3 className="text-2xl font-bold text-gray-800">{mockTeacher.name}</h3>
           <span className={`text-sm font-semibold px-4 py-1 rounded-full ${subjectColor}`}>
-            Teaches {mockTeacher.subject}
+            {mockTeacher.subject} Teacher
           </span>
-        </div>
-      
-        {/* Contact Info */}
-        <div className="bg-white rounded-2xl shadow-sm p-4 space-y-4">
-             <div className="flex items-center space-x-4">
-                <div className={`p-2.5 rounded-lg ${theme.cardBg}`}>
-                    <MailIcon className={`w-5 h-5 ${theme.iconColor}`} />
-                </div>
-                <span className="text-gray-700 font-medium">{mockTeacher.email}</span>
-            </div>
-             <div className="flex items-center space-x-4">
-                <div className={`p-2.5 rounded-lg ${theme.cardBg}`}>
-                    <PhoneIcon className={`w-5 h-5 ${theme.iconColor}`} />
-                </div>
-                <span className="text-gray-700 font-medium">{mockTeacher.phone}</span>
-            </div>
+          <div className="flex space-x-4 pt-2">
+            <a href={`mailto:${mockTeacher.email}`} className="flex items-center space-x-1 text-gray-600 hover:text-purple-600">
+              <MailIcon className="h-4 w-4" />
+              <span className="text-sm">Email</span>
+            </a>
+            <a href={`tel:${mockTeacher.phone}`} className="flex items-center space-x-1 text-gray-600 hover:text-purple-600">
+              <PhoneIcon className="h-4 w-4" />
+              <span className="text-sm">Call</span>
+            </a>
+          </div>
         </div>
 
         {/* Quick Actions */}
-        <div>
-            <h3 className="text-md font-bold text-gray-600 px-2 mb-2">Quick Actions</h3>
-            <div className="grid grid-cols-3 gap-3">
-{/* FIX: Replaced spread operator with explicit props to resolve the TypeScript error. */}
-                {quickActions.map(item => (
-                    <QuickActionCard key={item.label} icon={item.icon} label={item.label} bgColor={item.bgColor} action={item.action} />
-                ))}
-            </div>
+        <div className="bg-white rounded-2xl shadow-sm p-4">
+          <h4 className="font-bold text-gray-800 mb-3 px-2">Quick Actions</h4>
+          <div className="grid grid-cols-3 gap-3">
+            {quickActions.map((action, index) => (
+              <QuickActionCard 
+                key={index}
+                icon={action.icon}
+                label={action.label}
+                bgColor={action.bgColor}
+                action={action.action}
+              />
+            ))}
+          </div>
         </div>
       </main>
-
-      {/* Action Buttons */}
-      <div className="p-4 mt-auto bg-gray-50 border-t border-gray-200">
-        <button
-            onClick={() => navigateTo('settings', 'Settings', {})}
-            className={`w-full flex items-center justify-center space-x-2 py-3 px-4 font-medium text-white rounded-lg shadow-sm ${theme.mainBg} hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500`}>
-          <SettingsIcon className="h-5 w-5" />
-          <span>Settings</span>
-        </button>
-      </div>
     </div>
   );
 };
