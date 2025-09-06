@@ -18,11 +18,9 @@ const AssessmentHeader: React.FC<AssessmentHeaderProps> = ({
       <div className="mb-2">
         <h1 className="text-2xl font-bold text-gray-800">{schoolName}</h1>
       </div>
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="font-semibold text-gray-600">Class: {className}</p>
-        </div>
-        <div className="text-right">
+      <div className="flex flex-col">
+        <p className="font-semibold text-gray-600">Class: {className}</p>
+        <div className="mt-2">
           <h2 className="text-xl font-bold text-gray-800">{assessmentTitle}</h2>
           <p className="font-semibold text-gray-600">Total Marks: {totalMarks}</p>
         </div>

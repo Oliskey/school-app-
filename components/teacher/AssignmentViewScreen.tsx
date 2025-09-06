@@ -52,11 +52,9 @@ const AssignmentViewScreen: React.FC<AssignmentViewScreenProps> = ({ assessment 
                         <div className="mb-2">
                             <h1 className="text-2xl font-bold text-gray-800">Smart School Academy</h1>
                         </div>
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="font-semibold text-gray-600">{subject} - {className}</p>
-                            </div>
-                            <div className="text-right">
+                        <div className="flex flex-col">
+                            <p className="font-semibold text-gray-600">{subject} - {className}</p>
+                            <div className="mt-2">
                                 <h2 className="text-xl font-bold text-gray-800">{assessment.type}</h2>
                                 <p className="font-semibold text-gray-600">Total Marks: {assessment.totalMarks}</p>
                             </div>
