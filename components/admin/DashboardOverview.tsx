@@ -7,7 +7,7 @@ interface DashboardOverviewProps {
     navigateTo: (view: string, title: string, props?: any) => void;
 }
 
-const DashboardOverview: React.FC<DashboardOverviewProps> = ({ navigateTo }) => {
+const DashboardOverview: React.FC<DashboardOverviewProps> = function({ navigateTo }) {
   const gridItems = [
     { label: 'Manage Classes', icon: <StudentsIcon />, action: () => navigateTo('classList', 'Manage Classes') },
     { label: 'Manage Staff', icon: <StaffIcon />, action: () => navigateTo('teacherList', 'Teachers') },
@@ -19,7 +19,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ navigateTo }) => 
     { label: 'Teacher Attendance', icon: <TeacherAttendanceIcon />, action: () => navigateTo('teacherAttendance', 'Teacher Attendance') },
     { label: 'Health Log', icon: <HeartIcon />, action: () => navigateTo('healthLog', 'Health Log') },
     { label: 'Publish Reports', icon: <ReportIcon />, action: () => navigateTo('reportCardPublishing', 'Publish Reports') },
-    { label: 'Online Store', icon: <ShoppingCartIcon />, action: () => navigateTo('onlineStore', 'Online Store') },
     { label: 'System Settings', icon: <SettingsIcon />, action: () => navigateTo('systemSettings', 'System Settings') },
   ];
 

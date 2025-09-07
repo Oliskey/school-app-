@@ -31,7 +31,6 @@ import NotificationsSettingsScreen from '../admin/NotificationsSettingsScreen';
 import SecuritySettingsScreen from '../admin/SecuritySettingsScreen';
 import ChangePasswordScreen from '../admin/ChangePasswordScreen';
 import NotificationsScreen from '../shared/NotificationsScreen';
-import OnlineStoreScreen from '../admin/OnlineStoreScreen';
 import AdminSelectClassForReport from '../admin/AdminSelectClassForReport';
 import AdminStudentListForReport from '../admin/AdminStudentListForReport';
 import AdminStudentReportCardScreen from '../admin/AdminStudentReportCardScreen';
@@ -140,7 +139,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         securitySettings: SecuritySettingsScreen,
         changePassword: ChangePasswordScreen,
         notifications: (props: any) => <NotificationsScreen {...props} userType="admin" />,
-        onlineStore: OnlineStoreScreen,
         schoolReports: AdminSelectClassForReport,
         studentListForReport: AdminStudentListForReport,
         viewStudentReport: AdminStudentReportCardScreen,

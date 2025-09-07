@@ -330,6 +330,8 @@ export const mockAssignments: Assignment[] = [
   { id: 5, title: 'Map of Nigeria Drawing', className: 'Grade 9A', subject: 'Geography', dueDate: '2024-08-18T23:59:59Z', totalStudents: 3, submissionsCount: 2 },
   { id: 6, title: 'Basic Algebra Worksheet', className: 'Grade 9A', subject: 'Mathematics', dueDate: '2024-08-20T23:59:59Z', totalStudents: 3, submissionsCount: 0 },
   { id: 7, title: 'Historical Events Timeline', className: 'Grade 11C', subject: 'History', dueDate: '2024-07-20T23:59:59Z', totalStudents: 1, submissionsCount: 0 },
+  // Assignment for Mrs. Funke Akintola (English teacher)
+  { id: 8, title: 'Shakespeare Poetry Analysis', className: 'Grade 11A', subject: 'English', dueDate: '2024-08-25T23:59:59Z', totalStudents: 5, submissionsCount: 2 },
 ];
 
 export const mockSubmissions: Submission[] = [
@@ -355,6 +357,27 @@ export const mockSubmissions: Submission[] = [
     isLate: false, 
     status: 'Ungraded',
     textSubmission: "Please find my analysis of Lady Macbeth's character arc attached."
+  },
+  // Submission for the new English assignment
+  { 
+    id: 801, 
+    assignmentId: 8, 
+    student: { id: 29, name: 'Sarah Gbadamosi', avatarUrl: 'https://i.pravatar.cc/150?u=sarah' }, 
+    submittedAt: '2024-08-20T14:30:00Z', 
+    isLate: false, 
+    status: 'Graded', 
+    grade: 88, 
+    feedback: "Good analysis of the poetry themes. Try to include more specific quotes from the text in your next submission.",
+    textSubmission: "I've completed the poetry analysis as requested. Please see the attached document."
+  },
+  { 
+    id: 802, 
+    assignmentId: 8, 
+    student: { id: 30, name: 'Titi Williams', avatarUrl: 'https://i.pravatar.cc/150?u=titi' }, 
+    submittedAt: '2024-08-22T09:15:00Z', 
+    isLate: false, 
+    status: 'Ungraded',
+    textSubmission: "Here is my analysis of the assigned poems. I focused on the themes of love and nature."
   },
 ];
 

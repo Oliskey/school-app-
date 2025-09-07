@@ -68,6 +68,56 @@
     .animate-checkmark-pop {
       animation: checkmark-pop 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
     }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+      50% {
+        transform: scale(1.02);
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+    }
+    
+    .animate-pulse-subtle {
+      animation: pulse 3s infinite ease-in-out;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+    
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
 </style>
 </head>
   <body class="bg-gray-100 dark:bg-gray-900">

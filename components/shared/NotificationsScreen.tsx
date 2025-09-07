@@ -63,8 +63,8 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ userType, nav
   };
   
   return (
-    <div className="flex flex-col h-full bg-gray-100">
-      <main className="flex-grow p-4 space-y-3 overflow-y-auto">
+    <div className="flex flex-col h-full bg-gradient-to-b from-gray-50 to-gray-100">
+      <main className="flex-grow p-3 md:p-5 space-y-4 md:space-y-5 overflow-y-auto">
         {relevantNotifications.length > 0 ? (
           relevantNotifications.map(notification => {
             const config = NOTIFICATION_CATEGORY_CONFIG[notification.category];
@@ -73,29 +73,40 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ userType, nav
               <button 
                 key={notification.id}
                 onClick={() => handleNotificationClick(notification)}
-                className="w-full text-left bg-white rounded-xl shadow-sm p-4 flex items-start space-x-4 relative transition-all hover:shadow-md hover:ring-2 hover:ring-gray-200"
+                className="w-full text-left bg-white rounded-xl md:rounded-2xl shadow-md md:shadow-lg p-4 md:p-6 flex flex-col md:flex-row items-start md:space-x-5 space-y-3 md:space-y-0 relative transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 {!notification.isRead && (
-                  <div className="absolute top-3 right-3 h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 md:-top-1.5 md:-right-1.5 h-3 w-3 md:h-4 md:w-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 animate-pulse shadow-md"></div>
                 )}
-                <div className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center ${config.bg}`}>
-                  <Icon className={`w-6 h-6 ${config.color}`} />
+                <div className={`flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-lg md:rounded-xl flex items-center justify-center ${config.bg} transition-all duration-300 hover:scale-105 shadow-sm md:shadow-md`}>
+                  <Icon className={`w-7 h-7 md:w-8 md:h-8 ${config.color}`} />
                 </div>
                 <div className="flex-grow">
-                  <div className="flex justify-between items-center">
-                    <p className={`font-bold ${notification.isRead ? 'text-gray-700' : 'text-gray-900'}`}>{notification.title}</p>
-                    <p className="text-xs text-gray-500 flex-shrink-0 ml-2">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-start space-y-2 md:space-y-0">
+                    <p className={`font-bold text-lg md:text-xl ${notification.isRead ? 'text-gray-700' : 'text-gray-900'}`}>{notification.title}</p>
+                    <p className="text-xs md:text-sm text-gray-500 flex-shrink-0 bg-gray-100 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full font-semibold">
                       {formatDistanceToNow(notification.timestamp)}
                     </p>
                   </div>
-                  <p className={`text-sm mt-1 ${notification.isRead ? 'text-gray-600' : 'text-gray-800'}`}>{notification.summary}</p>
+                  <p className={`text-sm md:text-base mt-2 md:mt-3 leading-relaxed ${notification.isRead ? 'text-gray-600' : 'text-gray-800'}`}>{notification.summary}</p>
+                  <div className="mt-3 md:mt-4">
+                    <span className={`inline-block px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-full ${config.bg} ${config.color} shadow-sm`}>
+                      {notification.category}
+                    </span>
+                  </div>
                 </div>
               </button>
             )
           })
         ) : (
-          <div className="text-center py-16">
-            <p className="text-gray-500">No new notifications.</p>
+          <div className="text-center py-16 md:py-20 bg-white rounded-xl md:rounded-2xl shadow-md md:shadow-lg">
+            <div className="mx-auto w-16 h-16 md:w-20 md:h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4 md:mb-5 shadow-sm md:shadow-md">
+              <svg className="w-8 h-8 md:w-10 md:h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-5 5v-5zM9 7H4l5-5v5z"></path>
+              </svg>
+            </div>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">No Notifications</h3>
+            <p className="text-gray-600 text-sm md:text-base max-w-md mx-auto px-4">You're all caught up! Check back later for new notifications.</p>
           </div>
         )}
       </main>
