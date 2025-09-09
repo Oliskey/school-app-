@@ -75,18 +75,18 @@ interface ViewStackItem {
 }
 
 const StatItem = ({ icon, label, value, colorClass }: { icon: React.ReactNode, label: string, value: string, colorClass: string }) => (
-    <div className="flex items-center space-x-2">
-        <div className={`p-1.5 rounded-lg ${colorClass}`}>
+    <div className="flex items-center space-x-3">
+        <div className={`p-2 rounded-lg ${colorClass}`}>
             {icon}
         </div>
         <div>
             <p className="text-xs text-gray-700">{label}</p>
-            <p className="font-bold text-xs text-gray-800">{value}</p>
+            <p className="font-bold text-sm text-gray-800">{value}</p>
         </div>
     </div>
 );
 
-const ChildStatCard = ({ data, navigateTo, colorTheme }: { data: any, navigateTo: (view: string, title: string, props?: any) => void, colorTheme: { bg: string, text: string } }) => {
+const ChildStatCard: React.FC<{ data: any, navigateTo: (view: string, title: string, props?: any) => void, colorTheme: { bg: string, text: string } }> = ({ data, navigateTo, colorTheme }) => {
     const { student, feeInfo, nextHomework, recentGrades, attendancePercentage } = data;
     const theme = THEME_CONFIG[DashboardType.Parent];
     const formattedClassName = getFormattedClassName(student.grade, student.section);
@@ -94,27 +94,27 @@ const ChildStatCard = ({ data, navigateTo, colorTheme }: { data: any, navigateTo
     const feeStatus = feeInfo ? `${new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(feeInfo.totalFee - feeInfo.paidAmount)} due ${new Date(feeInfo.dueDate).toLocaleDateString('en-GB', {day:'numeric', month:'short'})}` : "All fees paid";
     
     return (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden border-t-2" style={{borderColor: colorTheme.bg}}>
-            <div className="p-3">
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden border-t-4" style={{borderColor: colorTheme.bg}}>
+            <div className="p-4">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                        <img src={student.avatarUrl} alt={student.name} className="w-12 h-12 rounded-full object-cover border" style={{borderColor: colorTheme.bg}}/>
+                    <div className="flex items-center space-x-3">
+                        <img src={student.avatarUrl} alt={student.name} className="w-14 h-14 rounded-full object-cover border-2" style={{borderColor: colorTheme.bg}}/>
                         <div>
-                            <h3 className="font-bold text-base text-gray-800">{student.name}</h3>
-                            <p className="text-xs font-semibold" style={{color: colorTheme.text}}>{formattedClassName}</p>
+                            <h3 className="font-bold text-lg text-gray-800">{student.name}</h3>
+                            <p className="text-sm font-semibold" style={{color: colorTheme.text}}>{formattedClassName}</p>
                         </div>
                     </div>
-                    <button onClick={() => navigateTo('childDetail', student.name, { student: student })} className="bg-gray-100 p-1.5 rounded-full hover:bg-gray-200">
-                        <ChevronRightIcon className="text-gray-600 h-4 w-4"/>
+                    <button onClick={() => navigateTo('childDetail', student.name, { student: student })} className="bg-gray-100 p-2 rounded-full hover:bg-gray-200">
+                        <ChevronRightIcon className="text-gray-600"/>
                     </button>
                 </div>
             </div>
 
-            <div className="px-3 pb-3 grid grid-cols-2 gap-2">
-                <StatItem icon={<AttendanceSummaryIcon className="h-4 w-4 text-green-600"/>} label="Attendance" value={`${attendancePercentage}%`} colorClass="bg-green-100" />
-                <StatItem icon={<ReceiptIcon className="h-4 w-4 text-red-600"/>} label="Fees" value={feeStatus} colorClass="bg-red-100" />
-                {recentGrades.length > 0 && <StatItem icon={<ChartBarIcon className="h-4 w-4 text-sky-600"/>} label="Grade" value={`${recentGrades[0].subject}: ${recentGrades[0].score}%`} colorClass="bg-sky-100" />}
-                {nextHomework && <StatItem icon={<ClipboardListIcon className="h-4 w-4 text-purple-600"/>} label="Homework" value={`${nextHomework.subject} due ${new Date(nextHomework.dueDate).toLocaleDateString('en-GB', {day:'numeric', month:'short'})}`} colorClass="bg-purple-100" />}
+            <div className="px-4 pb-4 grid grid-cols-2 gap-4">
+                <StatItem icon={<AttendanceSummaryIcon className="h-5 w-5 text-green-600"/>} label="Attendance" value={`${attendancePercentage}%`} colorClass="bg-green-100" />
+                <StatItem icon={<ReceiptIcon className="h-5 w-5 text-red-600"/>} label="Upcoming Fees" value={feeStatus} colorClass="bg-red-100" />
+                {recentGrades.length > 0 && <StatItem icon={<ChartBarIcon className="h-5 w-5 text-sky-600"/>} label="Recent Grade" value={`${recentGrades[0].subject}: ${recentGrades[0].score}%`} colorClass="bg-sky-100" />}
+                {nextHomework && <StatItem icon={<ClipboardListIcon className="h-5 w-5 text-purple-600"/>} label="Next Homework" value={`${nextHomework.subject} due ${new Date(nextHomework.dueDate).toLocaleDateString('en-GB', {day:'numeric', month:'short'})}`} colorClass="bg-purple-100" />}
             </div>
         </div>
     );
@@ -421,10 +421,10 @@ const Dashboard = ({ navigateTo }: { navigateTo: (view: string, title: string, p
         }), []);
 
     const quickAccessItems = [
-        { label: 'Bus', icon: <BusVehicleIcon className="h-5 w-5"/>, action: () => navigateTo('busRoute', 'Bus Route') },
-        { label: 'Fees', icon: <ReceiptIcon className="h-5 w-5"/>, action: () => navigateTo('feeStatus', 'Fee Status', { childrenIds: parentChildrenIds }) },
-        { label: 'Reports', icon: <ReportIcon className="h-5 w-5"/>, action: () => navigateTo('selectReport', 'Select Report Card') },
-        { label: 'Appointments', icon: <CalendarPlusIcon className="h-5 w-5"/>, action: () => navigateTo('appointments', 'Book Appointment') },
+        { label: 'Bus Route', icon: <BusVehicleIcon className="h-7 w-7"/>, action: () => navigateTo('busRoute', 'Bus Route') },
+        { label: 'Fees', icon: <ReceiptIcon className="h-7 w-7"/>, action: () => navigateTo('feeStatus', 'Fee Status', { childrenIds: parentChildrenIds }) },
+        { label: 'Reports', icon: <ReportIcon className="h-7 w-7"/>, action: () => navigateTo('selectReport', 'Select Report Card') },
+        { label: 'Appointments', icon: <CalendarPlusIcon className="h-7 w-7"/>, action: () => navigateTo('appointments', 'Book Appointment') },
     ];
     
     const latestNotice = mockNotices.filter(n => n.audience.includes('all') || n.audience.includes('parents')).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
@@ -432,11 +432,11 @@ const Dashboard = ({ navigateTo }: { navigateTo: (view: string, title: string, p
     const childColorThemes = [{bg: '#3b82f6', text: '#1e40af'}, {bg: '#ec4899', text: '#831843'}];
 
     return (
-        <div className="p-3 space-y-4 bg-gray-50">
+        <div className="p-4 space-y-5 bg-gray-50">
             {/* Quick Actions */}
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-3">
                 {quickAccessItems.map((item, index) => (
-                    <button key={item.label} onClick={item.action} className={`${theme.cardBg} p-2 rounded-xl shadow-sm flex flex-col items-center justify-center space-y-1 hover:bg-green-200 transition-colors`}>
+                    <button key={item.label} onClick={item.action} className={`${theme.cardBg} p-3 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-2 hover:bg-green-200 transition-colors`}>
                         <div className={theme.iconColor}>{item.icon}</div>
                         <span className={`font-semibold ${theme.textColor} text-center text-xs`}>{item.label}</span>
                     </button>
@@ -444,26 +444,25 @@ const Dashboard = ({ navigateTo }: { navigateTo: (view: string, title: string, p
             </div>
 
             {/* Children Cards */}
-            <div className="space-y-3">
-{/* FIX: Removed redundant 'key' prop from ChildStatCard component call. */}
+            <div className="space-y-4">
                 {childrenData.map((data, index) => (
-                    <ChildStatCard data={data} navigateTo={navigateTo} colorTheme={childColorThemes[index % childColorThemes.length]} />
+                    <ChildStatCard key={data.student.id} data={data} navigateTo={navigateTo} colorTheme={childColorThemes[index % childColorThemes.length]} />
                 ))}
             </div>
             
              {/* School Notice */}
              {latestNotice && (
-                <div className="bg-white p-3 rounded-xl shadow-sm">
-                    <div className="flex items-center space-x-2 mb-2">
-                        <div className="bg-amber-100 p-1.5 rounded-lg">
-                            <MegaphoneIcon className="h-4 w-4 text-amber-600"/>
+                <div className="bg-white p-4 rounded-2xl shadow-sm">
+                    <div className="flex items-center space-x-3 mb-2">
+                        <div className="bg-amber-100 p-2 rounded-lg">
+                            <MegaphoneIcon className="h-5 w-5 text-amber-600"/>
                         </div>
-                        <h4 className="font-bold text-gray-800 text-sm">School Notice</h4>
+                        <h4 className="font-bold text-gray-800">School Notice</h4>
                     </div>
-                    <div className="border-l-2 border-amber-300 pl-2">
-                         <h5 className="font-semibold text-gray-700 text-sm">{latestNotice.title}</h5>
-                         <p className="text-xs text-gray-800">{latestNotice.content.substring(0, 80)}...</p>
-                         <button onClick={() => navigateTo('noticeboard', 'Noticeboard')} className="text-xs font-semibold text-green-600 mt-1">Read More</button>
+                    <div className="border-l-4 border-amber-300 pl-3">
+                         <h5 className="font-semibold text-gray-700">{latestNotice.title}</h5>
+                         <p className="text-sm text-gray-800">{latestNotice.content.substring(0, 100)}...</p>
+                         <button onClick={() => navigateTo('noticeboard', 'Noticeboard')} className="text-sm font-semibold text-green-600 mt-2">Read More</button>
                     </div>
                 </div>
              )}
@@ -479,6 +478,8 @@ interface ParentDashboardProps {
 const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePage }) => {
     const [viewStack, setViewStack] = useState<ViewStackItem[]>([{ view: 'dashboard', title: 'Parent Dashboard' }]);
     const [activeBottomNav, setActiveBottomNav] = useState('home');
+    const [version, setVersion] = useState(0);
+    const forceUpdate = () => setVersion(v => v + 1);
 
     useEffect(() => {
         const currentView = viewStack[viewStack.length - 1];
@@ -556,6 +557,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePa
         navigateTo,
         onLogout,
         handleBack,
+        forceUpdate,
     };
 
     return (
@@ -571,7 +573,7 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePa
             />
             <div className="flex-grow overflow-y-auto" style={{marginTop: '-4rem'}}>
                 <div className="pt-16">
-                    <div key={viewStack.length} className="animate-slide-in-up">
+                    <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
                         {ComponentToRender ? (
                             <ComponentToRender {...currentNavigation.props} {...commonProps} />
                         ) : (

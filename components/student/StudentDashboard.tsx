@@ -6,6 +6,7 @@ import { StudentBottomNav } from '../ui/DashboardBottomNav';
 import { mockStudents, mockTimetableData, mockAssignments, mockSubmissions, mockNotices, mockNotifications } from '../../data';
 import AdventureQuestHost from '../student/adventure/AdventureQuestHost';
 import ErrorBoundary from '../ui/ErrorBoundary';
+import GlobalSearchScreen from '../shared/GlobalSearchScreen';
 
 // Import all view components
 import StudyBuddy from '../student/StudyBuddy';
@@ -169,13 +170,14 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
     const [viewStack, setViewStack] = useState<ViewStackItem[]>([{ view: 'overview', title: 'Student Dashboard' }]);
     const [activeBottomNav, setActiveBottomNav] = useState('home');
     const [version, setVersion] = useState(0);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const forceUpdate = () => setVersion(v => v + 1);
     const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('student')).length;
     
     useEffect(() => {
         const currentView = viewStack[viewStack.length - 1];
-        setIsHomePage(currentView.view === 'overview');
-    }, [viewStack, setIsHomePage]);
+        setIsHomePage(currentView.view === 'overview' && !isSearchOpen);
+    }, [viewStack, isSearchOpen, setIsHomePage]);
     
     const navigateTo = (view: string, title: string, props: any = {}) => {
         setViewStack(stack => [...stack, { view, props, title }]);
@@ -258,7 +260,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-100">
+        <div className="flex flex-col h-full bg-gray-100 relative">
             <Header
                 title={currentNavigation.title}
                 avatarUrl={loggedInStudent.avatarUrl}
@@ -267,6 +269,7 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
                 onBack={viewStack.length > 1 ? handleBack : undefined}
                 onNotificationClick={handleNotificationClick}
                 notificationCount={notificationCount}
+                onSearchClick={() => setIsSearchOpen(true)}
             />
             <div className="flex-grow overflow-y-auto h-full" style={{marginTop: '-4rem'}}>
                 <div className="pt-16 h-full">
@@ -282,6 +285,13 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onLogout, setIsHome
                 </div>
             </div>
             <StudentBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />
+            {isSearchOpen && (
+                <GlobalSearchScreen 
+                    dashboardType={DashboardType.Student}
+                    navigateTo={navigateTo}
+                    onClose={() => setIsSearchOpen(false)}
+                />
+            )}
         </div>
     );
 };

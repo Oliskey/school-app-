@@ -1,3 +1,5 @@
+
+
 import React, { useState, useMemo } from 'react';
 import { ReceiptIcon } from '../../constants';
 import { StudentFeeInfo } from '../../types';
@@ -98,7 +100,7 @@ const FeeStatusScreen: React.FC<FeeStatusScreenProps> = ({ childrenIds }) => {
                     {paymentHistory.length > 0 ? (
                         <ul className="space-y-3">
                             {paymentHistory.map(p => (
-                                <li key={p.id} className="flex items-center">
+                                 <li key={p.id} className="flex items-center">
                                     <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3">
                                         <ReceiptIcon className="w-5 h-5 text-green-600"/>
                                     </div>
@@ -115,16 +117,6 @@ const FeeStatusScreen: React.FC<FeeStatusScreenProps> = ({ childrenIds }) => {
                     )}
                 </div>
             </main>
-
-            <div className="p-4 mt-auto bg-white border-t">
-                <button 
-                    onClick={() => alert(`Initiating payment of ${formatter.format(balance)} for ${selectedChild.name}.`)}
-                    disabled={balance <= 0}
-                    className={`w-full flex justify-center items-center space-x-2 py-3 px-4 border border-transparent rounded-lg shadow-sm font-medium text-white transition-colors ${balance > 0 ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 cursor-not-allowed'}`}
-                >
-                    <span>{balance > 0 ? `Pay ${formatter.format(balance)} Now` : 'Fees Paid'}</span>
-                </button>
-            </div>
         </div>
     );
 };

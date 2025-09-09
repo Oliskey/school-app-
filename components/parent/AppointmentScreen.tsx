@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from 'react';
 import { Teacher, AppointmentSlot } from '../../types';
 import { mockTeachers, mockAppointmentSlots } from '../../data';
@@ -55,7 +56,7 @@ const AppointmentScreen: React.FC = () => {
                         className="mt-2 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-gray-900"
                     >
                         <option value="">-- Select Teacher --</option>
-                        {mockTeachers.map(t => <option key={t.id} value={t.id}>{t.name} - {t.subject}</option>)}
+                        {mockTeachers.map(t => <option key={t.id} value={t.id}>{t.name} - {t.subjects.join(', ')}</option>)}
                     </select>
                 </div>
                 

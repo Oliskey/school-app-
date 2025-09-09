@@ -1,13 +1,13 @@
+
 import React, { useState } from 'react';
 import { SchoolLogoIcon, UserIcon, LockIcon, EyeIcon, EyeOffIcon } from '../../constants';
 import { DashboardType } from '../../types';
 
 interface LoginProps {
   onLogin: (dashboard: DashboardType) => void;
-  onForgotPassword: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin, onForgotPassword }) => {
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -112,13 +112,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, onForgotPassword }) => {
                 Remember me
               </label>
             </div>
-            <button 
-              type="button"
-              onClick={onForgotPassword}
-              className="font-medium text-sky-600 hover:text-sky-500 focus:outline-none"
-            >
+            <a href="#" onClick={(e) => e.preventDefault()} className="font-medium text-sky-600 hover:text-sky-500">
                 Forgot password?
-            </button>
+            </a>
           </div>
 
           <div>

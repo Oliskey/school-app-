@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Student } from '../../types';
-import { DocumentTextIcon, BookOpenIcon, ClipboardListIcon, CheckCircleIcon, SUBJECT_COLORS, EditIcon, MailIcon, getFormattedClassName } from '../../constants';
+import { DocumentTextIcon, BookOpenIcon, ClipboardListIcon, CheckCircleIcon, SUBJECT_COLORS, EditIcon, MailIcon, getFormattedClassName, CakeIcon } from '../../constants';
 import DonutChart from '../ui/DonutChart';
 
 interface StudentProfileAdminViewProps {
@@ -55,6 +56,12 @@ const StudentProfileAdminView: React.FC<StudentProfileAdminViewProps> = ({ stude
                         <div>
                             <h3 className="text-xl font-bold text-gray-800">{student.name}</h3>
                             <p className="text-gray-500 font-medium">{formattedClassName}{student.department && `, ${student.department}`}</p>
+                            {student.birthday && (
+                                <div className="flex items-center space-x-2 mt-1 text-sm text-gray-500">
+                                    <CakeIcon className="w-4 h-4" />
+                                    <span>{new Date(student.birthday.replace(/-/g, '/')).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,7 @@
-import React from 'react';
-import { mockClasses } from '../../data';
-import { ClassInfo } from '../../types';
+
+import React, { useMemo } from 'react';
+import { mockClasses, mockTeachers } from '../../data';
+import { ClassInfo, Teacher } from '../../types';
 import { ChevronRightIcon, BookOpenIcon, SUBJECT_COLORS } from '../../constants';
 
 const getLevelFromGrade = (grade: number): string => {
@@ -14,8 +15,12 @@ interface TeacherCurriculumSelectionScreenProps {
   navigateTo: (view: string, title: string, props: any) => void;
 }
 
+const LOGGED_IN_TEACHER_ID = 2;
+
 const TeacherCurriculumSelectionScreen: React.FC<TeacherCurriculumSelectionScreenProps> = ({ navigateTo }) => {
-    
+    const teacher = useMemo(() => mockTeachers.find(t => t.id === LOGGED_IN_TEACHER_ID)!, []);
+    const teacherClasses = useMemo(() => mockClasses.filter(c => teacher.classes.includes(`${c.grade}${c.section}`)), [teacher]);
+
     const handleSelectClass = (classInfo: ClassInfo) => {
         const level = getLevelFromGrade(classInfo.grade);
         const title = `Curriculum for ${level} ${classInfo.department || ''}`.trim();
@@ -32,7 +37,7 @@ const TeacherCurriculumSelectionScreen: React.FC<TeacherCurriculumSelectionScree
                 <h3 className="font-bold text-lg text-purple-800">Select a Class</h3>
                 <p className="text-sm text-purple-700">Choose a class to view its official subject curriculum.</p>
             </div>
-            {mockClasses.map(classInfo => {
+            {teacherClasses.map(classInfo => {
                 const subjectColor = SUBJECT_COLORS[classInfo.subject] || 'bg-gray-200 text-gray-800';
                 return (
                     <button 

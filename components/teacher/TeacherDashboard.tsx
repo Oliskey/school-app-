@@ -1,12 +1,10 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 import { DashboardType, Teacher } from '../../types';
 import { THEME_CONFIG } from '../../constants';
 import Header from '../ui/Header';
 import { TeacherBottomNav } from '../ui/DashboardBottomNav';
 import { mockNotifications, mockTeachers } from '../../data';
+import GlobalSearchScreen from '../shared/GlobalSearchScreen';
 
 // Import all view components
 import TeacherOverview from '../teacher/TeacherOverview';
@@ -18,6 +16,7 @@ import PhotoGalleryScreen from '../teacher/PhotoGalleryScreen';
 import AddExamScreen from '../admin/AddExamScreen';
 import CreateAssignmentScreen from '../teacher/CreateAssignmentScreen';
 import TeacherAssignmentsListScreen from '../teacher/TeacherAssignmentsListScreen';
+import ClassAssignmentsScreen from '../teacher/ClassAssignmentsScreen';
 import AssignmentSubmissionsScreen from '../teacher/AssignmentSubmissionsScreen';
 import GradeSubmissionScreen from '../teacher/GradeSubmissionScreen';
 import CurriculumScreen from '../shared/CurriculumScreen';
@@ -41,7 +40,6 @@ import NewChatScreen from '../teacher/NewChatScreen';
 import TeacherReportCardPreviewScreen from '../teacher/TeacherReportCardPreviewScreen';
 import NotificationsScreen from '../shared/NotificationsScreen';
 import TeacherSelectClassForAttendance from '../teacher/TeacherUnifiedAttendanceScreen';
-// FIX: Corrected import path for TeacherMarkAttendanceScreen. The component was aliased incorrectly.
 import TeacherMarkAttendanceScreen from '../teacher/TeacherAttendanceScreen';
 import LessonPlannerScreen from '../teacher/LessonPlannerScreen';
 import LessonPlanDetailScreen from '../teacher/LessonPlanDetailScreen';
@@ -70,11 +68,14 @@ const LOGGED_IN_TEACHER_ID = 2;
 const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHomePage }) => {
   const [viewStack, setViewStack] = useState<ViewStackItem[]>([{ view: 'overview', title: 'Teacher Dashboard', props: {} }]);
   const [activeBottomNav, setActiveBottomNav] = useState('home');
+  const [version, setVersion] = useState(0);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const forceUpdate = () => setVersion(v => v + 1);
 
   useEffect(() => {
     const currentView = viewStack[viewStack.length - 1];
-    setIsHomePage(currentView.view === 'overview');
-  }, [viewStack, setIsHomePage]);
+    setIsHomePage(currentView.view === 'overview' && !isSearchOpen);
+  }, [viewStack, isSearchOpen, setIsHomePage]);
 
   const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('teacher')).length;
 
@@ -129,6 +130,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     addExam: AddExamScreen,
     createAssignment: CreateAssignmentScreen,
     assignmentsList: TeacherAssignmentsListScreen,
+    classAssignments: ClassAssignmentsScreen,
     assignmentSubmissions: AssignmentSubmissionsScreen,
     gradeSubmission: GradeSubmissionScreen,
     curriculumSelection: TeacherCurriculumSelectionScreen,
@@ -168,10 +170,11 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     navigateTo,
     handleBack,
     onLogout,
+    forceUpdate,
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-100">
+    <div className="flex flex-col h-full bg-gray-100 relative">
        <Header
         title={currentNavigation.title}
         avatarUrl="https://i.pravatar.cc/150?u=teacher"
@@ -180,10 +183,11 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
         onBack={viewStack.length > 1 ? handleBack : undefined}
         onNotificationClick={handleNotificationClick}
         notificationCount={notificationCount}
+        onSearchClick={() => setIsSearchOpen(true)}
       />
       <div className="flex-grow overflow-y-auto">
         <main className="min-h-full">
-            <div key={viewStack.length} className="animate-slide-in-up">
+            <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
               {ComponentToRender ? (
                   <ComponentToRender {...currentNavigation.props} {...commonProps} />
               ) : (
@@ -193,6 +197,13 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
         </main>
       </div>
       <TeacherBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />
+      {isSearchOpen && (
+          <GlobalSearchScreen 
+              dashboardType={DashboardType.Teacher}
+              navigateTo={navigateTo}
+              onClose={() => setIsSearchOpen(false)}
+          />
+      )}
     </div>
   );
 };

@@ -1,57 +1,62 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { PlusIcon, EditIcon, TrashIcon, EXAM_TYPE_COLORS, EnterResultsIcon } from '../../constants';
 import { Exam } from '../../types';
 import { mockExamsData } from '../../data';
 
-// In a real app, this would be determined by the logged-in user
+interface TeacherExamManagementProps {
+    navigateTo: (view: string, title: string, props?: any) => void;
+    forceUpdate: () => void;
+    handleBack: () => void;
+}
+
 const LOGGED_IN_TEACHER_ID = 2; 
 
-const TeacherExamManagement: React.FC<{ navigateTo: (view: string, title: string, props?: any) => void; }> = ({ navigateTo }) => {
-    // Teachers only manage a global list of exams in this mock setup.
-    // A real app would fetch exams based on teacherId.
-    const [exams, setExams] = useState<Exam[]>(mockExamsData);
-
-    const teacherExams = exams.filter(e => e.teacherId === LOGGED_IN_TEACHER_ID);
-
-    const handleSave = (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>, examToEdit?: Exam | null) => {
-        if (examToEdit) {
-            // Editing an exam
-            if (examToEdit.isPublished) {
-                alert("Cannot edit a published exam.");
-                return;
-            }
-            setExams(prev => prev.map(e => e.id === examToEdit.id ? { ...examToEdit, ...examData } : e));
-        } else {
-            // Adding a new exam
-            const newId = Math.max(0, ...exams.map(e => e.id)) + 1;
-            setExams(prev => [...prev, { id: newId, ...examData, isPublished: false, teacherId: LOGGED_IN_TEACHER_ID }]);
-        }
-    };
+const TeacherExamManagement: React.FC<TeacherExamManagementProps> = ({ navigateTo, forceUpdate, handleBack }) => {
     
+    const teacherExams = mockExamsData.filter(e => e.teacherId === LOGGED_IN_TEACHER_ID);
+
     const handleDelete = (exam: Exam) => {
         if (exam.isPublished) {
             alert("Cannot delete a published exam.");
             return;
         }
         if (window.confirm('Are you sure you want to delete this exam?')) {
-            setExams(prev => prev.filter(e => e.id !== exam.id));
+            const index = mockExamsData.findIndex(e => e.id === exam.id);
+            if (index > -1) {
+                mockExamsData.splice(index, 1);
+                forceUpdate();
+            }
         }
     };
 
     const handleEdit = (exam: Exam) => {
         navigateTo('addExam', 'Edit Exam', { 
             examToEdit: exam, 
-            onSave: (data: any) => handleSave(data, exam) 
+            onSave: (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => {
+                if (exam.isPublished) {
+                    alert("Cannot edit a published exam.");
+                    return;
+                }
+                const index = mockExamsData.findIndex(e => e.id === exam.id);
+                if (index > -1) {
+                    mockExamsData[index] = { ...mockExamsData[index], ...examData };
+                    forceUpdate();
+                    handleBack();
+                }
+            }
         });
     };
 
     const handleAddNew = () => {
         navigateTo('addExam', 'Add New Exam', {
-             onSave: (data: any) => handleSave(data, null) 
+             onSave: (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => {
+                const newId = Math.max(0, ...mockExamsData.map(e => e.id)) + 1;
+                mockExamsData.unshift({ id: newId, ...examData, isPublished: false, teacherId: LOGGED_IN_TEACHER_ID });
+                forceUpdate();
+                handleBack();
+             }
         });
     };
-
 
     return (
         <div className="flex flex-col h-full bg-gray-100 relative">

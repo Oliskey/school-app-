@@ -1,3 +1,5 @@
+
+
 import React, { useState, useMemo } from 'react';
 import { Student, Parent, Teacher, Conversation, RoleName } from '../../types';
 import { mockStudents, mockTeachers, mockParents, mockAdminConversations } from '../../data';
@@ -51,7 +53,7 @@ const AdminNewChatScreen: React.FC<AdminNewChatScreenProps> = ({ navigateTo }) =
             id: t.id, 
             name: t.name, 
             avatarUrl: t.avatarUrl,
-            subtitle: `${t.subject} Teacher`,
+            subtitle: `${t.subjects[0]} Teacher`,
             userType: 'Teacher' as const 
         })),
     ], []);

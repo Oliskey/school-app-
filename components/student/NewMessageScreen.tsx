@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Student, Teacher, Conversation, RoleName } from '../../types';
-import { mockStudents, mockTeachers, mockConversations } from '../../data';
+import { mockStudents, mockTeachers, mockParents, mockConversations } from '../../data';
 import { SearchIcon } from '../../constants';
 
 type UserListItem = {
@@ -49,7 +49,7 @@ const NewMessageScreen: React.FC<NewMessageScreenProps> = ({ navigateTo }) => {
             id: t.id,
             name: t.name,
             avatarUrl: t.avatarUrl,
-            subtitle: `${t.subject} Teacher`,
+            subtitle: `${t.subjects[0]} Teacher`,
             userType: 'Teacher'
         })),
         []

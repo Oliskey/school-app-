@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { DashboardType, Student, BehaviorNote, StudentAttendance, AttendanceStatus, StudentAssignment } from '../../types';
 import { 
@@ -40,6 +41,7 @@ import {
     mockNotifications,
 } from '../../data';
 import DonutChart from '../ui/DonutChart';
+import GlobalSearchScreen from '../shared/GlobalSearchScreen';
 
 
 // Import all view components
@@ -86,7 +88,7 @@ const StatItem = ({ icon, label, value, colorClass }: { icon: React.ReactNode, l
     </div>
 );
 
-const ChildStatCard = ({ data, navigateTo, colorTheme }: { data: any, navigateTo: (view: string, title: string, props?: any) => void, colorTheme: { bg: string, text: string } }) => {
+const ChildStatCard: React.FC<{ data: any, navigateTo: (view: string, title: string, props?: any) => void, colorTheme: { bg: string, text: string } }> = ({ data, navigateTo, colorTheme }) => {
     const { student, feeInfo, nextHomework, recentGrades, attendancePercentage } = data;
     const theme = THEME_CONFIG[DashboardType.Parent];
     const formattedClassName = getFormattedClassName(student.grade, student.section);
@@ -445,7 +447,6 @@ const Dashboard = ({ navigateTo }: { navigateTo: (view: string, title: string, p
 
             {/* Children Cards */}
             <div className="space-y-4">
-{/* FIX: The 'key' prop is required for elements in a list. Added student.id as a unique key. */}
                 {childrenData.map((data, index) => (
                     <ChildStatCard key={data.student.id} data={data} navigateTo={navigateTo} colorTheme={childColorThemes[index % childColorThemes.length]} />
                 ))}
@@ -479,11 +480,14 @@ interface ParentDashboardProps {
 const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePage }) => {
     const [viewStack, setViewStack] = useState<ViewStackItem[]>([{ view: 'dashboard', title: 'Parent Dashboard' }]);
     const [activeBottomNav, setActiveBottomNav] = useState('home');
+    const [version, setVersion] = useState(0);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const forceUpdate = () => setVersion(v => v + 1);
 
     useEffect(() => {
         const currentView = viewStack[viewStack.length - 1];
-        setIsHomePage(currentView.view === 'dashboard');
-    }, [viewStack, setIsHomePage]);
+        setIsHomePage(currentView.view === 'dashboard' && !isSearchOpen);
+    }, [viewStack, isSearchOpen, setIsHomePage]);
 
     const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('parent')).length;
 
@@ -556,10 +560,11 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePa
         navigateTo,
         onLogout,
         handleBack,
+        forceUpdate,
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-100">
+        <div className="flex flex-col h-full bg-gray-100 relative">
              <Header
                 title={currentNavigation.title}
                 avatarUrl="https://i.pravatar.cc/150?u=parent1"
@@ -568,10 +573,11 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePa
                 onBack={viewStack.length > 1 ? handleBack : undefined}
                 onNotificationClick={handleNotificationClick}
                 notificationCount={notificationCount}
+                onSearchClick={() => setIsSearchOpen(true)}
             />
             <div className="flex-grow overflow-y-auto" style={{marginTop: '-4rem'}}>
                 <div className="pt-16">
-                    <div key={viewStack.length} className="animate-slide-in-up">
+                    <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
                         {ComponentToRender ? (
                             <ComponentToRender {...currentNavigation.props} {...commonProps} />
                         ) : (
@@ -581,6 +587,13 @@ const ParentDashboard: React.FC<ParentDashboardProps> = ({ onLogout, setIsHomePa
                 </div>
             </div>
              <ParentBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />
+            {isSearchOpen && (
+                <GlobalSearchScreen 
+                    dashboardType={DashboardType.Parent}
+                    navigateTo={navigateTo}
+                    onClose={() => setIsSearchOpen(false)}
+                />
+            )}
         </div>
     );
 };

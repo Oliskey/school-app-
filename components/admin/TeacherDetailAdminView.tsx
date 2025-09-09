@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { Teacher } from '../../types';
 import { MailIcon, PhoneIcon, ChartBarIcon, CalendarIcon, EditIcon, gradeColors, SUBJECT_COLORS } from '../../constants';
@@ -29,7 +31,7 @@ const TeacherDetailAdminView: React.FC<TeacherDetailAdminViewProps> = ({ teacher
                 <img src={teacher.avatarUrl} alt={teacher.name} className="w-20 h-20 rounded-full object-cover border-4 border-indigo-100"/>
                 <div className="flex-grow">
                     <h3 className="text-xl font-bold text-gray-800">{teacher.name}</h3>
-                    <p className={`text-sm font-semibold inline-block px-2 py-0.5 rounded ${SUBJECT_COLORS[teacher.subject] || 'bg-gray-200'}`}>{teacher.subject}</p>
+                    <p className={`text-sm font-semibold inline-block px-2 py-0.5 rounded ${SUBJECT_COLORS[teacher.subjects[0]] || 'bg-gray-200'}`}>{teacher.subjects.join(', ')}</p>
                     <div className="flex space-x-4 mt-2">
                          <a href={`mailto:${teacher.email}`} className="flex items-center space-x-1 text-sm text-gray-600 hover:text-indigo-600"><MailIcon className="w-4 h-4"/><span>Email</span></a>
                          <a href={`tel:${teacher.phone}`} className="flex items-center space-x-1 text-sm text-gray-600 hover:text-indigo-600"><PhoneIcon className="w-4 h-4"/><span>Call</span></a>

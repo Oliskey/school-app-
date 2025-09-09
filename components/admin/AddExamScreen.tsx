@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SUBJECTS_LIST } from '../../constants';
 import { Exam } from '../../types';
@@ -6,7 +5,6 @@ import { Exam } from '../../types';
 interface AddExamScreenProps {
   onSave: (exam: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => void;
   examToEdit?: Exam | null;
-  // The onBack functionality is now handled by the parent dashboard's navigation stack
 }
 
 const AddExamScreen: React.FC<AddExamScreenProps> = ({ onSave, examToEdit }) => {

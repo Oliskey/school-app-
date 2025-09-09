@@ -68,6 +68,8 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage }) => {
     const [activeBottomNav, setActiveBottomNav] = useState('home');
     const [viewStack, setViewStack] = useState<ViewStackItem[]>([{ view: 'overview', props: {}, title: 'Admin Dashboard' }]);
+    const [version, setVersion] = useState(0);
+    const forceUpdate = () => setVersion(v => v + 1);
 
     useEffect(() => {
         setIsHomePage(viewStack.length === 1);
@@ -173,6 +175,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         navigateTo,
         onLogout,
         handleBack,
+        forceUpdate,
     };
 
     return (
@@ -187,7 +190,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
                 notificationCount={notificationCount}
             />
             <div className="flex-grow overflow-y-auto">
-                <div key={viewStack.length} className="animate-slide-in-up">
+                <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
                     {ComponentToRender ? <ComponentToRender {...currentNavigation.props} {...commonProps} /> : <div>View not found: {currentNavigation.view}</div>}
                 </div>
             </div>

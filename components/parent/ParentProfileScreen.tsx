@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   EditIcon, 
-  BookOpenIcon, 
-  ShieldCheckIcon, 
-  UsersIcon, 
-  CameraIcon, 
-  HelpingHandIcon, 
-  ClipboardListIcon, 
-  MegaphoneIcon, 
   NotificationIcon, 
   SecurityIcon, 
   HelpIcon, 
   LogoutIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  MegaphoneIcon,
+  BookOpenIcon,
+  ShieldCheckIcon,
+  UsersIcon,
+  CameraIcon,
+  HelpingHandIcon,
+  ClipboardListIcon
 } from '../../constants';
 import { mockParents } from '../../data';
 
@@ -23,7 +23,6 @@ interface ParentProfileScreenProps {
 
 const ParentProfileScreen: React.FC<ParentProfileScreenProps> = ({ onLogout, navigateTo }) => {
   const mockParent = mockParents[0];
-  const [imageError, setImageError] = useState(false);
 
   const menuItems = [
     { icon: <EditIcon />, label: 'Edit Profile', action: () => navigateTo('editParentProfile', 'Edit Profile') },
@@ -35,7 +34,7 @@ const ParentProfileScreen: React.FC<ParentProfileScreenProps> = ({ onLogout, nav
     { icon: <ClipboardListIcon />, label: 'Permission Slips', action: () => navigateTo('permissionSlips', 'Permission Slips') },
     { icon: <MegaphoneIcon />, label: 'Feedback & Support', action: () => navigateTo('feedback', 'Feedback & Support') },
     { icon: <NotificationIcon />, label: 'Notification Settings', action: () => navigateTo('notificationSettings', 'Notifications') },
-    { icon: <SecurityIcon />, label: 'Security & Password', action: () => navigateTo('parentSecurity', 'Security Settings') },
+    { icon: <SecurityIcon />, label: 'Security & Password', action: () => navigateTo('securitySettings', 'Security') },
     { icon: <HelpIcon />, label: 'Help Center', action: () => alert('Help Center clicked') },
   ];
 
@@ -60,52 +59,38 @@ const ParentProfileScreen: React.FC<ParentProfileScreenProps> = ({ onLogout, nav
       <div className="flex-grow p-4 space-y-4 overflow-y-auto">
         {/* Profile Info Card */}
         <div className="flex items-center p-4 space-x-4 bg-white rounded-xl shadow-sm">
-            {imageError ? (
-                <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
-                    <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                </div>
-            ) : (
-                <img 
-                    src={mockParent.avatarUrl}
-                    alt="Parent Avatar" 
-                    className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
-                    onError={() => setImageError(true)}
-                />
-            )}
+            <img 
+                src={mockParent.avatarUrl}
+                alt="Parent Avatar" 
+                className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
+            />
             <div>
-                <h2 className="text-xl font-bold text-gray-800">{mockParent.name}</h2>
-                <p className="text-gray-600">Parent Account</p>
+                <h3 className="text-xl font-bold text-gray-800">{mockParent.name}</h3>
+                <p className="text-sm text-gray-500">{mockParent.email}</p>
             </div>
         </div>
-
-        {/* Menu Items */}
-        <div className="space-y-3">
+        
+        {/* Menu Card */}
+        <div className="bg-white rounded-xl shadow-sm p-2">
           {menuItems.map((item, index) => (
-            <button
-              key={item.label}
-              onClick={item.action}
-              className="w-full flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center space-x-3">
+            <button key={item.label} onClick={item.action} className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-4">
                 <div className={`p-2 rounded-lg ${theme.iconColors[index % theme.iconColors.length]}`}>
-                  {item.icon}
+                  {React.cloneElement(item.icon, { className: 'h-5 w-5' })}
                 </div>
-                <span className="font-medium text-gray-800">{item.label}</span>
+                <span className="font-semibold text-gray-700">{item.label}</span>
               </div>
-              <ChevronRightIcon className="h-5 w-5 text-gray-400" />
+              <ChevronRightIcon className="h-5 w-5 text-gray-400"/>
             </button>
           ))}
         </div>
+      </div>
 
-        {/* Logout Button */}
-        <button
-          onClick={onLogout}
-          className="w-full flex items-center justify-center space-x-2 p-4 bg-red-50 text-red-500 rounded-xl shadow-sm hover:bg-red-100 transition-colors"
-        >
+      {/* Logout Button */}
+      <div className="p-4 mt-auto">
+        <button onClick={onLogout} className="w-full flex items-center justify-center space-x-2 py-3 px-4 font-medium text-red-500 bg-white rounded-xl shadow-sm hover:bg-red-50">
           <LogoutIcon className="h-5 w-5" />
-          <span className="font-medium">Logout</span>
+          <span>Logout</span>
         </button>
       </div>
     </div>

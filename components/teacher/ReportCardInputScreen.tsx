@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Student, Teacher, Rating, ReportCard, ReportCardAcademicRecord } from '../../types';
 import { SchoolLogoIcon, PlusIcon } from '../../constants';
@@ -57,8 +58,7 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
         return teacher.classes.some(cls => cls === studentClass);
     }, [student, teacher, isAdmin]);
     
-    // Kept for simplicity in other components, but based on the more specific isClassTeacher logic.
-    const hasEditPermission = isClassTeacher;
+    const canEditGeneralSections = isAdmin || isClassTeacher;
 
     const SKILL_BEHAVIOUR_DOMAINS = ['Neatness', 'Punctuality', 'Politeness', 'Respect for Others', 'Participation in Class', 'Homework Completion', 'Teamwork/Cooperation', 'Attentiveness', 'Creativity', 'Honesty/Integrity'];
     const PSYCHOMOTOR_SKILLS = ['Handwriting', 'Drawing/Art Skills', 'Craft Skills', 'Music & Dance', 'Sports Participation'];
@@ -212,19 +212,17 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
                         <thead className="bg-gray-50"><tr className="text-left text-gray-800"><th className="p-2 border">Subject</th><th className="p-2 border w-20 text-center">CA (40)</th><th className="p-2 border w-20 text-center">Exam (60)</th><th className="p-2 border w-20 text-center">Total (100)</th><th className="p-2 border w-16 text-center">Grade</th><th className="p-2 border">Remark</th></tr></thead>
                         <tbody>
                             {academicData.map((record, index) => {
-                                const teacherSubject = teacher?.subject.toLowerCase() || '';
-                                const recordSubject = record.subject.toLowerCase();
-                                const isSubjectTeacher = teacherSubject && (recordSubject.includes(teacherSubject) || teacherSubject.includes(recordSubject));
-                                const canEditScores = isAdmin || isClassTeacher || isSubjectTeacher;
+                                const isSubjectTeacher = teacher.subjects.includes(record.subject);
+                                const canEditScores = isAdmin || isSubjectTeacher;
                                 
                                 return (
                                 <tr key={index} className={canEditScores ? '' : 'bg-gray-50'}>
                                     <td className="p-1 border font-semibold text-gray-800">{record.subject}</td>
-                                    <td className="p-1 border"><input type="number" max="40" min="0" value={record.ca} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'ca', e.target.value)} className="w-full text-center border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100"/></td>
-                                    <td className="p-1 border"><input type="number" max="60" min="0" value={record.exam} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'exam', e.target.value)} className="w-full text-center border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100"/></td>
+                                    <td className="p-1 border"><input type="number" max="40" min="0" value={record.ca} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'ca', e.target.value)} className="w-full text-center border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></td>
+                                    <td className="p-1 border"><input type="number" max="60" min="0" value={record.exam} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'exam', e.target.value)} className="w-full text-center border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></td>
                                     <td className="p-1 border text-center font-bold text-gray-800">{record.total}</td>
                                     <td className="p-1 border text-center font-bold text-gray-800">{record.grade}</td>
-                                    <td className="p-1 border"><input type="text" value={record.remark} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'remark', e.target.value)} className="w-full border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100"/></td>
+                                    <td className="p-1 border"><input type="text" value={record.remark} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'remark', e.target.value)} className="w-full border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></td>
                                 </tr>
                             )})}
                         </tbody>
@@ -240,17 +238,17 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
                 )}
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-                    <div><SectionHeader title="Skills & Behaviour" /><table className="w-full text-sm"><tbody>{SKILL_BEHAVIOUR_DOMAINS.map(skill => (<tr key={skill}><td className="py-1 text-gray-800">{skill}</td><td className="w-20"><RatingSelector disabled={!hasEditPermission && !isAdmin} value={skills[skill] || ''} onChange={val => setSkills(p => ({...p, [skill]: val}))} options={RATING_OPTIONS}/></td></tr>))}</tbody></table></div>
-                    <div><SectionHeader title="Psychomotor Skills" /><table className="w-full text-sm"><tbody>{PSYCHOMOTOR_SKILLS.map(skill => (<tr key={skill}><td className="py-1 text-gray-800">{skill}</td><td className="w-20"><RatingSelector disabled={!hasEditPermission && !isAdmin} value={psychomotor[skill] || ''} onChange={val => setPsychomotor(p => ({...p, [skill]: val}))} options={RATING_OPTIONS}/></td></tr>))}</tbody></table></div>
+                    <div><SectionHeader title="Skills & Behaviour" /><table className="w-full text-sm"><tbody>{SKILL_BEHAVIOUR_DOMAINS.map(skill => (<tr key={skill}><td className="py-1 text-gray-800">{skill}</td><td className="w-20"><RatingSelector disabled={!canEditGeneralSections} value={skills[skill] || ''} onChange={val => setSkills(p => ({...p, [skill]: val}))} options={RATING_OPTIONS}/></td></tr>))}</tbody></table></div>
+                    <div><SectionHeader title="Psychomotor Skills" /><table className="w-full text-sm"><tbody>{PSYCHOMOTOR_SKILLS.map(skill => (<tr key={skill}><td className="py-1 text-gray-800">{skill}</td><td className="w-20"><RatingSelector disabled={!canEditGeneralSections} value={psychomotor[skill] || ''} onChange={val => setPsychomotor(p => ({...p, [skill]: val}))} options={RATING_OPTIONS}/></td></tr>))}</tbody></table></div>
                 </div>
                 
                 <SectionHeader title="Attendance Record" />
                 <div className="grid grid-cols-4 gap-4 text-sm">
-                    {Object.entries(attendance).map(([key, value]) => (<div key={key}><label className="capitalize text-xs text-gray-700">{key.replace(/([A-Z])/g, ' $1')}</label><input type="number" value={value} disabled={!hasEditPermission && !isAdmin} onChange={e => setAttendance(p => ({...p, [key]: e.target.value}))} className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></div>))}
+                    {Object.entries(attendance).map(([key, value]) => (<div key={key}><label className="capitalize text-xs text-gray-700">{key.replace(/([A-Z])/g, ' $1')}</label><input type="number" value={value} disabled={!canEditGeneralSections} onChange={e => setAttendance(p => ({...p, [key]: e.target.value}))} className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></div>))}
                 </div>
                 
                 <div className="mt-6 space-y-4">
-                    <div><label className="font-semibold text-sm text-gray-900">Teacher's General Comment:</label><textarea value={teacherComment} disabled={!hasEditPermission && !isAdmin} onChange={e => setTeacherComment(e.target.value)} rows={3} className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"></textarea></div>
+                    <div><label className="font-semibold text-sm text-gray-900">Teacher's General Comment:</label><textarea value={teacherComment} disabled={!canEditGeneralSections} onChange={e => setTeacherComment(e.target.value)} rows={3} className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"></textarea></div>
                     <div><label className="font-semibold text-sm text-gray-900">Principal's Comment:</label><textarea value={principalComment} onChange={e => setPrincipalComment(e.target.value)} readOnly={!isAdmin} placeholder={isAdmin ? "Enter principal's comment..." : "Principal's comment (read-only)"} rows={2} className={`w-full mt-1 p-2 border border-gray-300 rounded-md text-sm text-gray-900 ${isAdmin ? 'bg-white' : 'bg-gray-100 cursor-not-allowed'}`}></textarea></div>
                 </div>
 

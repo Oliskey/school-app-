@@ -3,6 +3,7 @@ import Header from '../ui/Header';
 import { AdminBottomNav } from '../ui/DashboardBottomNav';
 import { mockNotifications } from '../../data';
 import { DashboardType } from '../../types';
+import GlobalSearchScreen from '../shared/GlobalSearchScreen';
 
 // Import all view components
 import DashboardOverview from '../admin/DashboardOverview';
@@ -31,6 +32,7 @@ import NotificationsSettingsScreen from '../admin/NotificationsSettingsScreen';
 import SecuritySettingsScreen from '../admin/SecuritySettingsScreen';
 import ChangePasswordScreen from '../admin/ChangePasswordScreen';
 import NotificationsScreen from '../shared/NotificationsScreen';
+import OnlineStoreScreen from '../admin/OnlineStoreScreen';
 import AdminSelectClassForReport from '../admin/AdminSelectClassForReport';
 import AdminStudentListForReport from '../admin/AdminStudentListForReport';
 import AdminStudentReportCardScreen from '../admin/AdminStudentReportCardScreen';
@@ -67,10 +69,13 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage }) => {
     const [activeBottomNav, setActiveBottomNav] = useState('home');
     const [viewStack, setViewStack] = useState<ViewStackItem[]>([{ view: 'overview', props: {}, title: 'Admin Dashboard' }]);
+    const [version, setVersion] = useState(0);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const forceUpdate = () => setVersion(v => v + 1);
 
     useEffect(() => {
-        setIsHomePage(viewStack.length === 1);
-    }, [viewStack, setIsHomePage]);
+        setIsHomePage(viewStack.length === 1 && !isSearchOpen);
+    }, [viewStack, isSearchOpen, setIsHomePage]);
 
     const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('admin')).length;
 
@@ -139,6 +144,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         securitySettings: SecuritySettingsScreen,
         changePassword: ChangePasswordScreen,
         notifications: (props: any) => <NotificationsScreen {...props} userType="admin" />,
+        onlineStore: OnlineStoreScreen,
         schoolReports: AdminSelectClassForReport,
         studentListForReport: AdminStudentListForReport,
         viewStudentReport: AdminStudentReportCardScreen,
@@ -171,10 +177,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         navigateTo,
         onLogout,
         handleBack,
+        forceUpdate,
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-100">
+        <div className="flex flex-col h-full bg-gray-100 relative">
             <Header
                 title={currentNavigation.title}
                 avatarUrl="https://i.pravatar.cc/150?u=admin"
@@ -183,13 +190,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
                 onBack={viewStack.length > 1 ? handleBack : undefined}
                 onNotificationClick={handleNotificationClick}
                 notificationCount={notificationCount}
+                onSearchClick={() => setIsSearchOpen(true)}
             />
             <div className="flex-grow overflow-y-auto">
-                <div key={viewStack.length} className="animate-slide-in-up">
+                <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
                     {ComponentToRender ? <ComponentToRender {...currentNavigation.props} {...commonProps} /> : <div>View not found: {currentNavigation.view}</div>}
                 </div>
             </div>
             <AdminBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />
+            {isSearchOpen && (
+                <GlobalSearchScreen 
+                    dashboardType={DashboardType.Admin}
+                    navigateTo={navigateTo}
+                    onClose={() => setIsSearchOpen(false)}
+                />
+            )}
         </div>
     );
 };

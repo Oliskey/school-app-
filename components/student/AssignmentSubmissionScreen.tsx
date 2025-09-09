@@ -1,6 +1,8 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { StudentAssignment } from '../../types';
+import React, { useState, useRef } from 'react';
+import { StudentAssignment, Submission } from '../../types';
 import { SUBJECT_COLORS, ClockIcon, PaperclipIcon, XCircleIcon, FileDocIcon, FilePdfIcon, FileImageIcon, DocumentTextIcon } from '../../constants';
+// FIX: Imported mockAssignments to allow updating the global state for the demo.
+import { mockSubmissions, mockAssignments } from '../../data';
 
 const getFileIcon = (fileName: string): React.ReactElement => {
   const extension = fileName.split('.').pop()?.toLowerCase();
@@ -21,9 +23,11 @@ const formatFileSize = (bytes: number): string => {
 interface AssignmentSubmissionScreenProps {
   assignment: StudentAssignment;
   handleBack: () => void;
+  forceUpdate: () => void;
+  studentId: number;
 }
 
-const AssignmentSubmissionScreen: React.FC<AssignmentSubmissionScreenProps> = ({ assignment, handleBack }) => {
+const AssignmentSubmissionScreen: React.FC<AssignmentSubmissionScreenProps> = ({ assignment, handleBack, forceUpdate, studentId }) => {
   const [textAnswer, setTextAnswer] = useState(assignment.submission?.textSubmission || '');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +54,40 @@ const AssignmentSubmissionScreen: React.FC<AssignmentSubmissionScreenProps> = ({
       alert("Please provide an answer or attach a file.");
       return;
     }
+    
+    const existingSubmissionIndex = mockSubmissions.findIndex(s => s.assignmentId === assignment.id && s.student.id === studentId);
+
+    const submissionData = {
+        student: { id: 4, name: 'Fatima Bello', avatarUrl: 'https://i.pravatar.cc/150?u=fatima' }, // Assuming student ID 4 is logged in
+        submittedAt: new Date().toISOString(),
+        isLate: new Date() > new Date(assignment.dueDate),
+        status: 'Ungraded' as 'Ungraded',
+        textSubmission: textAnswer,
+        files: attachedFiles.map(f => ({ name: f.name, size: f.size }))
+    };
+
+    if (existingSubmissionIndex > -1) {
+        mockSubmissions[existingSubmissionIndex] = {
+            ...mockSubmissions[existingSubmissionIndex],
+            ...submissionData,
+        };
+    } else {
+        const newSubmission: Submission = {
+            id: Date.now(),
+            assignmentId: assignment.id,
+            ...submissionData
+        };
+        mockSubmissions.push(newSubmission);
+        
+        // Also update the submission count on the assignment
+        const assignmentIndex = mockAssignments.findIndex(a => a.id === assignment.id);
+        if (assignmentIndex > -1) {
+            mockAssignments[assignmentIndex].submissionsCount++;
+        }
+    }
+
     alert("Assignment submitted successfully!");
+    forceUpdate();
     handleBack();
   };
   

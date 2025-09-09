@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { Student, Teacher } from '../../types';
 import { mockStudents, mockTeachers } from '../../data';
@@ -14,7 +16,7 @@ const SubjectsScreen: React.FC<SubjectsScreenProps> = ({ navigateTo }) => {
   const studentSubjects = [...new Set(student.academicPerformance?.map(p => p.subject) || [])];
 
   const getTeacherForSubject = (subjectName: string): Teacher | undefined => {
-    return mockTeachers.find(teacher => teacher.subject === subjectName);
+    return mockTeachers.find(teacher => teacher.subjects.includes(subjectName));
   };
 
   return (

@@ -23,8 +23,8 @@ const TeacherCard: React.FC<{ teacher: Teacher, onSelect: (teacher: Teacher) => 
                 <img src={teacher.avatarUrl} alt={teacher.name} className="w-16 h-16 rounded-full object-cover" />
                 <div className="flex-grow">
                     <p className="font-bold text-lg text-gray-800">{teacher.name}</p>
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${SUBJECT_COLORS[teacher.subject] || 'bg-gray-100 text-gray-800'}`}>
-                        {teacher.subject}
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${SUBJECT_COLORS[teacher.subjects[0]] || 'bg-gray-100 text-gray-800'}`}>
+                        {teacher.subjects[0]}
                     </span>
                 </div>
             </div>

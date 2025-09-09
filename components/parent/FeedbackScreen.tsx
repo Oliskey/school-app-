@@ -19,7 +19,7 @@ const StarRatingInput = ({ rating, setRating }: { rating: number, setRating: (r:
     </div>
 );
 
-const SubmitNewTab: React.FC = () => {
+const SubmitNewTab: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted }) => {
     const [category, setCategory] = useState('');
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
@@ -36,11 +36,37 @@ const SubmitNewTab: React.FC = () => {
         }
     };
     
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!category || !comment) {
+            alert('Please select a category and provide a comment.');
+            return;
+        }
+
+        const newComplaint: Complaint = {
+            id: `COMP-${Date.now()}`,
+            category: category as any,
+            rating,
+            comment,
+            imageUrl: image || undefined,
+            timeline: [
+                {
+                    timestamp: new Date().toISOString(),
+                    status: 'Submitted',
+                    comment: comment,
+                    by: 'You',
+                }
+            ]
+        };
+        mockComplaints.unshift(newComplaint);
+        onSubmitted();
+    };
+    
     return (
-        <form className="p-4 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 space-y-5">
             <div>
                 <label className="text-sm font-medium text-gray-700">Category</label>
-                <select value={category} onChange={e => setCategory(e.target.value)} className="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
+                <select value={category} onChange={e => setCategory(e.target.value)} required className="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500">
                     <option value="">Select a category...</option>
                     <option>Bus Service</option>
                     <option>Academics</option>
@@ -55,7 +81,7 @@ const SubmitNewTab: React.FC = () => {
             </div>
             <div>
                  <label htmlFor="comment" className="text-sm font-medium text-gray-700">Comments</label>
-                 <textarea id="comment" value={comment} onChange={e => setComment(e.target.value)} rows={5} placeholder="Share your feedback in detail..." className="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"></textarea>
+                 <textarea id="comment" value={comment} onChange={e => setComment(e.target.value)} rows={5} placeholder="Share your feedback in detail..." required className="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"></textarea>
             </div>
             <div>
                  <label className="text-sm font-medium text-gray-700">Attach Photo (Optional)</label>
@@ -135,10 +161,19 @@ const TrackStatusTab: React.FC = () => {
     );
 };
 
+interface FeedbackScreenProps {
+    forceUpdate: () => void;
+}
 
-const FeedbackScreen: React.FC = () => {
+const FeedbackScreen: React.FC<FeedbackScreenProps> = ({ forceUpdate }) => {
     const [activeTab, setActiveTab] = useState<'submit' | 'track'>('submit');
     const theme = { mainBg: 'bg-green-500', textColor: 'text-green-600' };
+    
+    const handleFormSubmitted = () => {
+        forceUpdate();
+        alert('Feedback submitted successfully!');
+        setActiveTab('track');
+    };
 
     return (
         <div className="flex flex-col h-full bg-gray-100">
@@ -150,7 +185,7 @@ const FeedbackScreen: React.FC = () => {
             </div>
 
             <div className="flex-grow overflow-y-auto">
-                {activeTab === 'submit' ? <SubmitNewTab /> : <TrackStatusTab />}
+                {activeTab === 'submit' ? <SubmitNewTab onSubmitted={handleFormSubmitted} /> : <TrackStatusTab />}
             </div>
         </div>
     );

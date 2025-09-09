@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   PaperclipIcon,
   CalendarIcon,
@@ -8,9 +8,11 @@ import {
   FilePdfIcon,
   FileImageIcon,
   DocumentTextIcon,
+  BookOpenIcon,
 } from '../../constants';
-import { mockClasses } from '../../data';
-import { ClassInfo } from '../../types';
+import { mockClasses, mockTeachers } from '../../data';
+import { ClassInfo, Assignment, Teacher } from '../../types';
+import { SUBJECTS_LIST } from '../../constants';
 
 const getFileIcon = (fileName: string): React.ReactElement => {
   const extension = fileName.split('.').pop()?.toLowerCase();
@@ -30,15 +32,25 @@ const formatFileSize = (bytes: number): string => {
 
 interface CreateAssignmentScreenProps {
     classInfo?: ClassInfo;
+    onAssignmentAdded: (newAssignment: Omit<Assignment, 'id'>) => void;
+    handleBack: () => void;
 }
 
-const CreateAssignmentScreen: React.FC<CreateAssignmentScreenProps> = ({ classInfo }) => {
+const LOGGED_IN_TEACHER_ID = 2;
+
+const CreateAssignmentScreen: React.FC<CreateAssignmentScreenProps> = ({ classInfo, onAssignmentAdded, handleBack }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [selectedClass, setSelectedClass] = useState(classInfo ? `Grade ${classInfo.grade}${classInfo.section}` : '');
+  const [subject, setSubject] = useState(classInfo?.subject || '');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const teacher = useMemo(() => mockTeachers.find(t => t.id === LOGGED_IN_TEACHER_ID)!, []);
+  const teacherClasses = useMemo(() => mockClasses.filter(c => teacher.classes.includes(`${c.grade}${c.section}`)), [teacher]);
+  const teacherSubjects = useMemo(() => SUBJECTS_LIST.filter(s => teacher.subjects.includes(s.name)), [teacher]);
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -56,26 +68,25 @@ const CreateAssignmentScreen: React.FC<CreateAssignmentScreenProps> = ({ classIn
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !description || !dueDate || !selectedClass) {
+    if (!title || !description || !dueDate || !selectedClass || !subject) {
         alert("Please fill out all required fields.");
         return;
     }
-    const assignmentData = {
+    
+    const targetClass = mockClasses.find(c => `Grade ${c.grade}${c.section}` === selectedClass);
+    const totalStudents = targetClass ? targetClass.studentCount : 0;
+
+    const newAssignmentData = {
         title,
         description,
-        dueDate,
-        selectedClass,
-        fileCount: attachedFiles.length,
-        fileNames: attachedFiles.map(f => f.name),
+        className: selectedClass,
+        subject,
+        dueDate: new Date(dueDate).toISOString(),
+        totalStudents: totalStudents,
+        submissionsCount: 0,
     };
-    console.log("Assignment Created:", assignmentData);
-    alert(`Assignment for ${selectedClass} created successfully!`);
-    // Reset form
-    setTitle('');
-    setDescription('');
-    setDueDate('');
-    setSelectedClass('');
-    setAttachedFiles([]);
+    
+    onAssignmentAdded(newAssignmentData);
   };
 
   return (
@@ -101,17 +112,24 @@ const CreateAssignmentScreen: React.FC<CreateAssignmentScreenProps> = ({ classIn
                     <label htmlFor="assignment-class" className="block text-sm font-medium text-gray-700 mb-1">Class</label>
                     <select id="assignment-class" value={selectedClass} onChange={e => setSelectedClass(e.target.value)} required className="w-full px-3 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
                         <option value="" disabled>Select a class</option>
-                        {mockClasses.map(c => <option key={c.id} value={`Grade ${c.grade}${c.section}`}>Grade {c.grade}{c.section}</option>)}
+                        {teacherClasses.map(c => <option key={c.id} value={`Grade ${c.grade}${c.section}`}>Grade {c.grade}{c.section}</option>)}
                     </select>
                 </div>
-                <div>
-                    <label htmlFor="due-date" className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                    <div className="relative">
-                        <input id="due-date" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} required className="w-full pl-3 pr-10 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
-                        <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <CalendarIcon className="h-5 w-5 text-gray-400" />
-                        </span>
-                    </div>
+                 <div>
+                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <select id="subject" value={subject} onChange={e => setSubject(e.target.value)} required className="w-full px-3 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500">
+                      <option value="" disabled>Select subject...</option>
+                      {teacherSubjects.map(sub => <option key={sub.id} value={sub.name}>{sub.name}</option>)}
+                    </select>
+                </div>
+            </div>
+             <div>
+                <label htmlFor="due-date" className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                <div className="relative">
+                    <input id="due-date" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} required className="w-full pl-3 pr-10 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"/>
+                    <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <CalendarIcon className="h-5 w-5 text-gray-400" />
+                    </span>
                 </div>
             </div>
           </div>

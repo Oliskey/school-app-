@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
-import { XCircleIcon, AIIcon, SparklesIcon, BriefcaseIcon, ChevronRightIcon } from '../../constants';
+import { XCircleIcon, AIIcon, SparklesIcon, BriefcaseIcon } from '../../constants';
 import { SUBJECT_COLORS } from '../../constants';
 
 // --- TYPES ---
@@ -75,7 +75,7 @@ const DraggableSubject: React.FC<{ subjectName: string }> = ({ subjectName }) =>
         <div
             draggable
             onDragStart={(e) => e.dataTransfer.setData('subjectName', subjectName)}
-            className={`p-4 rounded-xl cursor-grab text-base font-bold text-center ${colorClass} shadow-md hover:shadow-lg transition-all transform hover:scale-105 border-2 border-white hover:border-gray-200`}
+            className={`p-2 rounded-lg cursor-grab text-sm font-semibold text-center ${colorClass} shadow-sm hover:shadow-md transition-shadow`}
             aria-label={`Drag ${subjectName} subject`}
         >
             {subjectName}
@@ -103,10 +103,10 @@ const TimetableCell: React.FC<{ subject: string | null; teacher: string | null; 
     }
 
     if (isBreak) {
-        return <div className="h-32 bg-gradient-to-r from-amber-100 to-orange-100 rounded-xl flex items-center justify-center font-bold text-amber-800 border-2 border-dashed border-amber-300 text-lg shadow-inner">{subject}</div>;
+        return <div className="h-24 bg-gray-200 rounded-lg flex items-center justify-center font-semibold text-gray-500">{subject}</div>;
     }
 
-    const colorClass = subject ? SUBJECT_COLORS[subject] : 'bg-white border-2 border-dashed border-gray-300';
+    const colorClass = subject ? SUBJECT_COLORS[subject] : 'bg-white';
     
     return (
         <div
@@ -115,27 +115,23 @@ const TimetableCell: React.FC<{ subject: string | null; teacher: string | null; 
             onDrop={handleDrop}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
-            className={`h-32 rounded-xl flex flex-col items-center justify-center text-center p-3 relative transition-all duration-200 shadow-sm hover:shadow-md ${subject ? colorClass : 'bg-gray-100'}`}
+            className={`h-24 border-2 border-transparent rounded-lg flex flex-col items-center justify-center text-center p-1 relative transition-colors duration-150 ${subject ? colorClass : 'bg-gray-200/50'}`}
         >
             {subject ? (
                 <>
-                    <span className="font-bold text-lg">{subject}</span>
-                    {teacher && <span className="text-sm mt-1 opacity-90 font-medium">{teacher}</span>}
+                    <span className="font-bold text-sm">{subject}</span>
+                    {teacher && <span className="text-xs mt-1 opacity-80">{teacher}</span>}
                     {isHovering && (
                          <button 
                             onClick={onClear} 
-                            className="absolute top-2 right-2 text-gray-600 hover:text-red-500 transition-colors bg-white/90 rounded-full p-1 shadow-sm"
+                            className="absolute top-1 right-1 text-gray-500 hover:text-red-500 transition-colors"
                             aria-label={`Clear ${subject} from this slot`}
                          >
-                            <XCircleIcon className="w-6 h-6" />
+                            <XCircleIcon className="w-4 h-4 bg-white/50 rounded-full" />
                         </button>
                     )}
                 </>
-            ) : (
-                <div className="text-gray-500 text-base font-medium">
-                    Drop subject here
-                </div>
-            )}
+            ) : <div className="w-full h-full rounded-lg"></div>}
         </div>
     );
 };
@@ -305,116 +301,67 @@ const TimetableEditor: React.FC = () => {
     return (
         <div className="flex flex-col h-full bg-gray-100 relative">
             {isGenerating && (
-                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-50 backdrop-blur-sm rounded-3xl">
-                    <div className="bg-white/10 p-6 rounded-full mb-6">
-                        <AIIcon className="w-20 h-20 text-white animate-spin" />
-                    </div>
-                    <p className="text-white font-bold text-2xl mb-2">Generating Timetable</p>
-                    <p className="text-white/90 text-lg">AI is creating your optimized schedule...</p>
-                    <div className="mt-6 w-64 h-2 bg-white/20 rounded-full overflow-hidden">
-                        <div className="h-full bg-white rounded-full animate-pulse" style={{ width: '60%' }}></div>
-                    </div>
+                <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-50">
+                    <AIIcon className="w-16 h-16 text-white animate-spin" />
+                    <p className="text-white font-semibold mt-4">Generating Timetable...</p>
                 </div>
             )}
-            <header className="p-4 bg-white border-b border-gray-200 flex-shrink-0 shadow-sm">
+            <header className="p-4 bg-white border-b border-gray-200 flex-shrink-0">
                 <div className="flex justify-between items-center">
                     <div>
-                        <div className="flex flex-col">
-                            <h2 className="text-3xl font-extrabold text-gray-900 mb-1">Timetable Editor</h2>
-                            <div className="flex items-center space-x-4">
-                                <select 
-                                    value={selectedClass} 
-                                    onChange={(e) => setSelectedClass(e.target.value)}
-                                    className="p-3 border-2 border-gray-300 rounded-xl font-bold text-base focus:ring-3 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-md min-w-[140px]"
-                                >
-                                    <option>Grade 9A</option>
-                                    <option>Grade 9B</option>
-                                    <option>Grade 10A</option>
-                                    <option>Grade 10B</option>
-                                    <option>Grade 11A</option>
-                                    <option>Grade 11B</option>
-                                    <option>Grade 12A</option>
-                                    <option>Grade 12B</option>
-                                </select>
-                                <div className="flex items-center text-base font-semibold text-gray-700 bg-green-100 px-4 py-2 rounded-full">
-                                    <div className="w-3 h-3 rounded-full bg-green-500 mr-2 animate-pulse"></div>
-                                    <span>Live Editing</span>
-                                </div>
-                            </div>
-                        </div>
+                        <h2 className="text-xl font-bold text-gray-800">Timetable Editor</h2>
+                        <select 
+                            value={selectedClass} 
+                            onChange={(e) => setSelectedClass(e.target.value)}
+                            className="mt-1 p-2 border border-gray-300 rounded-lg font-semibold text-sm focus:ring-sky-500 focus:border-sky-500 bg-gray-50"
+                        >
+                            <option>Grade 9A</option>
+                            <option>Grade 9B</option>
+                        </select>
                     </div>
-                    <div className="flex space-x-3">
-                        <button className="flex items-center space-x-2 px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl shadow-md transition-all transform hover:scale-105">
-                            <span>Save Draft</span>
-                        </button>
-                        <button onClick={handleGenerateTimetable} disabled={isGenerating} className="flex items-center space-x-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg transition-all transform hover:scale-105 disabled:from-gray-400 disabled:to-gray-400 disabled:scale-100">
-                            <AIIcon className="w-6 h-6" />
-                            <span>Generate with AI</span>
-                        </button>
-                    </div>
+                    <button onClick={handleGenerateTimetable} disabled={isGenerating} className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-700 transition-colors disabled:bg-gray-400">
+                        <AIIcon className="w-5 h-5" />
+                        <span>Generate with AI</span>
+                    </button>
                 </div>
             </header>
 
             <div className="flex-grow flex overflow-hidden">
-                <aside className="w-72 flex-shrink-0 p-4 bg-white border-r border-gray-200 overflow-y-auto space-y-6 shadow-inner">
+                <aside className="w-64 flex-shrink-0 p-4 bg-white border-r border-gray-200 overflow-y-auto space-y-6">
                     <div>
-                        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                            <span>Subjects Palette</span>
-                            <span className="ml-2 bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded-full">
-                                {Object.keys(MOCK_SCHOOL_DATA.subjectRequirements).length}
-                            </span>
-                        </h3>
-                        <div className="grid grid-cols-1 gap-3">
+                        <h3 className="text-lg font-bold text-gray-800 mb-4">Subjects Palette</h3>
+                        <div className="grid grid-cols-2 gap-2">
                             {Object.keys(MOCK_SCHOOL_DATA.subjectRequirements).map(subjectName => (
                                 <DraggableSubject key={subjectName} subjectName={subjectName} />
                             ))}
-                        </div>
-                    </div>
-                    <div className="border-t border-gray-200 pt-4">
-                        <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
-                        <div className="space-y-3">
-                            <button className="w-full text-left p-4 bg-blue-100 hover:bg-blue-200 rounded-xl transition-colors font-semibold flex items-center">
-                                <span className="flex-grow">Clear All Periods</span>
-                                <ChevronRightIcon className="w-5 h-5" />
-                            </button>
-                            <button className="w-full text-left p-4 bg-green-100 hover:bg-green-200 rounded-xl transition-colors font-semibold flex items-center">
-                                <span className="flex-grow">Copy Monday to All Days</span>
-                                <ChevronRightIcon className="w-5 h-5" />
-                            </button>
-                            <button className="w-full text-left p-4 bg-purple-100 hover:bg-purple-200 rounded-xl transition-colors font-semibold flex items-center">
-                                <span className="flex-grow">Auto-assign Teachers</span>
-                                <ChevronRightIcon className="w-5 h-5" />
-                            </button>
                         </div>
                     </div>
                     <AISummary suggestions={suggestions} teacherLoad={teacherLoad} />
                 </aside>
 
                 <main className="flex-1 overflow-auto bg-gray-200/50">
-                    <div className="p-4 space-y-4">
-                        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 p-4 rounded-r-xl shadow-md">
-                            <p className="text-indigo-800 font-medium">
-                                <span className="font-bold">Tip:</span> Drag subjects from the palette on the left and drop them into the timetable slots. Click on any subject to remove it.
+                    <div className="p-4 space-y-3">
+                        <div className="bg-indigo-50 border-l-4 border-indigo-400 p-3 rounded-r-lg">
+                            <p className="text-sm text-indigo-800">
+                                <strong>Tip:</strong> Drag subjects from the palette on the left and drop them into the timetable slots.
                             </p>
                         </div>
-                        <div className="grid gap-2" style={{ gridTemplateColumns: `min-content repeat(${PERIODS.length}, 1fr)`}}>
+                        <div className="grid gap-1.5" style={{ gridTemplateColumns: `min-content repeat(${PERIODS.length}, 1fr)`}}>
                             {/* Top-left empty cell */}
-                            <div className="sticky top-0 left-0 bg-white z-30 border-b border-r border-gray-300 rounded-tl-lg shadow-md"></div>
+                            <div className="sticky top-0 left-0 bg-gray-100 z-30 border-b border-r border-gray-200"></div>
                             
-                            {/* Period headers with improved styling */}
+                            {/* Period headers */}
                             {PERIODS.map(period => (
-                                <div key={period.name} className="text-center font-bold text-gray-800 text-base py-4 sticky top-0 bg-white z-20 border-b border-gray-300 shadow-md rounded-tr-xl">
-                                    <div className="font-extrabold text-gray-900">{period.name}</div>
-                                    <div className="font-medium text-sm text-gray-600 mt-1">{formatTime12Hour(period.start)} - {formatTime12Hour(period.end)}</div>
+                                <div key={period.name} className="text-center font-bold text-gray-600 text-sm py-2 sticky top-0 bg-gray-100 z-20 border-b border-gray-200">
+                                    {period.name}
+                                    <div className="font-normal text-xs text-gray-500">{formatTime12Hour(period.start)} - {formatTime12Hour(period.end)}</div>
                                 </div>
                             ))}
                             
-                            {/* Rows for each day with improved styling */}
+                            {/* Rows for each day */}
                             {days.map(day => (
                                 <React.Fragment key={day}>
-                                    <div className="sticky left-0 bg-gradient-to-b from-gray-50 to-white z-10 font-extrabold text-gray-800 text-lg flex items-center justify-center p-4 border-r border-gray-300 shadow-md rounded-bl-xl">
-                                        {day}
-                                    </div>
+                                    <div className="sticky left-0 bg-gray-100 z-10 font-bold text-gray-600 text-sm flex items-center justify-center p-2 border-r border-gray-200">{day}</div>
                                     {PERIODS.map(period => (
                                         <TimetableCell
                                             key={`${day}-${period.name}`}

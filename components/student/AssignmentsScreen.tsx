@@ -47,15 +47,15 @@ const AssignmentsScreen: React.FC<StudentAssignmentsScreenProps> = ({ studentId,
         const isOverdue = new Date(assignment.dueDate) < new Date() && !assignment.submission;
         
         if (assignment.submission?.status === 'Graded') {
-            return { text: 'View Grade', style: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-md' };
+            return { text: 'View Grade', style: 'bg-green-100 text-green-700 hover:bg-green-200' };
         }
         if (assignment.submission) {
-            return { text: 'View Submission', style: 'bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white shadow-md' };
+            return { text: 'View Submission', style: 'bg-sky-100 text-sky-700 hover:bg-sky-200' };
         }
         if (isOverdue) {
-            return { text: 'Submit Late', style: 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white shadow-md' };
+            return { text: 'Submit Late', style: 'bg-red-500 text-white hover:bg-red-600' };
         }
-        return { text: 'Submit Now', style: 'bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white shadow-md' };
+        return { text: 'Submit Now', style: 'bg-orange-500 text-white hover:bg-orange-600' };
     };
 
     const handleButtonClick = (assignment: StudentAssignment, buttonText: string) => {
@@ -75,37 +75,37 @@ const AssignmentsScreen: React.FC<StudentAssignmentsScreenProps> = ({ studentId,
 
 
     return (
-        <div className="flex flex-col h-full bg-gradient-to-b from-gray-50 to-gray-100">
-            <main className="flex-grow p-3 md:p-5 space-y-4 md:space-y-5 overflow-y-auto">
+        <div className="flex flex-col h-full bg-gray-50">
+            <main className="flex-grow p-4 space-y-4 overflow-y-auto">
                 {studentAssignments.length > 0 ? studentAssignments.map(assignment => {
                     const status = getStatus(assignment);
                     const subjectColor = SUBJECT_COLORS[assignment.subject] || 'bg-gray-100 text-gray-800';
                     const buttonInfo = getButtonInfo(assignment);
 
                     return (
-                        <div key={assignment.id} className="bg-white rounded-xl md:rounded-2xl shadow-md md:shadow-lg overflow-hidden transition-all hover:shadow-lg transform hover:-translate-y-0.5">
-                            <div className="p-4 md:p-5">
-                                <div className="flex justify-between items-start mb-3">
-                                    <h4 className="font-bold text-lg md:text-xl text-gray-800 pr-2 md:pr-3 flex-1">{assignment.title}</h4>
-                                    <span className={`px-3 py-1.5 text-xs md:text-sm font-bold rounded-full flex-shrink-0 ${subjectColor} shadow-sm`}>
+                        <div key={assignment.id} className="bg-white rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md">
+                            <div className="p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h4 className="font-bold text-lg text-gray-800 pr-2 flex-1">{assignment.title}</h4>
+                                    <span className={`px-2.5 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${subjectColor}`}>
                                         {assignment.subject}
                                     </span>
                                 </div>
 
-                                <div className="flex items-center text-sm md:text-base text-gray-600 mt-2 md:mt-3">
-                                    <ClockIcon className="w-4 h-4 md:w-5 md:h-5 mr-1.5 md:mr-2 text-gray-500" />
-                                    <span>Due: {new Date(assignment.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                <div className="flex items-center text-sm text-gray-500">
+                                    <ClockIcon className="w-4 h-4 mr-1.5" />
+                                    <span>Due: {new Date(assignment.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
                                 </div>
                             </div>
-                            <div className="bg-gray-50 px-4 py-3 md:px-5 md:py-4 flex flex-col md:flex-row md:justify-between md:items-center space-y-3 md:space-y-0 border-t border-gray-100">
-                                <div className={`flex items-center space-x-2 text-sm md:text-base font-bold ${status.color}`}>
-                                    {React.cloneElement(status.icon, { className: `w-5 h-5 md:w-6 md:h-6 ${status.isComplete ? 'animate-checkmark-pop' : ''}`.trim() })}
+                            <div className="bg-gray-50 px-4 py-3 flex justify-between items-center">
+                                <div className={`flex items-center space-x-2 text-sm font-semibold ${status.color}`}>
+                                    {React.cloneElement(status.icon, { className: `w-5 h-5 ${status.isComplete ? 'animate-checkmark-pop' : ''}`.trim() })}
                                     <span>{status.text}</span>
                                 </div>
 
                                 <button 
                                   onClick={() => handleButtonClick(assignment, buttonInfo.text)}
-                                  className={`px-4 py-2 md:px-5 md:py-2.5 text-sm md:text-base font-bold rounded-lg md:rounded-xl transition-all duration-300 transform hover:scale-105 ${buttonInfo.style}`}
+                                  className={`px-4 py-1.5 text-sm font-semibold rounded-lg transition-colors ${buttonInfo.style}`}
                                 >
                                     {buttonInfo.text}
                                 </button>
@@ -113,10 +113,10 @@ const AssignmentsScreen: React.FC<StudentAssignmentsScreenProps> = ({ studentId,
                         </div>
                     );
                 }) : (
-                    <div className="text-center py-12 md:py-16 bg-white rounded-xl md:rounded-2xl shadow-md md:shadow-lg mt-6 md:mt-8">
-                        <DocumentTextIcon className="mx-auto h-12 md:h-16 w-12 md:w-16 text-gray-300" />
-                        <h3 className="mt-3 md:mt-4 text-lg md:text-xl font-bold text-gray-900">No Assignments Found</h3>
-                        <p className="mt-2 text-sm md:text-base text-gray-600 px-4">{subjectFilter ? `There are no assignments for this subject yet.` : `You're all caught up!`}</p>
+                    <div className="text-center py-10 bg-white rounded-lg shadow-sm mt-8">
+                        <DocumentTextIcon className="mx-auto h-12 w-12 text-gray-300" />
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">No Assignments Found</h3>
+                        <p className="mt-1 text-sm text-gray-500">{subjectFilter ? `There are no assignments for this subject yet.` : `You're all caught up!`}</p>
                     </div>
                 )}
             </main>

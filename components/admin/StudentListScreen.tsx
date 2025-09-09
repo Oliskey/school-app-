@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from 'react';
 import { 
   SearchIcon,
@@ -27,6 +28,24 @@ const AttendanceStatusIndicator: React.FC<{ status: AttendanceStatus }> = ({ sta
       return null;
   }
 };
+
+const StudentRow: React.FC<{ student: Student; onSelect: (student: Student) => void; }> = ({ student, onSelect }) => (
+    <button
+      key={student.id}
+      onClick={() => onSelect(student)}
+      className="w-full text-left bg-white rounded-lg p-2 flex items-center space-x-3 transition-all hover:bg-gray-100 ring-1 ring-gray-100"
+      aria-label={`View profile for ${student.name}`}
+    >
+      <img src={student.avatarUrl} alt={student.name} className="w-10 h-10 rounded-full object-cover" />
+      <div className="flex-grow">
+        <p className="font-bold text-sm text-gray-800">{student.name}</p>
+        <p className="text-xs text-gray-500">ID: SCH-0{student.id}</p>
+      </div>
+      <div className="flex items-center space-x-3">
+        <AttendanceStatusIndicator status={student.attendanceStatus} />
+      </div>
+    </button>
+);
 
 const StageAccordion: React.FC<{ title: string; count: number; children: React.ReactNode, defaultOpen?: boolean }> = ({ title, count, children, defaultOpen = false }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -114,24 +133,6 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
     navigateTo('studentProfileAdminView', student.name, { student });
   };
 
-  const StudentRow: React.FC<{ student: Student }> = ({ student }) => (
-    <button
-      key={student.id}
-      onClick={() => handleStudentSelect(student)}
-      className="w-full text-left bg-white rounded-lg p-2 flex items-center space-x-3 transition-all hover:bg-gray-100 ring-1 ring-gray-100"
-      aria-label={`View profile for ${student.name}`}
-    >
-      <img src={student.avatarUrl} alt={student.name} className="w-10 h-10 rounded-full object-cover" />
-      <div className="flex-grow">
-        <p className="font-bold text-sm text-gray-800">{student.name}</p>
-        <p className="text-xs text-gray-500">ID: SCH-0{student.id}</p>
-      </div>
-      <div className="flex items-center space-x-3">
-        <AttendanceStatusIndicator status={student.attendanceStatus} />
-      </div>
-    </button>
-  );
-
   const studentsByStageAndClass = useMemo(() => {
     const stages: {
       primary: {
@@ -196,7 +197,7 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
         <div className="p-4 bg-gray-100 z-10"><div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3"><SearchIcon className="text-gray-600" /></span><input type="text" placeholder="Search by name..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" aria-label="Search for a student" /></div></div>
         <main className="flex-grow px-4 pb-24 space-y-3 overflow-y-auto">
           {filteredStudents.map(student => (
-            <StudentRow key={student.id} student={student} />
+            <StudentRow key={student.id} student={student} onSelect={handleStudentSelect} />
           ))}
         </main>
         <div className="absolute bottom-6 right-6"><button onClick={() => navigateTo('addStudent', 'Add New Student', {})} className="bg-sky-500 text-white p-4 rounded-full shadow-lg hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500" aria-label="Add new student"><PlusIcon className="h-6 w-6" /></button></div>
@@ -204,7 +205,6 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
     );
   }
 
-{/* FIX: Replaced problematic `reduce` with `.flat().length` to avoid TypeScript type inference issues and correctly calculate counts. */}
   const seniorCount = Object.values(studentsByStageAndClass.senior).flat().length;
   const juniorCount = Object.values(studentsByStageAndClass.junior).flat().length;
   const lowerPrimaryCount = Object.values(studentsByStageAndClass.primary.lower).flat().length;
@@ -226,10 +226,9 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
       <main className="flex-grow px-4 pb-24 space-y-4 overflow-y-auto">
         {seniorCount > 0 && (
           <StageAccordion title="Senior Secondary" count={seniorCount}>
-{/* FIX: Added explicit types to map callback parameters to resolve 'unknown' type errors. */}
             {Object.entries(studentsByStageAndClass.senior).map(([className, students]: [string, Student[]]) => (
               <SubStageAccordion key={className} title={className} count={students.length}>
-                {students.map(s => <StudentRow key={s.id} student={s} />)}
+                {students.map(s => <StudentRow key={s.id} student={s} onSelect={handleStudentSelect} />)}
               </SubStageAccordion>
             ))}
           </StageAccordion>
@@ -237,10 +236,9 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
         
         {juniorCount > 0 && (
           <StageAccordion title="Junior Secondary" count={juniorCount}>
-{/* FIX: Added explicit types to map callback parameters to resolve 'unknown' type errors. */}
             {Object.entries(studentsByStageAndClass.junior).map(([className, students]: [string, Student[]]) => (
               <SubStageAccordion key={className} title={className} count={students.length}>
-                {students.map(s => <StudentRow key={s.id} student={s} />)}
+                {students.map(s => <StudentRow key={s.id} student={s} onSelect={handleStudentSelect} />)}
               </SubStageAccordion>
             ))}
           </StageAccordion>
@@ -250,20 +248,18 @@ const StudentListScreen: React.FC<StudentListScreenProps> = ({ filter, navigateT
             <StageAccordion title="Primary School" count={primaryCount}>
                 {upperPrimaryCount > 0 && (
                     <SubStageAccordion title="Upper Primary (4-6)" count={upperPrimaryCount}>
-{/* FIX: Added explicit types to map callback parameters to resolve 'unknown' type errors. */}
                         {Object.entries(studentsByStageAndClass.primary.upper).map(([className, students]: [string, Student[]]) => (
                             <ClassAccordion key={className} title={className} count={students.length}>
-                                {students.map(s => <StudentRow key={s.id} student={s} />)}
+                                {students.map(s => <StudentRow key={s.id} student={s} onSelect={handleStudentSelect} />)}
                             </ClassAccordion>
                         ))}
                     </SubStageAccordion>
                 )}
                 {lowerPrimaryCount > 0 && (
                     <SubStageAccordion title="Lower Primary (1-3)" count={lowerPrimaryCount}>
-{/* FIX: Added explicit types to map callback parameters to resolve 'unknown' type errors. */}
                         {Object.entries(studentsByStageAndClass.primary.lower).map(([className, students]: [string, Student[]]) => (
                             <ClassAccordion key={className} title={className} count={students.length}>
-                                {students.map(s => <StudentRow key={s.id} student={s} />)}
+                                {students.map(s => <StudentRow key={s.id} student={s} onSelect={handleStudentSelect} />)}
                             </ClassAccordion>
                         ))}
                     </SubStageAccordion>

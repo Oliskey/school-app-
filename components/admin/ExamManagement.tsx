@@ -3,40 +3,65 @@ import { PlusIcon, EditIcon, TrashIcon, PublishIcon, EXAM_TYPE_COLORS } from '..
 import { Exam } from '../../types';
 import { mockExamsData, mockTeachers } from '../../data';
 
-const ExamManagement: React.FC<{ navigateTo: (view: string, title: string, props?: any) => void; }> = ({ navigateTo }) => {
-    const [exams, setExams] = useState<Exam[]>(mockExamsData);
+interface ExamManagementProps {
+    navigateTo: (view: string, title: string, props?: any) => void;
+    forceUpdate: () => void;
+    handleBack: () => void;
+}
+
+const ExamManagement: React.FC<ExamManagementProps> = ({ navigateTo, forceUpdate, handleBack }) => {
     const [selectedTeacherId, setSelectedTeacherId] = useState<string>('all');
 
     const filteredExams = useMemo(() => {
+        const sortedExams = [...mockExamsData].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         if (selectedTeacherId === 'all') {
-            return exams;
+            return sortedExams;
         }
-        return exams.filter(exam => exam.teacherId === parseInt(selectedTeacherId, 10));
-    }, [exams, selectedTeacherId]);
+        return sortedExams.filter(exam => exam.teacherId === parseInt(selectedTeacherId, 10));
+    }, [selectedTeacherId, mockExamsData]);
 
     const handleEdit = (exam: Exam) => {
-        const onSave = (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => {
-            setExams(prev => prev.map(e => e.id === exam.id ? { ...exam, ...examData } : e));
-        };
-        navigateTo('addExam', 'Edit Exam', { onSave, examToEdit: exam });
+        navigateTo('addExam', 'Edit Exam', { 
+            examToEdit: exam, 
+            onSave: (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => {
+                const index = mockExamsData.findIndex(e => e.id === exam.id);
+                if (index > -1) {
+                    mockExamsData[index] = { ...mockExamsData[index], ...examData };
+                    forceUpdate();
+                    handleBack();
+                }
+            }
+        });
     };
 
     const handleDelete = (examId: number) => {
         if (window.confirm('Are you sure you want to delete this exam?')) {
-            setExams(prev => prev.filter(e => e.id !== examId));
+            const index = mockExamsData.findIndex(e => e.id === examId);
+            if (index > -1) {
+                mockExamsData.splice(index, 1);
+                forceUpdate();
+            }
         }
     };
     
     const handlePublish = (examId: number) => {
-        setExams(prev => prev.map(e => e.id === examId ? { ...e, isPublished: true } : e));
+        const index = mockExamsData.findIndex(e => e.id === examId);
+        if (index > -1) {
+            mockExamsData[index].isPublished = true;
+            forceUpdate();
+        }
     };
 
     const handleAddNew = () => {
-         const onSave = (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => {
-            const newId = Math.max(0, ...exams.map(e => e.id)) + 1;
-            setExams(prev => [...prev, { id: newId, ...examData, isPublished: false, teacherId: parseInt(selectedTeacherId, 10) || undefined }]);
-        };
-        navigateTo('addExam', 'Add New Exam', { onSave });
+         navigateTo('addExam', 'Add New Exam', { 
+            onSave: (examData: Omit<Exam, 'id' | 'isPublished' | 'teacherId'>) => {
+                const newId = Math.max(0, ...mockExamsData.map(e => e.id)) + 1;
+                const teacherId = selectedTeacherId === 'all' ? undefined : parseInt(selectedTeacherId, 10);
+                mockExamsData.unshift({ id: newId, ...examData, isPublished: false, teacherId });
+                forceUpdate();
+                handleBack();
+            }
+        });
     };
 
     return (
@@ -57,50 +82,9 @@ const ExamManagement: React.FC<{ navigateTo: (view: string, title: string, props
             </div>
 
             <main className="flex-grow p-4 space-y-3 overflow-y-auto pb-20">
-                {/* For larger screens: Table view */}
-                <div className="hidden sm:block bg-white rounded-xl shadow-sm overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredExams.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(exam => (
-                                <tr key={exam.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full border ${EXAM_TYPE_COLORS[exam.type] || 'bg-gray-100 text-gray-800 border-gray-300'}`}>
-                                            {exam.type}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{new Date(exam.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric'})}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{exam.className}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{exam.subject}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        {exam.isPublished
-                                            ? <span className="text-green-600">Published</span>
-                                            : <span className="text-amber-600">Pending</span>
-                                        }
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                        {!exam.isPublished && <button onClick={() => handlePublish(exam.id)} className="text-sky-600 hover:text-sky-900" aria-label="Publish exam"><PublishIcon className="w-5 h-5"/></button>}
-                                        <button onClick={() => handleEdit(exam)} className="text-indigo-600 hover:text-indigo-900"><EditIcon className="w-5 h-5"/></button>
-                                        <button onClick={() => handleDelete(exam.id)} className="text-red-600 hover:text-red-900"><TrashIcon className="w-5 h-5"/></button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
                 {/* For smaller screens: Card view */}
-                <div className="sm:hidden space-y-3">
-                     {filteredExams.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(exam => (
+                <div className="space-y-3">
+                     {filteredExams.map(exam => (
                         <div key={exam.id} className="bg-white rounded-xl shadow-sm p-4 space-y-3">
                             <div className="flex justify-between items-start">
                                 <div>

@@ -79,6 +79,7 @@ export interface Student {
     academicPerformance?: AcademicRecord[];
     behaviorNotes?: BehaviorNote[];
     reportCards?: ReportCard[];
+    birthday?: string; // YYYY-MM-DD
 }
 
 export type StudentReportInfo = Student & { isPublished: boolean };
@@ -93,7 +94,7 @@ export interface Teacher {
     id: number;
     name: string;
     avatarUrl: string;
-    subject: string;
+    subjects: string[];
     classes: string[];
     email: string;
     phone: string;
@@ -213,6 +214,7 @@ export interface Photo {
 export interface Assignment {
   id: number;
   title: string;
+  description?: string;
   className: string; // e.g., "Grade 10A"
   subject: string;
   dueDate: string; // ISO string

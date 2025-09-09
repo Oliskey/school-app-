@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from 'react';
 import { mockLearningResources } from '../../data';
 import { LearningResource } from '../../types';
@@ -48,7 +49,6 @@ const LearningResourcesScreen: React.FC = () => {
         <div className="flex flex-col h-full bg-gray-50">
             <div className="p-4 bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
                 <div className="flex space-x-2 overflow-x-auto pb-2 -mb-2">
-{/* FIX: Explicitly type 'subject' to resolve 'unknown' type error. */}
                     {subjects.map((subject: string) => (
                         <button
                             key={subject}

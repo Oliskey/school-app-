@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { Student, Teacher } from '../../types';
 import { mockStudents, mockTeachers, mockNotices } from '../../data';
@@ -12,7 +14,7 @@ interface ClassroomScreenProps {
 }
 
 const ClassroomScreen: React.FC<ClassroomScreenProps> = ({ subjectName, navigateTo }) => {
-  const teacher = mockTeachers.find(t => t.subject === subjectName);
+  const teacher = mockTeachers.find(t => t.subjects.includes(subjectName));
   const colorClass = SUBJECT_COLORS[subjectName] || 'bg-gray-200 text-gray-800';
   const [bgColor, textColor] = colorClass.split(' ');
   const ringColor = bgColor.replace('bg-', 'ring-').replace('-100', '-300').replace('-200', '-300').replace('-300', '-400').replace('-400', '-500').replace('-500', '-600');

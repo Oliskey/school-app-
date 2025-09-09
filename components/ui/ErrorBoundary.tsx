@@ -1,4 +1,3 @@
-
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
@@ -11,10 +10,10 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-// FIX: Refactored to use a constructor for state initialization and method binding, which is a more robust pattern for class components.
+  // FIX: Added constructor to initialize state and bind event handlers, correcting the 'this' context for class methods.
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: undefined };
     this.handleGoBack = this.handleGoBack.bind(this);
   }
 

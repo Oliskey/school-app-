@@ -1,6 +1,4 @@
 
-
-
 import React, { useState } from 'react';
 import { StarIcon } from '../../constants';
 import { Teacher } from '../../types';
@@ -77,7 +75,7 @@ const TeacherPerformanceScreen: React.FC<TeacherPerformanceScreenProps> = ({ tea
                      <img src={teacher.avatarUrl} alt={teacher.name} className="w-20 h-20 rounded-full object-cover" />
                      <div>
                         <p className="font-bold text-xl text-gray-800">{teacher.name}</p>
-                        <p className="font-medium text-gray-500">{teacher.subject}</p>
+                        <p className="font-medium text-gray-500">{teacher.subjects[0]}</p>
                      </div>
                 </div>
                 
