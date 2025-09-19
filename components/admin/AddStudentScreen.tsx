@@ -12,7 +12,6 @@ interface AddStudentScreenProps {
 const AddStudentScreen: React.FC<AddStudentScreenProps> = ({ studentToEdit, forceUpdate, handleBack }) => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [fullName, setFullName] = useState('');
-    const [age, setAge] = useState('');
     const [gender, setGender] = useState('');
     const [birthday, setBirthday] = useState('');
     const [className, setClassName] = useState('');
@@ -109,7 +108,7 @@ const AddStudentScreen: React.FC<AddStudentScreenProps> = ({ studentToEdit, forc
                         </div>
                         <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
                             <div>
-                                <label htmlFor="fullName" className="text-sm font-medium text-gray-600 sr-only">Full Name</label>
+                                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                                 <div className="relative">
                                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><UserIcon className="w-5 h-5" /></span>
                                     <input type="text" name="fullName" id="fullName" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Adebayo Adewale" required/>
@@ -117,34 +116,30 @@ const AddStudentScreen: React.FC<AddStudentScreenProps> = ({ studentToEdit, forc
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                  <div>
-                                    <label htmlFor="age" className="text-sm font-medium text-gray-600 sr-only">Age</label>
-                                    <input type="number" name="age" id="age" value={age} onChange={e => setAge(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Age" />
-                                </div>
-                                 <div>
-                                    <label htmlFor="gender" className="text-sm font-medium text-gray-600 sr-only">Gender</label>
+                                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                                     <select id="gender" name="gender" value={gender} onChange={e => setGender(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
-                                        <option value="">Gender</option>
+                                        <option value="">Select Gender...</option>
                                         <option>Male</option>
                                         <option>Female</option>
                                     </select>
                                 </div>
-                            </div>
-                            <div>
-                                <label htmlFor="birthday" className="text-sm font-medium text-gray-600 sr-only">Birthday</label>
-                                <input type="date" name="birthday" id="birthday" value={birthday} onChange={e => setBirthday(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Birthday" />
+                                <div>
+                                    <label htmlFor="birthday" className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                                    <input type="date" name="birthday" id="birthday" value={birthday} onChange={e => setBirthday(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Date of Birth" />
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="class" className="text-sm font-medium text-gray-600 sr-only">Class</label>
+                                    <label htmlFor="class" className="block text-sm font-medium text-gray-700 mb-1">Class</label>
                                     <select id="class" name="class" value={className} onChange={e => setClassName(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" required>
-                                        <option value="">Select Class</option>
+                                        <option value="">Select Class...</option>
                                         {[...Array(12).keys()].map(i => <option key={i+1} value={`Grade ${i + 1}`}>Grade {i + 1}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label htmlFor="section" className="text-sm font-medium text-gray-600 sr-only">Section</label>
+                                    <label htmlFor="section" className="block text-sm font-medium text-gray-700 mb-1">Section</label>
                                     <select id="section" name="section" value={section} onChange={e => setSection(e.target.value)} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" required>
-                                        <option value="">Select Section</option>
+                                        <option value="">Select Section...</option>
                                         <option>A</option>
                                         <option>B</option>
                                         <option>C</option>
@@ -153,9 +148,9 @@ const AddStudentScreen: React.FC<AddStudentScreenProps> = ({ studentToEdit, forc
                             </div>
                             {grade >= 10 && (
                                 <div>
-                                    <label htmlFor="department" className="text-sm font-medium text-gray-600 sr-only">Department</label>
+                                    <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">Department</label>
                                     <select id="department" name="department" value={department} onChange={e => setDepartment(e.target.value as Department | '')} className="w-full px-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500">
-                                        <option value="">Select Department</option>
+                                        <option value="">Select Department...</option>
                                         <option value="Science">Science</option>
                                         <option value="Commercial">Commercial</option>
                                         <option value="Arts">Arts</option>
@@ -172,15 +167,15 @@ const AddStudentScreen: React.FC<AddStudentScreenProps> = ({ studentToEdit, forc
                         </div>
                         <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
                              <div>
-                                <label htmlFor="guardianName" className="text-sm font-medium text-gray-600 sr-only">Guardian's Name</label>
+                                <label htmlFor="guardianName" className="block text-sm font-medium text-gray-700 mb-1">Guardian's Name</label>
                                 <div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><UserIcon className="w-5 h-5" /></span><input type="text" name="guardianName" id="guardianName" value={guardianName} onChange={e => setGuardianName(e.target.value)} className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="Mr. Adewale"/></div>
                             </div>
                             <div>
-                                <label htmlFor="guardianPhone" className="text-sm font-medium text-gray-600 sr-only">Guardian's Phone</label>
+                                <label htmlFor="guardianPhone" className="block text-sm font-medium text-gray-700 mb-1">Guardian's Phone</label>
                                 <div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><PhoneIcon className="w-5 h-5" /></span><input type="tel" name="guardianPhone" id="guardianPhone" value={guardianPhone} onChange={e => setGuardianPhone(e.target.value)} className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="+234 801 234 5678"/></div>
                             </div>
                             <div>
-                                <label htmlFor="guardianEmail" className="text-sm font-medium text-gray-600 sr-only">Guardian's Email</label>
+                                <label htmlFor="guardianEmail" className="block text-sm font-medium text-gray-700 mb-1">Guardian's Email</label>
                                 <div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><MailIcon className="w-5 h-5" /></span><input type="email" name="guardianEmail" id="guardianEmail" value={guardianEmail} onChange={e => setGuardianEmail(e.target.value)} className="w-full pl-10 pr-3 py-3 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:ring-sky-500 focus:border-sky-500" placeholder="guardian@example.com"/></div>
                             </div>
                         </div>

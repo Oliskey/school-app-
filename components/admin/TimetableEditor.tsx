@@ -1,14 +1,21 @@
-
-import React, { useState } from 'react';
-import { GoogleGenAI, Type } from "@google/genai";
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { XCircleIcon, AIIcon, SparklesIcon, BriefcaseIcon } from '../../constants';
+import { XCircleIcon, SparklesIcon, BriefcaseIcon, CheckCircleIcon } from '../../constants';
 import { SUBJECT_COLORS } from '../../constants';
+import { mockSavedTimetable } from '../../data';
 
 // --- TYPES ---
 type Timetable = { [key: string]: string | null };
 type TeacherAssignments = { [key: string]: string | null };
 type TeacherLoad = { teacherName: string; totalPeriods: number };
+interface TeacherInfo { name: string; subjects: string[]; }
+
+interface TimetableEditorProps {
+    timetableData: any; // The whole object from the generator/save
+    navigateTo: (view: string, title: string, props?: any) => void;
+    handleBack: () => void;
+}
+
 
 // --- CONSTANTS & HELPERS ---
 const formatTime12Hour = (timeStr: string) => {
@@ -34,48 +41,36 @@ const PERIODS = [
     { name: 'Period 8', start: '15:15', end: '16:00' },
 ];
 
-const MOCK_SCHOOL_DATA = {
-    class: 'Grade 9A',
-    periodsPerDay: 8,
-    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-    teachers: [
-        { name: 'Mr. Adeoye', subjects: ['Mathematics'] },
-        { name: 'Mrs. Akintola', subjects: ['English'] },
-        { name: 'Dr. Bello', subjects: ['Basic Technology'] },
-        { name: 'Ms. Sani', subjects: ['Basic Science'] },
-        { name: 'Mr. Obi', subjects: ['Business Studies'] },
-        { name: 'Mrs. Musa', subjects: ['Social Studies', 'Civic Education'] },
-        { name: 'Mr. Pwajok', subjects: ['P.E.'] },
-        { name: 'Ms. Effiong', subjects: ['Art'] },
-    ],
-    subjectRequirements: {
-        'Mathematics': 5,
-        'English': 5,
-        'Basic Science': 4,
-        'Basic Technology': 4,
-        'Social Studies': 3,
-        'Business Studies': 3,
-        'Civic Education': 2,
-        'P.E.': 2,
-        'Art': 2,
-    },
-    rules: [
-        "No double periods except for Mathematics, which can have one double period per week.",
-        "Fridays must end early, after the 6th period. Periods 7 and 8 on Friday should be empty.",
-        "Teachers cannot be assigned more than 5 periods on any single day.",
-        "Core subjects (Mathematics, English, Basic Science) should be spread out and preferably scheduled in the morning periods (1-4).",
-        "Practical/Creative subjects (P.E., Art) should be scheduled in the afternoon (periods 5-8)."
-    ]
-};
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 // --- SUB-COMPONENTS ---
+
+const Toast: React.FC<{ message: string; onClear: () => void; }> = ({ message, onClear }) => {
+    useEffect(() => {
+        const timer = setTimeout(onClear, 3000);
+        return () => clearTimeout(timer);
+    }, [onClear]);
+
+    return (
+        <div className="fixed bottom-24 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 animate-slide-in-up z-50">
+            <CheckCircleIcon className="w-5 h-5 text-green-400" />
+            <span>{message}</span>
+        </div>
+    );
+};
+
 const DraggableSubject: React.FC<{ subjectName: string }> = ({ subjectName }) => {
+    const [isDragging, setIsDragging] = useState(false);
     const colorClass = SUBJECT_COLORS[subjectName] || 'bg-gray-200 text-gray-800';
     return (
         <div
             draggable
-            onDragStart={(e) => e.dataTransfer.setData('subjectName', subjectName)}
-            className={`p-2 rounded-lg cursor-grab text-sm font-semibold text-center ${colorClass} shadow-sm hover:shadow-md transition-shadow`}
+            onDragStart={(e) => {
+                e.dataTransfer.setData('subjectName', subjectName);
+                setIsDragging(true);
+            }}
+            onDragEnd={() => setIsDragging(false)}
+            className={`p-2 rounded-lg cursor-grab text-sm font-semibold text-center ${colorClass} shadow-sm hover:shadow-md transition-all ${isDragging ? 'opacity-50 scale-95 ring-2 ring-offset-2 ring-sky-400' : ''}`}
             aria-label={`Drag ${subjectName} subject`}
         >
             {subjectName}
@@ -88,7 +83,10 @@ const TimetableCell: React.FC<{ subject: string | null; teacher: string | null; 
     
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        if(!isBreak) {
+        if (isBreak) {
+            e.dataTransfer.dropEffect = "none";
+        } else {
+            e.dataTransfer.dropEffect = "move";
             e.currentTarget.classList.add('bg-sky-100', 'border-sky-300', 'border-dashed');
         }
     };
@@ -98,8 +96,9 @@ const TimetableCell: React.FC<{ subject: string | null; teacher: string | null; 
     };
     
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
         handleDragLeave(e);
-        if(!isBreak) onDrop(e);
+        if (!isBreak) onDrop(e);
     }
 
     if (isBreak) {
@@ -169,19 +168,31 @@ const AISummary: React.FC<{ suggestions: string[]; teacherLoad: TeacherLoad[] }>
 
 
 // --- MAIN COMPONENT ---
-const TimetableEditor: React.FC = () => {
-    const [timetable, setTimetable] = useState<Timetable>({});
-    const [teacherAssignments, setTeacherAssignments] = useState<TeacherAssignments>({});
-    const [suggestions, setSuggestions] = useState<string[]>([]);
-    const [teacherLoad, setTeacherLoad] = useState<TeacherLoad[]>([]);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [selectedClass, setSelectedClass] = useState('Grade 9A');
+const TimetableEditor: React.FC<TimetableEditorProps> = ({ timetableData, navigateTo, handleBack }) => {
+    const [timetable, setTimetable] = useState<Timetable>(timetableData.timetable || {});
+    const [teacherAssignments, setTeacherAssignments] = useState<TeacherAssignments>(timetableData.teacherAssignments || {});
+    const [status, setStatus] = useState<'Draft' | 'Published'>(timetableData.status || 'Draft');
+    const [toastMessage, setToastMessage] = useState('');
 
     const handleDrop = (day: string, periodName: string, e: React.DragEvent<HTMLDivElement>) => {
         const subjectName = e.dataTransfer.getData('subjectName');
         if (subjectName) {
             const key = `${day}-${periodName}`;
             setTimetable(prev => ({ ...prev, [key]: subjectName }));
+            
+            const teachers: TeacherInfo[] = timetableData.teachers || [];
+            const teacherForSubject = teachers.find(t => t.subjects.includes(subjectName));
+
+            if (teacherForSubject) {
+                setTeacherAssignments(prev => ({ ...prev, [key]: teacherForSubject.name }));
+            } else {
+                // If no teacher is found for this subject (edge case), clear the assignment
+                setTeacherAssignments(prev => {
+                    const newAssignments = { ...prev };
+                    delete newAssignments[key];
+                    return newAssignments;
+                });
+            }
         }
     };
 
@@ -199,130 +210,58 @@ const TimetableEditor: React.FC = () => {
         })
     };
 
-    const handleGenerateTimetable = async () => {
-        setIsGenerating(true);
-        setSuggestions([]);
-        setTeacherLoad([]);
-        try {
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-            const prompt = `
-                You are an expert school administrator and timetable planner. Generate a clear, balanced, and conflict-free weekly timetable for the class: ${MOCK_SCHOOL_DATA.class}.
-
-                Inputs:
-                - Teachers & Subjects: ${JSON.stringify(MOCK_SCHOOL_DATA.teachers)}
-                - Subject weekly period requirements: ${JSON.stringify(MOCK_SCHOOL_DATA.subjectRequirements)}
-                - Periods: ${MOCK_SCHOOL_DATA.periodsPerDay} teaching periods per day, plus breaks. The periods are named 'Period 1' to 'Period 8'.
-                - Rules: ${MOCK_SCHOOL_DATA.rules.join('. ')}
-
-                Your task is to generate the timetable and associated data according to the provided JSON schema. Ensure all rules are followed and subjects meet their weekly quota.
-            `;
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: prompt,
-                config: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: Type.OBJECT,
-                        properties: {
-                            timetable: {
-                                type: Type.ARRAY,
-                                description: "An array of timetable slots.",
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        slot: { type: Type.STRING, description: "The timetable slot, format 'Day-Period Name' (e.g., 'Monday-Period 1')." },
-                                        subject: { type: Type.STRING, description: "The subject for this slot. Can be an empty string for free periods." }
-                                    },
-                                    required: ['slot', 'subject']
-                                }
-                            },
-                            teacherAssignments: {
-                                type: Type.ARRAY,
-                                description: "An array of teacher assignments for each slot.",
-                                items: {
-                                    type: Type.OBJECT,
-                                    properties: {
-                                        slot: { type: Type.STRING, description: "The timetable slot, format 'Day-Period Name'." },
-                                        teacher: { type: Type.STRING, description: "The teacher assigned to this slot. Can be an empty string." }
-                                    },
-                                    required: ['slot', 'teacher']
-                                }
-                            },
-                            suggestions: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Suggestions to improve the timetable." },
-                            teacherLoad: {
-                                 type: Type.ARRAY,
-                                 items: {
-                                     type: Type.OBJECT,
-                                     properties: {
-                                         teacherName: { type: Type.STRING },
-                                         totalPeriods: { type: Type.INTEGER }
-                                     },
-                                     required: ['teacherName', 'totalPeriods']
-                                 }
-                            }
-                        }
-                    }
-                }
-            });
-            const result = JSON.parse(response.text.trim());
-
-            const timetableMap: Timetable = {};
-            if (result.timetable && Array.isArray(result.timetable)) {
-                for (const item of result.timetable) {
-                    if (item.slot && item.subject) {
-                        timetableMap[item.slot] = item.subject;
-                    }
-                }
-            }
-            setTimetable(timetableMap);
-
-            const teacherAssignmentsMap: TeacherAssignments = {};
-            if (result.teacherAssignments && Array.isArray(result.teacherAssignments)) {
-                for (const item of result.teacherAssignments) {
-                    if (item.slot && item.teacher) {
-                        teacherAssignmentsMap[item.slot] = item.teacher;
-                    }
-                }
-            }
-            setTeacherAssignments(teacherAssignmentsMap);
-
-            setSuggestions(result.suggestions || []);
-            setTeacherLoad(result.teacherLoad || []);
-        } catch (error) {
-            console.error("Timetable generation error:", error);
-            alert("An error occurred while generating the timetable. Please try again.");
-        } finally {
-            setIsGenerating(false);
+    const handleSave = () => {
+        if (mockSavedTimetable.current) {
+            mockSavedTimetable.current.timetable = timetable;
+            mockSavedTimetable.current.teacherAssignments = teacherAssignments;
         }
+        setToastMessage('Changes saved successfully!');
     };
 
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    const handlePublish = () => {
+        if (mockSavedTimetable.current) {
+            mockSavedTimetable.current.timetable = timetable;
+            mockSavedTimetable.current.teacherAssignments = teacherAssignments;
+            mockSavedTimetable.current.status = 'Published';
+            setStatus('Published');
+        }
+        setToastMessage('Timetable published!');
+    };
 
+    const handleRegenerate = () => {
+        if (window.confirm("This will discard your current timetable and start a new generation. Are you sure?")) {
+            mockSavedTimetable.current = null;
+            handleBack(); // Go back to overview, user clicks card again to generate
+        }
+    };
+    
     return (
         <div className="flex flex-col h-full bg-gray-100 relative">
-            {isGenerating && (
-                <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-50">
-                    <AIIcon className="w-16 h-16 text-white animate-spin" />
-                    <p className="text-white font-semibold mt-4">Generating Timetable...</p>
-                </div>
-            )}
+            {toastMessage && <Toast message={toastMessage} onClear={() => setToastMessage('')} />}
             <header className="p-4 bg-white border-b border-gray-200 flex-shrink-0">
                 <div className="flex justify-between items-center">
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-800">Timetable Editor</h2>
-                        <select 
-                            value={selectedClass} 
-                            onChange={(e) => setSelectedClass(e.target.value)}
-                            className="mt-1 p-2 border border-gray-300 rounded-lg font-semibold text-sm focus:ring-sky-500 focus:border-sky-500 bg-gray-50"
-                        >
-                            <option>Grade 9A</option>
-                            <option>Grade 9B</option>
-                        </select>
+                    <div className="flex items-center space-x-3">
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-800">Timetable Editor</h2>
+                            <p className="font-semibold text-gray-600">{timetableData.className}</p>
+                        </div>
+                        <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${status === 'Published' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                            {status}
+                        </span>
                     </div>
-                    <button onClick={handleGenerateTimetable} disabled={isGenerating} className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-700 transition-colors disabled:bg-gray-400">
-                        <AIIcon className="w-5 h-5" />
-                        <span>Generate with AI</span>
-                    </button>
+                    <div className="flex items-center space-x-2">
+                        <button onClick={handleRegenerate} className="px-3 py-2 text-sm font-semibold bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                            Re-generate
+                        </button>
+                        <button onClick={handleSave} className="px-3 py-2 text-sm font-semibold bg-sky-500 text-white rounded-lg hover:bg-sky-600">
+                            Save Changes
+                        </button>
+                        {status !== 'Published' && (
+                            <button onClick={handlePublish} className="px-3 py-2 text-sm font-semibold bg-green-500 text-white rounded-lg hover:bg-green-600">
+                                Publish
+                            </button>
+                        )}
+                    </div>
                 </div>
             </header>
 
@@ -331,21 +270,16 @@ const TimetableEditor: React.FC = () => {
                     <div>
                         <h3 className="text-lg font-bold text-gray-800 mb-4">Subjects Palette</h3>
                         <div className="grid grid-cols-2 gap-2">
-                            {Object.keys(MOCK_SCHOOL_DATA.subjectRequirements).map(subjectName => (
+                            {timetableData.subjects.map((subjectName: string) => (
                                 <DraggableSubject key={subjectName} subjectName={subjectName} />
                             ))}
                         </div>
                     </div>
-                    <AISummary suggestions={suggestions} teacherLoad={teacherLoad} />
+                    <AISummary suggestions={timetableData.suggestions} teacherLoad={timetableData.teacherLoad} />
                 </aside>
 
                 <main className="flex-1 overflow-auto bg-gray-200/50">
                     <div className="p-4 space-y-3">
-                        <div className="bg-indigo-50 border-l-4 border-indigo-400 p-3 rounded-r-lg">
-                            <p className="text-sm text-indigo-800">
-                                <strong>Tip:</strong> Drag subjects from the palette on the left and drop them into the timetable slots.
-                            </p>
-                        </div>
                         <div className="grid gap-1.5" style={{ gridTemplateColumns: `min-content repeat(${PERIODS.length}, 1fr)`}}>
                             {/* Top-left empty cell */}
                             <div className="sticky top-0 left-0 bg-gray-100 z-30 border-b border-r border-gray-200"></div>
@@ -359,7 +293,7 @@ const TimetableEditor: React.FC = () => {
                             ))}
                             
                             {/* Rows for each day */}
-                            {days.map(day => (
+                            {DAYS.map(day => (
                                 <React.Fragment key={day}>
                                     <div className="sticky left-0 bg-gray-100 z-10 font-bold text-gray-600 text-sm flex items-center justify-center p-2 border-r border-gray-200">{day}</div>
                                     {PERIODS.map(period => (

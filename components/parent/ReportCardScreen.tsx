@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { SchoolLogoIcon, DocumentTextIcon } from '../../constants';
 import { Student, ReportCard } from '../../types';
@@ -79,7 +80,7 @@ interface ReportCardScreenProps {
 
 const ReportCardScreen: React.FC<ReportCardScreenProps> = ({ student }) => {
     const publishedReports = useMemo(() => 
-        (student.reportCards || []).filter(r => r.isPublished), 
+        (student.reportCards || []).filter(r => r.status === 'Published'), 
         [student]
     );
 

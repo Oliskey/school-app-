@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '../ui/Header';
 import { AdminBottomNav } from '../ui/DashboardBottomNav';
@@ -52,6 +53,14 @@ import AdminMessagesScreen from '../admin/AdminMessagesScreen';
 import AdminNewChatScreen from '../admin/AdminNewChatScreen';
 import ChatScreen from '../shared/ChatScreen';
 import HealthLogScreen from '../admin/HealthLogScreen';
+import TimetableGeneratorScreen from '../admin/TimetableGeneratorScreen';
+
+// User Management Screens
+import SelectUserTypeToAddScreen from '../admin/SelectUserTypeToAddScreen';
+import AddTeacherScreen from '../admin/AddTeacherScreen';
+import AddParentScreen from '../admin/AddParentScreen';
+import ParentListScreen from '../admin/ParentListScreen';
+import ParentDetailAdminView from '../admin/ParentDetailAdminView';
 
 
 // Type for navigation stack item
@@ -123,7 +132,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         reports: ReportsScreen,
         classList: ClassListScreen,
         teacherList: TeacherListScreen,
-        timetable: TimetableEditor,
+        timetable: TimetableGeneratorScreen,
+        timetableEditor: TimetableEditor,
         teacherAttendance: TeacherAttendanceScreen,
         feeManagement: FeeManagement,
         examManagement: ExamManagement,
@@ -148,7 +158,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         schoolReports: AdminSelectClassForReport,
         studentListForReport: AdminStudentListForReport,
         viewStudentReport: AdminStudentReportCardScreen,
-        // New Settings Screens
         systemSettings: SystemSettingsScreen,
         academicSettings: AcademicSettingsScreen,
         financialSettings: FinancialSettingsScreen,
@@ -157,17 +166,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         personalSecuritySettings: PersonalSecuritySettingsScreen,
         teacherDetailAdminView: TeacherDetailAdminView,
         teacherAttendanceDetail: TeacherAttendanceDetail,
-        // New Attendance Screens
         attendanceOverview: AttendanceOverviewScreen,
         classAttendanceDetail: ClassAttendanceDetailScreen,
-        // Report Card Editing
         adminSelectTermForReport: AdminSelectTermForReport,
         adminReportCardInput: (props: any) => <ReportCardInputScreen {...props} isAdmin={true} />,
-        // Messaging
         adminMessages: AdminMessagesScreen,
         adminNewChat: AdminNewChatScreen,
         chat: (props: any) => <ChatScreen {...props} currentUserId={0} />,
         healthLog: HealthLogScreen,
+        // User Management
+        selectUserTypeToAdd: SelectUserTypeToAddScreen,
+        addTeacher: AddTeacherScreen,
+        addParent: AddParentScreen,
+        parentList: ParentListScreen,
+        parentDetailAdminView: ParentDetailAdminView,
     };
     
     const currentNavigation = viewStack[viewStack.length - 1];

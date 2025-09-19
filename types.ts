@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export enum DashboardType {
@@ -65,7 +64,7 @@ export interface ReportCard {
     };
     teacherComment: string;
     principalComment: string;
-    isPublished: boolean;
+    status: 'Draft' | 'Submitted' | 'Published';
 }
 
 export interface Student {
@@ -82,7 +81,7 @@ export interface Student {
     birthday?: string; // YYYY-MM-DD
 }
 
-export type StudentReportInfo = Student & { isPublished: boolean };
+export type StudentReportInfo = Student & { status: 'Draft' | 'Submitted' | 'Published'; };
 
 export interface StudentAttendance {
   studentId: number;
@@ -98,6 +97,7 @@ export interface Teacher {
     classes: string[];
     email: string;
     phone: string;
+    status: 'Active' | 'Inactive';
 }
 
 export interface ClassInfo {
@@ -114,10 +114,12 @@ export interface Notice {
   id: number;
   title: string;
   content: string;
-  timestamp: string; // ISO string for sorting
-  category: 'Event' | 'Urgent' | 'Holiday' | 'General';
+  timestamp: string; // ISO string
+  // FIX: Updated category to use the unified AnnouncementCategory type.
+  category: AnnouncementCategory;
   isPinned: boolean;
   imageUrl?: string;
+  videoUrl?: string;
   audience: Array<'all' | 'parents' | 'teachers' | 'students'>;
   className?: string;
 }
@@ -163,6 +165,7 @@ export interface VideoLesson extends DigitalResource {
 
 
 export interface Driver {
+  id: number;
   name: string;
   avatarUrl:string;
   phone: string;
@@ -276,9 +279,13 @@ export interface StudentFeeInfo {
 
 export interface Message {
   id: string;
-  senderId: number; // 4 for the logged-in student, others for participants
-  text: string;
+  senderId: number;
+  text?: string;
   timestamp: string; // ISO string
+  type: 'text' | 'audio' | 'video';
+  audioUrl?: string;
+  videoUrl?: string;
+  duration?: number; // in seconds
 }
 
 export interface Conversation {
@@ -297,8 +304,8 @@ export interface Conversation {
   messages: Message[];
 }
 
-
-export type AnnouncementCategory = 'General' | 'Homework' | 'Test Reminder' | 'Event';
+// FIX: Unify AnnouncementCategory with Notice category to support all required types.
+export type AnnouncementCategory = 'General' | 'Homework' | 'Test Reminder' | 'Event' | 'Urgent' | 'Holiday';
 
 export interface TimetableEntry {
   day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday';
@@ -704,4 +711,50 @@ export interface HealthLogEntry {
   medicationAdministered?: { name: string; dosage: string; };
   parentNotified: boolean;
   recordedBy: string; // Nurse/Admin name
+}
+
+// For AI Game Creator
+export type GameLevel = 'Pre-Primary (3-5 years)' | 'Lower Primary (6-8 years)' | 'Upper Primary (9-11 years)' | 'Junior Secondary (12-14 years)' | 'Senior Secondary (15-18 years)';
+
+export interface AIGameQuestion {
+  id: string; // Use string for potential UUIDs
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+}
+
+export interface AIGame {
+  id: string;
+  gameName: string;
+  subject: string;
+  topic: string;
+  level: GameLevel;
+  creatorId: number; // Teacher's ID
+  status: 'Draft' | 'Published';
+  questions: AIGameQuestion[];
+}
+
+// For AI Timetable Generator
+export interface SavedTimetable {
+    className: string;
+    subjects: string[];
+    timetable: { [key: string]: string | null };
+    teacherAssignments: { [key: string]: string | null };
+    suggestions: string[];
+    teacherLoad: { teacherName: string; totalPeriods: number }[];
+    status: 'Draft' | 'Published';
+}
+
+// For Bus Duty Roster
+export interface BusRoute {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface BusRosterEntry {
+  routeId: string;
+  driverId: number | null;
+  date: string; // YYYY-MM-DD
 }

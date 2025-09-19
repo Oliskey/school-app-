@@ -1,27 +1,42 @@
-
-
 import React from 'react';
 import { HomeIcon, PhoneIcon, BusVehicleIcon } from '../../constants';
-import { mockDriver, mockPickupPoints } from '../../data';
+import { mockDrivers, mockPickupPoints, mockBusRoster } from '../../data';
+import { Driver } from '../../types';
 
 const BusRouteScreen: React.FC = () => {
+    // NEW LOGIC: Find today's assigned driver for a specific route
+    const today = new Date().toISOString().split('T')[0];
+    // For this demo, we assume the parent's child is on 'route-a'
+    const todaysAssignment = mockBusRoster.find(r => r.routeId === 'route-a' && r.date === today);
+    const driver = mockDrivers.find(d => d.id === todaysAssignment?.driverId);
 
-  const DriverInfoCard = () => (
-    <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-lg flex items-center space-x-4 border border-gray-200/50">
-      <img src={mockDriver.avatarUrl} alt={mockDriver.name} className="w-16 h-16 rounded-full object-cover border-4 border-white/50" />
-      <div className="flex-grow">
-        <p className="font-bold text-lg text-gray-800">{mockDriver.name}</p>
-        <p className="text-sm text-gray-600">{mockDriver.phone}</p>
-      </div>
-      <a 
-        href={`tel:${mockDriver.phone}`} 
-        className="bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition-colors"
-        aria-label="Call driver"
-      >
-        <PhoneIcon className="h-6 w-6" />
-      </a>
-    </div>
-  );
+    const DriverInfoCard = ({ driver }: { driver: Driver | undefined }) => {
+        if (!driver) {
+            return (
+                <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-lg text-center border border-gray-200/50">
+                    <p className="font-bold text-lg text-gray-800">No driver assigned for this route today.</p>
+                </div>
+            );
+        }
+
+        return (
+            <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-lg flex items-center space-x-4 border border-gray-200/50">
+                <img src={driver.avatarUrl} alt={driver.name} className="w-16 h-16 rounded-full object-cover border-4 border-white/50" />
+                <div className="flex-grow">
+                    <p className="text-sm text-gray-600">Today's Driver</p>
+                    <p className="font-bold text-lg text-gray-800">{driver.name}</p>
+                    <p className="text-sm text-gray-600">{driver.phone}</p>
+                </div>
+                <a 
+                    href={`tel:${driver.phone}`} 
+                    className="bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition-colors"
+                    aria-label="Call driver"
+                >
+                    <PhoneIcon className="h-6 w-6" />
+                </a>
+            </div>
+        );
+    };
 
   return (
     <div className="flex flex-col h-full bg-green-50">
@@ -83,7 +98,7 @@ const BusRouteScreen: React.FC = () => {
         </div>
 
         {/* Driver Card */}
-        <DriverInfoCard />
+        <DriverInfoCard driver={driver} />
       </div>
     </div>
   );

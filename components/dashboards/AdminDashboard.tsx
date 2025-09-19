@@ -1,56 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import Header from '../ui/Header';
 import { AdminBottomNav } from '../ui/DashboardBottomNav';
 import { mockNotifications } from '../../data';
 import { DashboardType } from '../../types';
 
-// Import all view components
-import DashboardOverview from '../admin/DashboardOverview';
-import AnalyticsScreen from '../admin/AnalyticsScreen';
-import ClassListScreen from '../admin/ClassListScreen';
-import StudentListScreen from '../admin/StudentListScreen';
-import AddStudentScreen from '../admin/AddStudentScreen';
-import TeacherListScreen from '../admin/TeacherListScreen';
-import TeacherPerformanceScreen from '../admin/TeacherPerformanceScreen';
-import TimetableEditor from '../admin/TimetableEditor';
-import TeacherAttendanceScreen from '../admin/TeacherAttendanceScreen';
-import FeeManagement from '../admin/FeeManagement';
-import FeeDetailsScreen from '../admin/FeeDetailsScreen';
-import ExamManagement from '../admin/ExamManagement';
-import AddExamScreen from '../admin/AddExamScreen';
-import ReportCardPublishing from '../admin/ReportCardPublishing';
-import CalendarScreen from '../shared/CalendarScreen';
-import UserRolesScreen from '../admin/UserRolesScreen';
-import AuditLogScreen from '../admin/AuditLogScreen';
-import ProfileSettings from '../admin/ProfileSettings';
-import CommunicationHub from '../admin/CommunicationHub';
-import ReportsScreen from '../admin/ReportsScreen';
-import StudentProfileAdminView from '../admin/StudentProfileAdminView';
-import EditProfileScreen from '../admin/EditProfileScreen';
-import NotificationsSettingsScreen from '../admin/NotificationsSettingsScreen';
-import SecuritySettingsScreen from '../admin/SecuritySettingsScreen';
-import ChangePasswordScreen from '../admin/ChangePasswordScreen';
-import NotificationsScreen from '../shared/NotificationsScreen';
-import OnlineStoreScreen from '../admin/OnlineStoreScreen';
-import AdminSelectClassForReport from '../admin/AdminSelectClassForReport';
-import AdminStudentListForReport from '../admin/AdminStudentListForReport';
-import AdminStudentReportCardScreen from '../admin/AdminStudentReportCardScreen';
-import SystemSettingsScreen from '../admin/SystemSettingsScreen';
-import AcademicSettingsScreen from '../admin/AcademicSettingsScreen';
-import FinancialSettingsScreen from '../admin/FinancialSettingsScreen';
-import CommunicationSettingsScreen from '../admin/CommunicationSettingsScreen';
-import BrandingSettingsScreen from '../admin/BrandingSettingsScreen';
-import PersonalSecuritySettingsScreen from '../admin/PersonalSecuritySettingsScreen';
-import TeacherDetailAdminView from '../admin/TeacherDetailAdminView';
-import TeacherAttendanceDetail from '../admin/TeacherAttendanceDetail';
-import AttendanceOverviewScreen from '../admin/AttendanceOverviewScreen';
-import ClassAttendanceDetailScreen from '../admin/ClassAttendanceDetailScreen';
-import AdminSelectTermForReport from '../admin/AdminSelectTermForReport';
-import ReportCardInputScreen from '../teacher/ReportCardInputScreen';
-import AdminMessagesScreen from '../admin/AdminMessagesScreen';
-import AdminNewChatScreen from '../admin/AdminNewChatScreen';
-import ChatScreen from '../shared/ChatScreen';
-import HealthLogScreen from '../admin/HealthLogScreen';
+// Lazy load all view components
+const GlobalSearchScreen = lazy(() => import('../shared/GlobalSearchScreen'));
+const DashboardOverview = lazy(() => import('../admin/DashboardOverview'));
+const AnalyticsScreen = lazy(() => import('../admin/AnalyticsScreen'));
+const ClassListScreen = lazy(() => import('../admin/ClassListScreen'));
+const StudentListScreen = lazy(() => import('../admin/StudentListScreen'));
+const AddStudentScreen = lazy(() => import('../admin/AddStudentScreen'));
+const TeacherListScreen = lazy(() => import('../admin/TeacherListScreen'));
+const TeacherPerformanceScreen = lazy(() => import('../admin/TeacherPerformanceScreen'));
+const TimetableEditor = lazy(() => import('../admin/TimetableEditor'));
+const TeacherAttendanceScreen = lazy(() => import('../admin/TeacherAttendanceScreen'));
+const FeeManagement = lazy(() => import('../admin/FeeManagement'));
+const FeeDetailsScreen = lazy(() => import('../admin/FeeDetailsScreen'));
+const ExamManagement = lazy(() => import('../admin/ExamManagement'));
+const AddExamScreen = lazy(() => import('../admin/AddExamScreen'));
+const ReportCardPublishing = lazy(() => import('../admin/ReportCardPublishing'));
+const CalendarScreen = lazy(() => import('../shared/CalendarScreen'));
+const UserRolesScreen = lazy(() => import('../admin/UserRolesScreen'));
+const AuditLogScreen = lazy(() => import('../admin/AuditLogScreen'));
+const ProfileSettings = lazy(() => import('../admin/ProfileSettings'));
+const CommunicationHub = lazy(() => import('../admin/CommunicationHub'));
+const ReportsScreen = lazy(() => import('../admin/ReportsScreen'));
+const StudentProfileAdminView = lazy(() => import('../admin/StudentProfileAdminView'));
+const EditProfileScreen = lazy(() => import('../admin/EditProfileScreen'));
+const NotificationsSettingsScreen = lazy(() => import('../admin/NotificationsSettingsScreen'));
+const SecuritySettingsScreen = lazy(() => import('../admin/SecuritySettingsScreen'));
+const ChangePasswordScreen = lazy(() => import('../admin/ChangePasswordScreen'));
+const NotificationsScreen = lazy(() => import('../shared/NotificationsScreen'));
+const OnlineStoreScreen = lazy(() => import('../admin/OnlineStoreScreen'));
+const AdminSelectClassForReport = lazy(() => import('../admin/AdminSelectClassForReport'));
+const AdminStudentListForReport = lazy(() => import('../admin/AdminStudentListForReport'));
+const AdminStudentReportCardScreen = lazy(() => import('../admin/AdminStudentReportCardScreen'));
+const SystemSettingsScreen = lazy(() => import('../admin/SystemSettingsScreen'));
+const AcademicSettingsScreen = lazy(() => import('../admin/AcademicSettingsScreen'));
+const FinancialSettingsScreen = lazy(() => import('../admin/FinancialSettingsScreen'));
+const CommunicationSettingsScreen = lazy(() => import('../admin/CommunicationSettingsScreen'));
+const BrandingSettingsScreen = lazy(() => import('../admin/BrandingSettingsScreen'));
+const PersonalSecuritySettingsScreen = lazy(() => import('../admin/PersonalSecuritySettingsScreen'));
+const TeacherDetailAdminView = lazy(() => import('../admin/TeacherDetailAdminView'));
+const TeacherAttendanceDetail = lazy(() => import('../admin/TeacherAttendanceDetail'));
+const AttendanceOverviewScreen = lazy(() => import('../admin/AttendanceOverviewScreen'));
+const ClassAttendanceDetailScreen = lazy(() => import('../admin/ClassAttendanceDetailScreen'));
+const AdminSelectTermForReport = lazy(() => import('../admin/AdminSelectTermForReport'));
+const ReportCardInputScreen = lazy(() => import('../teacher/ReportCardInputScreen'));
+const AdminMessagesScreen = lazy(() => import('../admin/AdminMessagesScreen'));
+const AdminNewChatScreen = lazy(() => import('../admin/AdminNewChatScreen'));
+const ChatScreen = lazy(() => import('../shared/ChatScreen'));
+const HealthLogScreen = lazy(() => import('../admin/HealthLogScreen'));
+const TimetableGeneratorScreen = lazy(() => import('../admin/TimetableGeneratorScreen'));
+const BusDutyRosterScreen = lazy(() => import('../admin/BusDutyRosterScreen'));
+
+// User Management Screens
+const SelectUserTypeToAddScreen = lazy(() => import('../admin/SelectUserTypeToAddScreen'));
+const AddTeacherScreen = lazy(() => import('../admin/AddTeacherScreen'));
+const AddParentScreen = lazy(() => import('../admin/AddParentScreen'));
+const ParentListScreen = lazy(() => import('../admin/ParentListScreen'));
+const ParentDetailAdminView = lazy(() => import('../admin/ParentDetailAdminView'));
 
 
 // Type for navigation stack item
@@ -65,15 +75,22 @@ interface AdminDashboardProps {
     setIsHomePage: (isHome: boolean) => void;
 }
 
+const DashboardSuspenseFallback = () => (
+    <div className="flex justify-center items-center h-full p-8 pt-20">
+      <div className="w-10 h-10 border-4 border-t-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin"></div>
+    </div>
+);
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage }) => {
     const [activeBottomNav, setActiveBottomNav] = useState('home');
     const [viewStack, setViewStack] = useState<ViewStackItem[]>([{ view: 'overview', props: {}, title: 'Admin Dashboard' }]);
     const [version, setVersion] = useState(0);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const forceUpdate = () => setVersion(v => v + 1);
 
     useEffect(() => {
-        setIsHomePage(viewStack.length === 1);
-    }, [viewStack, setIsHomePage]);
+        setIsHomePage(viewStack.length === 1 && !isSearchOpen);
+    }, [viewStack, isSearchOpen, setIsHomePage]);
 
     const notificationCount = mockNotifications.filter(n => !n.isRead && n.audience.includes('admin')).length;
 
@@ -115,13 +132,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         navigateTo('notifications', 'Notifications');
     };
 
-    const viewComponents: { [key: string]: React.ComponentType<any> } = {
+    const viewComponents = React.useMemo(() => ({
         overview: DashboardOverview,
         analytics: AnalyticsScreen,
         reports: ReportsScreen,
         classList: ClassListScreen,
         teacherList: TeacherListScreen,
-        timetable: TimetableEditor,
+        timetable: TimetableGeneratorScreen,
+        timetableEditor: TimetableEditor,
         teacherAttendance: TeacherAttendanceScreen,
         feeManagement: FeeManagement,
         examManagement: ExamManagement,
@@ -146,7 +164,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         schoolReports: AdminSelectClassForReport,
         studentListForReport: AdminStudentListForReport,
         viewStudentReport: AdminStudentReportCardScreen,
-        // New Settings Screens
         systemSettings: SystemSettingsScreen,
         academicSettings: AcademicSettingsScreen,
         financialSettings: FinancialSettingsScreen,
@@ -155,21 +172,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
         personalSecuritySettings: PersonalSecuritySettingsScreen,
         teacherDetailAdminView: TeacherDetailAdminView,
         teacherAttendanceDetail: TeacherAttendanceDetail,
-        // New Attendance Screens
         attendanceOverview: AttendanceOverviewScreen,
         classAttendanceDetail: ClassAttendanceDetailScreen,
-        // Report Card Editing
         adminSelectTermForReport: AdminSelectTermForReport,
         adminReportCardInput: (props: any) => <ReportCardInputScreen {...props} isAdmin={true} />,
-        // Messaging
         adminMessages: AdminMessagesScreen,
         adminNewChat: AdminNewChatScreen,
         chat: (props: any) => <ChatScreen {...props} currentUserId={0} />,
         healthLog: HealthLogScreen,
-    };
+        busDutyRoster: BusDutyRosterScreen,
+        // User Management
+        selectUserTypeToAdd: SelectUserTypeToAddScreen,
+        addTeacher: AddTeacherScreen,
+        addParent: AddParentScreen,
+        parentList: ParentListScreen,
+        parentDetailAdminView: ParentDetailAdminView,
+    }), []);
     
     const currentNavigation = viewStack[viewStack.length - 1];
-    const ComponentToRender = viewComponents[currentNavigation.view];
+    const ComponentToRender = viewComponents[currentNavigation.view as keyof typeof viewComponents];
     
     const commonProps = {
         navigateTo,
@@ -179,7 +200,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
     };
 
     return (
-        <div className="flex flex-col h-full bg-gray-100">
+        <div className="flex flex-col h-full bg-gray-100 relative">
             <Header
                 title={currentNavigation.title}
                 avatarUrl="https://i.pravatar.cc/150?u=admin"
@@ -188,13 +209,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout, setIsHomePage
                 onBack={viewStack.length > 1 ? handleBack : undefined}
                 onNotificationClick={handleNotificationClick}
                 notificationCount={notificationCount}
+                onSearchClick={() => setIsSearchOpen(true)}
             />
             <div className="flex-grow overflow-y-auto">
-                <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
-                    {ComponentToRender ? <ComponentToRender {...currentNavigation.props} {...commonProps} /> : <div>View not found: {currentNavigation.view}</div>}
-                </div>
+                 <Suspense fallback={<DashboardSuspenseFallback />}>
+                    <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
+                        {ComponentToRender ? <ComponentToRender {...currentNavigation.props} {...commonProps} /> : <div>View not found: {currentNavigation.view}</div>}
+                    </div>
+                </Suspense>
             </div>
             <AdminBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />
+            <Suspense>
+                {isSearchOpen && (
+                    <GlobalSearchScreen 
+                        dashboardType={DashboardType.Admin}
+                        navigateTo={navigateTo}
+                        onClose={() => setIsSearchOpen(false)}
+                    />
+                )}
+            </Suspense>
         </div>
     );
 };

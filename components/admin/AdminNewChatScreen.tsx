@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo } from 'react';
 import { Student, Parent, Teacher, Conversation, RoleName } from '../../types';
 import { mockStudents, mockTeachers, mockParents, mockAdminConversations } from '../../data';
@@ -49,7 +48,7 @@ const AdminNewChatScreen: React.FC<AdminNewChatScreenProps> = ({ navigateTo }) =
                 userType: 'Parent' as const
             };
         }),
-        ...mockTeachers.map(t => ({ 
+        ...mockTeachers.filter(t => t.status === 'Active').map(t => ({ 
             id: t.id, 
             name: t.name, 
             avatarUrl: t.avatarUrl,

@@ -1,7 +1,6 @@
 
-
 import React, { useMemo } from 'react';
-import { Submission, Assignment, Student, Conversation } from '../../types';
+import { Submission, Assignment, Student, Conversation, Message } from '../../types';
 import { mockSubmissions, mockStudents, mockConversations } from '../../data';
 import { CheckCircleIcon, ClockIcon, MailIcon } from '../../constants';
 
@@ -114,15 +113,15 @@ const AssignmentSubmissionsScreen: React.FC<AssignmentSubmissionsScreenProps> = 
             lastMessage: { text: `Hi ${student.name.split(' ')[0]}, just a reminder about the "${assignment.title}" assignment.`, timestamp: new Date().toISOString() },
             unreadCount: 1,
             messages: [
-                { id: `msg-${Date.now()}`, senderId: teacherId, text: `Hi ${student.name.split(' ')[0]}, just a reminder about the "${assignment.title}" assignment. Let me know if you have any questions.`, timestamp: new Date().toISOString() }
+                { id: `msg-${Date.now()}`, senderId: teacherId, text: `Hi ${student.name.split(' ')[0]}, just a reminder about the "${assignment.title}" assignment. Let me know if you have any questions.`, timestamp: new Date().toISOString(), type: 'text' }
             ],
         };
         mockConversations.push(newConversation);
         conversation = newConversation;
     } else {
-        const reminderMessage = { id: `msg-${Date.now()}`, senderId: teacherId, text: `Hi ${student.name.split(' ')[0]}, another reminder about the "${assignment.title}" assignment.`, timestamp: new Date().toISOString() };
+        const reminderMessage: Message = { id: `msg-${Date.now()}`, senderId: teacherId, text: `Hi ${student.name.split(' ')[0]}, another reminder about the "${assignment.title}" assignment.`, timestamp: new Date().toISOString(), type: 'text' };
         conversation.messages.push(reminderMessage);
-        conversation.lastMessage = { text: reminderMessage.text, timestamp: reminderMessage.timestamp };
+        conversation.lastMessage = { text: reminderMessage.text!, timestamp: reminderMessage.timestamp };
         conversation.unreadCount = (conversation.unreadCount || 0) + 1;
     }
     

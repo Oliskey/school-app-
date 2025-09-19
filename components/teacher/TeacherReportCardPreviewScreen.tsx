@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SchoolLogoIcon, DocumentTextIcon, XCircleIcon, PublishIcon } from '../../constants';
 import { Student } from '../../types';
@@ -24,7 +25,7 @@ const InfoField: React.FC<{ label: string; value: string | number }> = ({ label,
 const TeacherReportCardPreviewScreen: React.FC<TeacherReportCardPreviewScreenProps> = ({ student, handleBack, onPublish }) => {
     
     const report = student.reportCards?.[student.reportCards.length - 1];
-    const isPublished = report?.isPublished ?? false;
+    const isPublished = report?.status === 'Published';
 
     const handlePrint = () => {
         window.print();

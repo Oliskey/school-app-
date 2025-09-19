@@ -18,6 +18,14 @@ interface AIChatScreenProps {
     onBack: () => void;
 }
 
+const LoadingBubble = () => (
+    <div className="flex items-center space-x-2">
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+    </div>
+);
+
 const AIChatScreen: React.FC<AIChatScreenProps> = ({ dashboardType, onBack }) => {
     const [messages, setMessages] = useState<Message[]>([
         { role: 'model', text: `Hello! I'm your AI School Assistant. How can I help you navigate the ${dashboardType} dashboard or answer your questions today?` }
@@ -105,24 +113,17 @@ const AIChatScreen: React.FC<AIChatScreenProps> = ({ dashboardType, onBack }) =>
                         <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-2xl shadow ${msg.role === 'user' ? `${theme.mainBg} text-white` : 'bg-white text-gray-800'}`}>
                                <div className="prose prose-sm max-w-none prose-p:my-2 prose-headings:my-2">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                      {msg.text || ''}
-                                    </ReactMarkdown>
+                                    {msg.role === 'model' && !msg.text && index === messages.length -1 && isLoading ? (
+                                        <LoadingBubble />
+                                    ) : (
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                          {msg.text || ''}
+                                        </ReactMarkdown>
+                                    )}
                                </div>
                             </div>
                         </div>
                     ))}
-                    {isLoading && messages[messages.length - 1].role === 'model' && (
-                        <div className="flex justify-start">
-                            <div className="px-4 py-2 rounded-2xl shadow bg-white text-gray-800">
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <div className="p-4 bg-white border-t border-gray-200">

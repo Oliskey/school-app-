@@ -33,6 +33,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }
   };
 
+  const handleDemoLogin = (user: 'admin' | 'teacher' | 'parent' | 'student') => {
+    setUsername(user);
+    setPassword(user);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-full w-full bg-gradient-to-br from-sky-50 via-green-50 to-amber-50 p-4">
        <div className="w-full max-w-sm mx-auto bg-white/60 backdrop-blur-lg rounded-3xl p-8 shadow-2xl">
@@ -59,7 +64,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-3 py-3 text-gray-700 bg-white/80 border border-gray-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
+                className="w-full pl-10 pr-3 py-3 text-gray-700 bg-white/80 border border-gray-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
                 placeholder="Username (e.g., teacher)"
               />
             </div>
@@ -81,7 +86,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-3 text-gray-700 bg-white/80 border border-gray-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
+                className="w-full pl-10 pr-10 py-3 text-gray-700 bg-white/80 border border-gray-200 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
                 placeholder="Password (e.g., teacher)"
               />
               <button
@@ -120,17 +125,21 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-600 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all transform hover:scale-105"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all transform hover:scale-105"
             >
               Login
             </button>
           </div>
         </form>
         
-        <div className="mt-6 text-center text-xs text-gray-500 p-2 bg-gray-100/70 rounded-lg">
-            <p className="font-semibold text-gray-600">Use Demo Credentials:</p>
-            <p>admin/admin, teacher/teacher</p>
-            <p>parent/parent, student/student</p>
+        <div className="mt-6 text-center text-xs text-gray-500">
+            <p className="font-semibold text-gray-600 mb-2">Quick Logins:</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => handleDemoLogin('admin')} className="p-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors font-semibold">Admin</button>
+              <button type="button" onClick={() => handleDemoLogin('teacher')} className="p-2 bg-violet-100 text-violet-700 rounded-lg hover:bg-violet-200 transition-colors font-semibold">Teacher</button>
+              <button type="button" onClick={() => handleDemoLogin('parent')} className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-semibold">Parent</button>
+              <button type="button" onClick={() => handleDemoLogin('student')} className="p-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-semibold">Student</button>
+            </div>
         </div>
       </div>
     </div>

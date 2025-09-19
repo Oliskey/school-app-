@@ -23,6 +23,14 @@ const fileToGenerativePart = async (file: File) => {
   };
 };
 
+const LoadingBubble = () => (
+    <div className="flex items-center space-x-2">
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0s' }}></div>
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+        <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+    </div>
+);
+
 const StudyBuddy: React.FC = () => {
     const theme = THEME_CONFIG[DashboardType.Student];
     const [messages, setMessages] = useState<Message[]>([
@@ -54,11 +62,9 @@ const StudyBuddy: React.FC = () => {
         setIsLoading(true);
         setInputText('');
         
-        const userMessage: Message = { role: 'user', text };
-        setMessages(prev => [...prev, userMessage]);
-        
-        // Add a placeholder for the model's response, which will be populated by the stream
-        setMessages(prev => [...prev, { role: 'model', text: '' }]);
+        const userMessageText = imageFile ? `${text} (Image attached)` : text;
+        const userMessage: Message = { role: 'user', text: userMessageText };
+        setMessages(prev => [...prev, userMessage, { role: 'model', text: '' }]);
 
         try {
             if (!chatRef.current) {
@@ -121,9 +127,13 @@ const StudyBuddy: React.FC = () => {
                     <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-2 rounded-2xl shadow ${msg.role === 'user' ? `${theme.mainBg} text-white` : 'bg-white text-gray-800'}`}>
                            <div className="prose prose-sm max-w-none prose-p:my-2 prose-headings:my-2">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                  {msg.text || '...'}
-                                </ReactMarkdown>
+                                {msg.role === 'model' && !msg.text && index === messages.length - 1 && isLoading ? (
+                                    <LoadingBubble />
+                                ) : (
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {msg.text || ''}
+                                    </ReactMarkdown>
+                                )}
                            </div>
                         </div>
                     </div>

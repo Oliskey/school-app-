@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ title, avatarUrl, bgColor, onLogout, on
   );
 
   return (
-    <header className={`${bgColor} text-white p-6 pb-16 rounded-b-3xl relative z-10 print:hidden`}>
+    <header className={`${bgColor} text-white p-4 sm:p-5 pb-20 rounded-b-3xl relative z-10 print:hidden`}>
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2 min-w-0">
           {onBack && (
@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({ title, avatarUrl, bgColor, onLogout, on
               <ChevronLeftIcon className="h-7 w-7 text-white" />
             </button>
           )}
-          <h1 className="text-3xl font-bold truncate">{title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold truncate">{title}</h1>
         </div>
         <div className="flex items-center space-x-2">
           {onSearchClick && (

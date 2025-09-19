@@ -22,6 +22,8 @@ const AIParentingTipsScreen: React.FC<AIParentingTipsScreenProps> = ({ student }
 
     useEffect(() => {
         const generateTips = async () => {
+            setIsLoading(true);
+            setError(null);
             try {
                 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
@@ -64,10 +66,12 @@ const AIParentingTipsScreen: React.FC<AIParentingTipsScreenProps> = ({ student }
                                                 type: Type.ARRAY,
                                                 items: { type: Type.STRING }
                                             }
-                                        }
+                                        },
+                                        required: ["category", "content"]
                                     }
                                 }
-                            }
+                            },
+                            required: ["tips"]
                         }
                     }
                 });
@@ -130,7 +134,7 @@ const AIParentingTipsScreen: React.FC<AIParentingTipsScreenProps> = ({ student }
                     </div>
                     <ul className="space-y-2 list-disc list-inside text-gray-700">
                         {tipSection.content.map((item, idx) => (
-                           <li key={idx}><ReactMarkdown remarkPlugins={[remarkGfm]}>{item}</ReactMarkdown></li>
+                           <li key={idx} className="prose prose-sm max-w-none"><ReactMarkdown remarkPlugins={[remarkGfm]}>{item}</ReactMarkdown></li>
                         ))}
                     </ul>
                 </div>

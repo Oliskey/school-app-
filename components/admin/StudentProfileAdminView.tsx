@@ -1,12 +1,15 @@
 
 import React from 'react';
 import { Student } from '../../types';
-import { DocumentTextIcon, BookOpenIcon, ClipboardListIcon, CheckCircleIcon, SUBJECT_COLORS, EditIcon, MailIcon, getFormattedClassName, CakeIcon } from '../../constants';
+import { DocumentTextIcon, BookOpenIcon, ClipboardListIcon, CheckCircleIcon, SUBJECT_COLORS, EditIcon, MailIcon, getFormattedClassName, CakeIcon, TrashIcon } from '../../constants';
 import DonutChart from '../ui/DonutChart';
+import { mockStudents } from '../../data';
 
 interface StudentProfileAdminViewProps {
   student: Student;
   navigateTo: (view: string, title: string, props?: any) => void;
+  forceUpdate: () => void;
+  handleBack: () => void;
 }
 
 const SimpleBarChart = ({ data }: { data: { subject: string, score: number }[] }) => {
@@ -30,7 +33,7 @@ const SimpleBarChart = ({ data }: { data: { subject: string, score: number }[] }
     );
 };
 
-const StudentProfileAdminView: React.FC<StudentProfileAdminViewProps> = ({ student, navigateTo }) => {
+const StudentProfileAdminView: React.FC<StudentProfileAdminViewProps> = ({ student, navigateTo, forceUpdate, handleBack }) => {
     const academicPerformance = student.academicPerformance || [];
     const averageScore = academicPerformance.length > 0
         ? Math.round(academicPerformance.reduce((sum, record) => sum + record.score, 0) / academicPerformance.length)
@@ -45,6 +48,17 @@ const StudentProfileAdminView: React.FC<StudentProfileAdminViewProps> = ({ stude
     const totalDays = Object.values(attendanceData).reduce((sum, val) => sum + val, 0);
     const presentPercentage = totalDays > 0 ? Math.round(((attendanceData.present + attendanceData.late) / totalDays) * 100) : 0;
     const formattedClassName = getFormattedClassName(student.grade, student.section);
+
+    const handleDelete = () => {
+        if (window.confirm(`Are you sure you want to delete the account for ${student.name}? This action cannot be undone.`)) {
+            const index = mockStudents.findIndex(s => s.id === student.id);
+            if (index > -1) {
+                mockStudents.splice(index, 1);
+                forceUpdate();
+                handleBack(); // Go back to student list
+            }
+        }
+    };
 
     return (
         <div className="flex flex-col h-full bg-gray-50">
@@ -120,14 +134,18 @@ const StudentProfileAdminView: React.FC<StudentProfileAdminViewProps> = ({ stude
             </main>
             <div className="p-4 mt-auto bg-white border-t space-y-2 print:hidden">
                 <h3 className="text-sm font-bold text-gray-500 text-center uppercase tracking-wider">Admin Actions</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                     <button onClick={() => navigateTo('addStudent', `Edit ${student.name}`, { studentToEdit: student })} className="flex items-center justify-center space-x-2 py-3 px-4 bg-indigo-100 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-200">
                         <EditIcon className="w-5 h-5" />
-                        <span>Edit Profile</span>
+                        <span>Edit</span>
                     </button>
-                    <button onClick={() => navigateTo('adminSelectTermForReport', `Select Term for ${student.name}`, { student })} className="flex items-center justify-center space-x-2 py-3 px-4 bg-indigo-100 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-200">
-                        <EditIcon className="w-5 h-5" />
-                        <span>Edit Report Card</span>
+                     <button onClick={() => navigateTo('adminSelectTermForReport', `Select Term for ${student.name}`, { student })} className="flex items-center justify-center space-x-2 py-3 px-4 bg-indigo-100 text-indigo-700 font-semibold rounded-xl hover:bg-indigo-200">
+                        <DocumentTextIcon className="w-5 h-5" />
+                        <span>Reports</span>
+                    </button>
+                    <button onClick={handleDelete} className="flex items-center justify-center space-x-2 py-3 px-4 bg-red-100 text-red-700 font-semibold rounded-xl hover:bg-red-200">
+                        <TrashIcon className="w-5 h-5" />
+                        <span>Delete</span>
                     </button>
                 </div>
             </div>

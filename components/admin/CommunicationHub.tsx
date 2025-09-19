@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { UsersIcon, ParentNavIcon, TeacherNavIcon, StudentNavIcon, AIIcon } from '../../constants';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -56,7 +55,8 @@ const CommunicationHub: React.FC = () => {
                     properties: {
                         title: { type: Type.STRING, description: 'A concise and informative title for the announcement.' },
                         message: { type: Type.STRING, description: 'The full message body of the announcement, written in a clear, friendly, and professional tone. Use newline characters for paragraphs.' }
-                    }
+                    },
+                    propertyOrdering: ["title", "message"]
                 },
             }
         });
@@ -134,7 +134,7 @@ const CommunicationHub: React.FC = () => {
         </main>
         <div className="p-4 mt-auto bg-white border-t border-gray-200">
           <button onClick={handleSend} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm font-medium text-white bg-sky-500 hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
-            Send Announcement
+            Send
           </button>
         </div>
     </div>

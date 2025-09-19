@@ -1,11 +1,10 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { GoogleGenAI } from "@google/genai";
 import { Student, Teacher, Rating, ReportCard, ReportCardAcademicRecord } from '../../types';
-import { SchoolLogoIcon, PlusIcon } from '../../constants';
+import { SchoolLogoIcon, PlusIcon, AIIcon, LockIcon } from '../../constants';
 import { mockTeachers, mockStudents } from '../../data';
 import { getSubjectsForStudent } from '../../data';
-import { SUBJECTS_LIST } from '../../constants';
-
 
 interface ReportCardInputScreenProps {
   student: Student;
@@ -43,6 +42,17 @@ const RatingSelector: React.FC<{ value: Rating; onChange: (value: Rating) => voi
     </select>
 );
 
+const getScoreInputStyle = (scoreStr: string, maxScore: number): string => {
+    const score = parseInt(scoreStr, 10);
+    if (scoreStr === '' || isNaN(score)) return 'bg-white';
+    const percentage = (score / maxScore) * 100;
+    if (percentage >= 80) return 'bg-green-100 border-green-300';
+    if (percentage >= 60) return 'bg-sky-100 border-sky-300';
+    if (percentage >= 50) return 'bg-amber-100 border-amber-300';
+    return 'bg-red-100 border-red-300';
+};
+
+
 const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, term, handleBack, isAdmin = false }) => {
     const [academicData, setAcademicData] = useState<AcademicRecordState[]>([]);
     const [skills, setSkills] = useState<Record<string, Rating>>({});
@@ -50,10 +60,13 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
     const [attendance, setAttendance] = useState({ total: '115', present: '', absent: '', late: '' });
     const [teacherComment, setTeacherComment] = useState('');
     const [principalComment, setPrincipalComment] = useState('');
+    const [generatingRemarkIndex, setGeneratingRemarkIndex] = useState<number | null>(null);
+
+    const existingReport = useMemo(() => student.reportCards?.find(rc => rc.term === term), [student, term]);
+    const isLocked = !isAdmin && (existingReport?.status === 'Submitted' || existingReport?.status === 'Published');
 
     const isClassTeacher = useMemo(() => {
         if (isAdmin || !teacher || !student) return false;
-        // "Class Teacher" has the student's specific class (e.g., '7A') in their list of classes.
         const studentClass = `${student.grade}${student.section}`;
         return teacher.classes.some(cls => cls === studentClass);
     }, [student, teacher, isAdmin]);
@@ -85,7 +98,6 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
 
     useEffect(() => {
         const expectedSubjects = getSubjectsForStudent(student);
-        const existingReport = student.reportCards?.find(rc => rc.term === term);
         
         const existingRecordsMap = new Map<string, ReportCardAcademicRecord>();
         if (existingReport) {
@@ -127,30 +139,20 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
             });
             setTeacherComment(existingReport.teacherComment);
             setPrincipalComment(existingReport.principalComment);
-        } else {
-            setSkills({});
-            setPsychomotor({});
-            setAttendance({ total: '115', present: '', absent: '', late: '' });
-            setTeacherComment('');
-            setPrincipalComment('');
         }
-    }, [student, term]);
-
+    }, [student, term, existingReport]);
 
     const handleAcademicChange = useCallback((index: number, field: keyof Omit<AcademicRecordState, 'total' | 'grade'>, value: string) => {
         setAcademicData(currentData => {
             const newData = [...currentData];
             const recordToUpdate = { ...newData[index] };
     
-            // Directly update the field with the new value from the input
             (recordToUpdate as any)[field] = value;
     
-            // If CA or Exam score changed, recalculate everything
             if (field === 'ca' || field === 'exam') {
                 let caScore = parseInt(recordToUpdate.ca, 10) || 0;
                 let examScore = parseInt(recordToUpdate.exam, 10) || 0;
                 
-                // Clamp scores to their max values
                 if (caScore > 40) {
                     caScore = 40;
                     recordToUpdate.ca = '40';
@@ -164,13 +166,11 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
                 recordToUpdate.total = total;
                 recordToUpdate.grade = getGrade(total);
     
-                // Update remark only if it hasn't been manually edited by an admin
                 if (!recordToUpdate.remarkIsManual) {
                     recordToUpdate.remark = getRemark(total);
                 }
             }
             
-            // If the remark itself is being edited, flag it as manual to prevent overwrites
             if (field === 'remark') {
                  recordToUpdate.remarkIsManual = true;
             }
@@ -180,21 +180,87 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
         });
     }, [getGrade, getRemark]);
     
-    const addSubject = () => {
-        const newSubjectName = prompt("Enter new subject name:");
-        if (newSubjectName && !academicData.some(rec => rec.subject === newSubjectName)) {
-            setAcademicData(prev => [
-                ...prev,
-                { subject: newSubjectName, ca: '', exam: '', total: 0, grade: '', remark: '', remarkIsManual: false }
-            ]);
-        } else if (newSubjectName) {
-            alert("This subject already exists.");
+    const handleGenerateRemark = async (index: number) => {
+        const record = academicData[index];
+        if (!record || record.ca === '' || record.exam === '') {
+            alert("Please enter CA and Exam scores first.");
+            return;
+        }
+
+        setGeneratingRemarkIndex(index);
+        try {
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            const prompt = `Generate a short, constructive remark for a student's report card.
+            Subject: ${record.subject}
+            Continuous Assessment (CA) Score (out of 40): ${record.ca}
+            Exam Score (out of 60): ${record.exam}
+            Total Score (out of 100): ${record.total}
+            
+            The remark should be encouraging but also point out areas for improvement if necessary. Keep it to one sentence.`;
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: prompt,
+            });
+            const generatedRemark = response.text.trim().replace(/"/g, "");
+            handleAcademicChange(index, 'remark', generatedRemark);
+
+        } catch (error) {
+            console.error("AI Remark Generation Error:", error);
+            alert("Failed to generate remark.");
+        } finally {
+            setGeneratingRemarkIndex(null);
         }
     };
 
-    const handleSaveAndPublish = () => {
-        // ... (save logic)
-        alert('Report card has been saved and published successfully!');
+    const handleSave = (status: 'Draft' | 'Submitted') => {
+        if (status === 'Submitted' && !window.confirm('Are you sure you want to submit this for review? You will not be able to edit it after submission.')) {
+            return;
+        }
+
+        const studentIndex = mockStudents.findIndex(s => s.id === student.id);
+        if (studentIndex === -1) {
+            alert("Error: Student not found.");
+            return;
+        }
+
+        const newReportCard: ReportCard = {
+            term,
+            session: "2023/2024", // Mock session
+            status,
+            academicRecords: academicData.map(rec => ({
+                subject: rec.subject,
+                ca: parseInt(rec.ca, 10) || 0,
+                exam: parseInt(rec.exam, 10) || 0,
+                total: rec.total,
+                grade: rec.grade,
+                remark: rec.remark,
+            })),
+            skills,
+            psychomotor,
+            attendance: {
+                total: parseInt(attendance.total, 10) || 0,
+                present: parseInt(attendance.present, 10) || 0,
+                absent: parseInt(attendance.absent, 10) || 0,
+                late: parseInt(attendance.late, 10) || 0,
+            },
+            teacherComment,
+            principalComment,
+        };
+
+        const updatedStudent = { ...mockStudents[studentIndex] };
+        if (!updatedStudent.reportCards) updatedStudent.reportCards = [];
+        
+        const existingReportIndex = updatedStudent.reportCards.findIndex(rc => rc.term === term);
+        if (existingReportIndex > -1) {
+            updatedStudent.reportCards[existingReportIndex] = newReportCard;
+        } else {
+            updatedStudent.reportCards.push(newReportCard);
+        }
+
+        mockStudents[studentIndex] = updatedStudent;
+        
+        alert(`Report card has been ${status === 'Draft' ? 'saved as a draft' : 'submitted for review'}.`);
         handleBack();
     };
 
@@ -218,41 +284,55 @@ const ReportCardInputScreen: React.FC<ReportCardInputScreenProps> = ({ student, 
                                 return (
                                 <tr key={index} className={canEditScores ? '' : 'bg-gray-50'}>
                                     <td className="p-1 border font-semibold text-gray-800">{record.subject}</td>
-                                    <td className="p-1 border"><input type="number" max="40" min="0" value={record.ca} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'ca', e.target.value)} className="w-full text-center border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></td>
-                                    <td className="p-1 border"><input type="number" max="60" min="0" value={record.exam} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'exam', e.target.value)} className="w-full text-center border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></td>
+                                    <td className="p-1 border"><input type="number" max="40" min="0" value={record.ca} disabled={!canEditScores || isLocked} onChange={e => handleAcademicChange(index, 'ca', e.target.value)} className={`w-full text-center border rounded text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed ${getScoreInputStyle(record.ca, 40)}`} /></td>
+                                    <td className="p-1 border"><input type="number" max="60" min="0" value={record.exam} disabled={!canEditScores || isLocked} onChange={e => handleAcademicChange(index, 'exam', e.target.value)} className={`w-full text-center border rounded text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed ${getScoreInputStyle(record.exam, 60)}`} /></td>
                                     <td className="p-1 border text-center font-bold text-gray-800">{record.total}</td>
                                     <td className="p-1 border text-center font-bold text-gray-800">{record.grade}</td>
-                                    <td className="p-1 border"><input type="text" value={record.remark} disabled={!canEditScores} onChange={e => handleAcademicChange(index, 'remark', e.target.value)} className="w-full border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></td>
+                                    <td className="p-1 border">
+                                        <div className="flex items-center gap-1">
+                                            <input type="text" value={record.remark} disabled={!canEditScores || isLocked} onChange={e => handleAcademicChange(index, 'remark', e.target.value)} className="w-full border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/>
+                                            {canEditScores && !isLocked && (
+                                                <button type="button" onClick={() => handleGenerateRemark(index)} disabled={generatingRemarkIndex === index} className="p-1 text-purple-600 bg-purple-100 rounded hover:bg-purple-200 disabled:opacity-50" aria-label="Generate remark with AI">
+                                                    {generatingRemarkIndex === index ? (<div className="w-4 h-4 border-2 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>) : (<AIIcon className="w-4 h-4" />)}
+                                                </button>
+                                            )}
+                                            {(!canEditScores || isLocked) && <LockIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />}
+                                        </div>
+                                    </td>
                                 </tr>
                             )})}
                         </tbody>
                     </table>
                 </div>
-                {isAdmin && (
-                    <div className="mt-4">
-                        <button type="button" onClick={addSubject} className="flex items-center space-x-1 px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-100 rounded-md hover:bg-indigo-200">
-                           <PlusIcon className="w-4 h-4" />
-                           <span>Add Subject</span>
-                        </button>
-                    </div>
-                )}
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-                    <div><SectionHeader title="Skills & Behaviour" /><table className="w-full text-sm"><tbody>{SKILL_BEHAVIOUR_DOMAINS.map(skill => (<tr key={skill}><td className="py-1 text-gray-800">{skill}</td><td className="w-20"><RatingSelector disabled={!canEditGeneralSections} value={skills[skill] || ''} onChange={val => setSkills(p => ({...p, [skill]: val}))} options={RATING_OPTIONS}/></td></tr>))}</tbody></table></div>
-                    <div><SectionHeader title="Psychomotor Skills" /><table className="w-full text-sm"><tbody>{PSYCHOMOTOR_SKILLS.map(skill => (<tr key={skill}><td className="py-1 text-gray-800">{skill}</td><td className="w-20"><RatingSelector disabled={!canEditGeneralSections} value={psychomotor[skill] || ''} onChange={val => setPsychomotor(p => ({...p, [skill]: val}))} options={RATING_OPTIONS}/></td></tr>))}</tbody></table></div>
+                    <div><SectionHeader title="Skills & Behaviour" /><table className="w-full text-sm"><tbody>{SKILL_BEHAVIOUR_DOMAINS.map(skill => (<tr key={skill}><td className="py-1 text-gray-800">{skill}</td><td className="w-20"><RatingSelector disabled={!canEditGeneralSections || isLocked} value={skills[skill] || ''} onChange={val => setSkills(p => ({...p, [skill]: val}))} options={RATING_OPTIONS}/></td></tr>))}</tbody></table></div>
+                    <div><SectionHeader title="Psychomotor Skills" /><table className="w-full text-sm"><tbody>{PSYCHOMOTOR_SKILLS.map(skill => (<tr key={skill}><td className="py-1 text-gray-800">{skill}</td><td className="w-20"><RatingSelector disabled={!canEditGeneralSections || isLocked} value={psychomotor[skill] || ''} onChange={val => setPsychomotor(p => ({...p, [skill]: val}))} options={RATING_OPTIONS}/></td></tr>))}</tbody></table></div>
                 </div>
                 
                 <SectionHeader title="Attendance Record" />
                 <div className="grid grid-cols-4 gap-4 text-sm">
-                    {Object.entries(attendance).map(([key, value]) => (<div key={key}><label className="capitalize text-xs text-gray-700">{key.replace(/([A-Z])/g, ' $1')}</label><input type="number" value={value} disabled={!canEditGeneralSections} onChange={e => setAttendance(p => ({...p, [key]: e.target.value}))} className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></div>))}
+                    {Object.entries(attendance).map(([key, value]) => (<div key={key}><label className="capitalize text-xs text-gray-700">{key.replace(/([A-Z])/g, ' $1')}</label><input type="number" value={value} disabled={!canEditGeneralSections || isLocked} onChange={e => setAttendance(p => ({...p, [key]: e.target.value}))} className="w-full p-2 text-sm border border-gray-300 rounded bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"/></div>))}
                 </div>
                 
                 <div className="mt-6 space-y-4">
-                    <div><label className="font-semibold text-sm text-gray-900">Teacher's General Comment:</label><textarea value={teacherComment} disabled={!canEditGeneralSections} onChange={e => setTeacherComment(e.target.value)} rows={3} className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"></textarea></div>
-                    <div><label className="font-semibold text-sm text-gray-900">Principal's Comment:</label><textarea value={principalComment} onChange={e => setPrincipalComment(e.target.value)} readOnly={!isAdmin} placeholder={isAdmin ? "Enter principal's comment..." : "Principal's comment (read-only)"} rows={2} className={`w-full mt-1 p-2 border border-gray-300 rounded-md text-sm text-gray-900 ${isAdmin ? 'bg-white' : 'bg-gray-100 cursor-not-allowed'}`}></textarea></div>
+                    <div><label className="font-semibold text-sm text-gray-900">Teacher's General Comment:</label><textarea value={teacherComment} disabled={!canEditGeneralSections || isLocked} onChange={e => setTeacherComment(e.target.value)} rows={3} className="w-full mt-1 p-2 border border-gray-300 rounded-md text-sm bg-white text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"></textarea></div>
+                    <div><label className="font-semibold text-sm text-gray-900">Principal's Comment:</label><textarea value={principalComment} onChange={e => setPrincipalComment(e.target.value)} disabled={!isAdmin || isLocked} placeholder={isAdmin ? "Enter principal's comment..." : "Principal's comment (read-only)"} rows={2} className={`w-full mt-1 p-2 border border-gray-300 rounded-md text-sm text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed ${isAdmin ? 'bg-white' : 'bg-gray-100'}`}></textarea></div>
                 </div>
 
-                <div className="pt-6 mt-4 border-t"><button type="button" onClick={handleSaveAndPublish} className="w-full py-3 bg-purple-600 text-white font-bold rounded-lg shadow-md hover:bg-purple-700 transition-colors">Save & Publish Report</button></div>
+                <div className="pt-6 mt-4 border-t">
+                    {isLocked ? (
+                        <div className="text-center p-4 bg-purple-100 rounded-lg">
+                            <p className="font-bold text-purple-800">This report has been {existingReport?.status} and is locked.</p>
+                            <p className="text-sm text-purple-700">Please contact an administrator if changes are required.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-4">
+                            <button type="button" onClick={() => handleSave('Draft')} className="w-full py-3 bg-gray-200 text-gray-800 font-bold rounded-lg shadow-sm hover:bg-gray-300 transition-colors">Save Draft</button>
+                            <button type="button" onClick={() => handleSave('Submitted')} className="w-full py-3 bg-purple-600 text-white font-bold rounded-lg shadow-md hover:bg-purple-700 transition-colors">Submit for Review</button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

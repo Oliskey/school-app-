@@ -1,42 +1,76 @@
+
 import React, { useState, useMemo, useCallback } from 'react';
-import { SearchIcon, CheckCircleIcon, ClockIcon } from '../../constants';
+import { SearchIcon, CheckCircleIcon, ClockIcon, PublishIcon } from '../../constants';
 import { mockStudents as allStudents } from '../../data';
 import ReportCardPreview from './ReportCardPreview';
-import { StudentReportInfo } from '../../types';
+import { StudentReportInfo, ReportCard, Student } from '../../types';
 
-const mockStudentReports: StudentReportInfo[] = allStudents.map((student, index) => ({
-  ...student,
-  isPublished: index % 3 === 0, // Some are published, some are not
-}));
+const statusStyles: { [key in ReportCard['status']]: { bg: string, text: string, icon: React.ReactNode } } = {
+  Published: { bg: 'bg-green-100', text: 'text-green-800', icon: <CheckCircleIcon className="w-4 h-4 mr-1"/> },
+  Submitted: { bg: 'bg-sky-100', text: 'text-sky-800', icon: <PublishIcon className="w-4 h-4 mr-1"/> },
+  Draft: { bg: 'bg-gray-100', text: 'text-gray-800', icon: <ClockIcon className="w-4 h-4 mr-1"/> },
+};
+
 
 const ReportCardPublishing: React.FC = () => {
-  const [students, setStudents] = useState<StudentReportInfo[]>(mockStudentReports);
+  const [studentsWithReports, setStudentsWithReports] = useState<StudentReportInfo[]>(() => {
+    return allStudents.map(student => {
+        const latestReport = [...(student.reportCards || [])].sort((a, b) => {
+            if (a.session !== b.session) return b.session.localeCompare(a.session);
+            const termOrder = { "Third Term": 3, "Second Term": 2, "First Term": 1 };
+            return (termOrder[b.term as keyof typeof termOrder] || 0) - (termOrder[a.term as keyof typeof termOrder] || 0);
+        })[0];
+        
+        return {
+            ...student,
+            status: latestReport?.status || 'Draft',
+        };
+    });
+  });
+  
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'All' | 'Published' | 'Not Published'>('All');
+  const [activeTab, setActiveTab] = useState<ReportCard['status'] | 'All'>('Submitted');
   const [showPreview, setShowPreview] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentReportInfo | null>(null);
 
-  const handlePublish = useCallback((studentId: number) => {
-    setStudents(prev => prev.map(s => s.id === studentId ? { ...s, isPublished: true } : s));
-  }, []);
+  const updateStudentStatus = (studentId: number, newStatus: ReportCard['status']) => {
+      // Update local component state
+      setStudentsWithReports(prev => prev.map(s => s.id === studentId ? { ...s, status: newStatus } : s));
+
+      // Update "global" mock data to persist changes
+      const studentIndex = allStudents.findIndex(s => s.id === studentId);
+      if (studentIndex > -1) {
+          const latestReport = allStudents[studentIndex].reportCards?.[0]; // Assuming latest is first
+          if (latestReport) {
+              latestReport.status = newStatus;
+          }
+      }
+  };
+
+  const handlePublish = useCallback((studentId: number) => updateStudentStatus(studentId, 'Published'), []);
+  const handleRevert = useCallback((studentId: number) => updateStudentStatus(studentId, 'Draft'), []);
+  const handleUnpublish = useCallback((studentId: number) => updateStudentStatus(studentId, 'Submitted'), []);
 
   const handlePublishAll = () => {
-    if (window.confirm('Are you sure you want to publish all visible report cards?')) {
-      const filteredIds = new Set(filteredStudents.map(s => s.id));
-      setStudents(prev => prev.map(s => filteredIds.has(s.id) ? { ...s, isPublished: true } : s));
+    if (window.confirm('Are you sure you want to publish all submitted report cards?')) {
+        studentsWithReports.forEach(s => {
+            if (s.status === 'Submitted') {
+                handlePublish(s.id);
+            }
+        });
     }
   };
 
-  const handlePreview = (student: StudentReportInfo) => {
-    setSelectedStudent(student);
+  const handlePreview = (student: Student) => {
+    setSelectedStudent(student as StudentReportInfo);
     setShowPreview(true);
   };
 
   const filteredStudents = useMemo(() =>
-    students
-      .filter(student => activeTab === 'All' || (activeTab === 'Published' && student.isPublished) || (activeTab === 'Not Published' && !student.isPublished))
+    studentsWithReports
+      .filter(student => activeTab === 'All' || student.status === activeTab)
       .filter(student => student.name.toLowerCase().includes(searchTerm.toLowerCase())),
-    [students, activeTab, searchTerm]
+    [studentsWithReports, activeTab, searchTerm]
   );
   
   if (showPreview && selectedStudent) {
@@ -55,17 +89,18 @@ const ReportCardPublishing: React.FC = () => {
         </div>
         <div className="flex justify-between items-center">
             <div className="flex space-x-1 bg-gray-200 p-1 rounded-lg">
-                {(['All', 'Published', 'Not Published'] as const).map(tab => (
-                  <button key={tab} onClick={() => setActiveTab(tab)}
-                    className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${
-                      activeTab === tab ? 'bg-white text-sky-600 shadow-sm' : 'text-gray-600 hover:bg-gray-50'
-                    }`}>
-                    {tab}
-                  </button>
-                ))}
+                {(['Submitted', 'Published', 'Drafts', 'All'] as const).map(tab => {
+                    const mappedTab = tab === 'Drafts' ? 'Draft' : tab;
+                    return (
+                        <button key={tab} onClick={() => setActiveTab(mappedTab)}
+                            className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${ activeTab === mappedTab ? 'bg-white text-sky-600 shadow-sm' : 'text-gray-600 hover:bg-gray-50' }`}>
+                            {tab}
+                        </button>
+                    )
+                })}
             </div>
              <button onClick={handlePublishAll} className="px-3 py-2 text-sm font-semibold text-white bg-sky-500 rounded-lg shadow-sm hover:bg-sky-600">
-                Publish All
+                Publish All Submitted
              </button>
         </div>
       </div>
@@ -73,29 +108,35 @@ const ReportCardPublishing: React.FC = () => {
       <main className="flex-grow p-4 space-y-3 overflow-y-auto">
         {filteredStudents.length > 0 ? (
           filteredStudents.map(student => (
-            <div key={student.id} className="bg-white rounded-xl shadow-sm p-3 flex items-center space-x-3">
-              <img src={student.avatarUrl} alt={student.name} className="w-12 h-12 rounded-full object-cover" />
-              <div className="flex-grow">
-                <p className="font-bold text-gray-800">{student.name}</p>
-                <div className="flex items-center space-x-2 text-sm">
-                    <p className="text-gray-500">Grade {student.grade}{student.section}</p>
-                    {student.isPublished 
-                        ? <span className="flex items-center text-green-600"><CheckCircleIcon className="w-4 h-4 mr-1"/> Published</span> 
-                        : <span className="flex items-center text-gray-500"><ClockIcon className="w-4 h-4 mr-1"/> Not Published</span>
-                    }
+            <div key={student.id} className="bg-white rounded-xl shadow-sm p-3 flex flex-col space-y-2">
+                <div className="flex items-center space-x-3">
+                    <img src={student.avatarUrl} alt={student.name} className="w-12 h-12 rounded-full object-cover" />
+                    <div className="flex-grow">
+                        <p className="font-bold text-gray-800">{student.name}</p>
+                        <div className="flex items-center space-x-2 text-sm">
+                            <p className="text-gray-500">Grade {student.grade}{student.section}</p>
+                            <span className={`flex items-center text-xs font-semibold px-2 py-0.5 rounded-full ${statusStyles[student.status].bg} ${statusStyles[student.status].text}`}>
+                                {statusStyles[student.status].icon}
+                                {student.status}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button onClick={() => handlePreview(student)} className="px-3 py-1.5 text-xs font-semibold text-sky-700 bg-sky-100 rounded-full hover:bg-sky-200">Preview</button>
-                {!student.isPublished && (
-                  <button onClick={() => handlePublish(student.id)} className="px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-full hover:bg-green-600">Publish</button>
-                )}
-              </div>
+                 <div className="flex justify-end items-center space-x-2 border-t pt-2">
+                    <button onClick={() => handlePreview(student)} className="px-3 py-1.5 text-xs font-semibold text-sky-700 bg-sky-100 rounded-full hover:bg-sky-200">Preview</button>
+                    {student.status === 'Submitted' && <>
+                        <button onClick={() => handleRevert(student.id)} className="px-3 py-1.5 text-xs font-semibold text-amber-700 bg-amber-100 rounded-full hover:bg-amber-200">Revert</button>
+                        <button onClick={() => handlePublish(student.id)} className="px-3 py-1.5 text-xs font-semibold text-white bg-green-500 rounded-full hover:bg-green-600">Publish</button>
+                    </>}
+                     {student.status === 'Published' && <>
+                        <button onClick={() => handleUnpublish(student.id)} className="px-3 py-1.5 text-xs font-semibold text-amber-700 bg-amber-100 rounded-full hover:bg-amber-200">Unpublish</button>
+                    </>}
+                </div>
             </div>
           ))
         ) : (
              <div className="text-center py-10">
-                <p className="text-gray-500">No students found for this filter.</p>
+                <p className="text-gray-500">No report cards match this filter.</p>
             </div>
         )}
       </main>

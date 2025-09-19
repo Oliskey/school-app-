@@ -1,9 +1,8 @@
-
 import React, { useState, useMemo } from 'react';
 import { GameControllerIcon, ChevronRightIcon, PlayIcon, SearchIcon, BriefcaseIcon } from '../../../constants';
 import { educationalGamesData, EducationalGame } from '../../../data/gamesData';
-import { mockStudents } from '../../../data';
-import { Student } from '../../../types';
+import { mockStudents, mockCustomAIGames } from '../../../data';
+import { Student, AIGame } from '../../../types';
 
 // Assuming logged-in student is Fatima Bello for this demo
 const loggedInStudent: Student = mockStudents.find(s => s.id === 4)!;
@@ -16,7 +15,7 @@ const getStudentLevel = (grade: number): EducationalGame['level'] | null => {
     return null;
 };
 
-const GameCard: React.FC<{ game: EducationalGame; onClick?: () => void }> = ({ game, onClick }) => {
+const GameCard: React.FC<{ game: EducationalGame | (AIGame & { mode: 'Online' }); onClick?: () => void }> = ({ game, onClick }) => {
     const modeStyle = {
         Online: 'bg-green-100 text-green-800',
         Offline: 'bg-orange-100 text-orange-800',
@@ -32,8 +31,8 @@ const GameCard: React.FC<{ game: EducationalGame; onClick?: () => void }> = ({ g
         >
             <h4 className="font-bold text-orange-800">{game.gameName}</h4>
             <p className="text-xs font-semibold text-gray-500 mt-1">{game.subject}</p>
-            <p className="text-sm text-gray-700 mt-2"><strong>How to Play:</strong> {game.howToPlay}</p>
-            <p className="text-sm text-gray-700 mt-2"><strong>Learning Goal:</strong> {game.learningGoal}</p>
+            <p className="text-sm text-gray-700 mt-2"><strong>How to Play:</strong> {'howToPlay' in game ? game.howToPlay : `A quiz about ${game.topic}.`}</p>
+            <p className="text-sm text-gray-700 mt-2"><strong>Learning Goal:</strong> {'learningGoal' in game ? game.learningGoal : `Test your knowledge on ${game.topic}.`}</p>
             <div className="mt-3 flex justify-between items-center">
                 <span className={`px-2 py-1 text-xs font-semibold rounded-full ${modeStyle[game.mode]}`}>{game.mode} Activity</span>
                 {onClick && (
@@ -102,6 +101,10 @@ interface GamesHubScreenProps {
 const GamesHubScreen: React.FC<GamesHubScreenProps> = ({ navigateTo }) => {
     const studentLevel = getStudentLevel(loggedInStudent.grade);
 
+    const customGamesForLevel = useMemo(() => {
+        return mockCustomAIGames.filter(game => game.level === studentLevel && game.status === 'Published');
+    }, [studentLevel]);
+
     const gamesByLevel = useMemo(() => {
         return educationalGamesData.reduce((acc, game) => {
             (acc[game.level] = acc[game.level] || []).push(game);
@@ -164,6 +167,21 @@ const GamesHubScreen: React.FC<GamesHubScreenProps> = ({ navigateTo }) => {
                     ))}
                 </div>
             </div>
+            
+            {customGamesForLevel.length > 0 && (
+                <div>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2 px-1">Teacher-Created Games</h3>
+                    <div className="space-y-3">
+                        {customGamesForLevel.map(game => (
+                            <GameCard
+                                key={game.id}
+                                game={{ ...game, mode: 'Online' }}
+                                onClick={() => navigateTo('gamePlayer', game.gameName, { game, mode: 'play' })}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div>
                 <h3 className="text-lg font-bold text-gray-800 mb-2 px-1">Game Library</h3>

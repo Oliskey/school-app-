@@ -1,56 +1,64 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { DashboardType, Teacher } from '../../types';
 import { THEME_CONFIG } from '../../constants';
 import Header from '../ui/Header';
 import { TeacherBottomNav } from '../ui/DashboardBottomNav';
 import { mockNotifications, mockTeachers } from '../../data';
-import GlobalSearchScreen from '../shared/GlobalSearchScreen';
 
-// Import all view components
-import TeacherOverview from '../teacher/TeacherOverview';
-import ClassDetailScreen from '../teacher/ClassDetailScreen';
-import StudentProfileScreen from '../teacher/StudentProfileScreen';
-import TeacherExamManagement from '../teacher/TeacherExamManagement';
-import LibraryScreen from '../shared/LibraryScreen';
-import PhotoGalleryScreen from '../teacher/PhotoGalleryScreen';
-import AddExamScreen from '../admin/AddExamScreen';
-import CreateAssignmentScreen from '../teacher/CreateAssignmentScreen';
-import TeacherAssignmentsListScreen from '../teacher/TeacherAssignmentsListScreen';
-import ClassAssignmentsScreen from '../teacher/ClassAssignmentsScreen';
-import AssignmentSubmissionsScreen from '../teacher/AssignmentSubmissionsScreen';
-import GradeSubmissionScreen from '../teacher/GradeSubmissionScreen';
-import CurriculumScreen from '../shared/CurriculumScreen';
-import TeacherCurriculumSelectionScreen from '../teacher/TeacherCurriculumSelectionScreen';
-import GradeEntryScreen from '../teacher/GradeEntryScreen';
-import TeacherMessagesScreen from '../teacher/TeacherMessagesScreen';
-import TeacherCommunicationScreen from '../teacher/TeacherCommunicationScreen';
-import CalendarScreen from '../shared/CalendarScreen';
-import ReportCardInputScreen from '../teacher/ReportCardInputScreen';
-import CollaborationForumScreen from '../teacher/CollaborationForumScreen';
-import ForumTopicScreen from '../teacher/ForumTopicScreen';
-import TimetableScreen from '../shared/TimetableScreen';
-import ChatScreen from '../shared/ChatScreen';
-import TeacherReportsScreen from '../teacher/TeacherReportsScreen';
-import TeacherSettingsScreen from '../teacher/TeacherSettingsScreen';
-import EditTeacherProfileScreen from '../teacher/EditTeacherProfileScreen';
-import TeacherNotificationSettingsScreen from '../teacher/TeacherNotificationSettingsScreen';
-import TeacherSecurityScreen from '../teacher/TeacherSecurityScreen';
-import TeacherChangePasswordScreen from '../teacher/TeacherChangePasswordScreen';
-import NewChatScreen from '../teacher/NewChatScreen';
-import TeacherReportCardPreviewScreen from '../teacher/TeacherReportCardPreviewScreen';
-import NotificationsScreen from '../shared/NotificationsScreen';
-import TeacherSelectClassForAttendance from '../teacher/TeacherUnifiedAttendanceScreen';
-import TeacherMarkAttendanceScreen from '../teacher/TeacherAttendanceScreen';
-import LessonPlannerScreen from '../teacher/LessonPlannerScreen';
-import LessonPlanDetailScreen from '../teacher/LessonPlanDetailScreen';
-import DetailedLessonNoteScreen from '../teacher/DetailedLessonNoteScreen';
-import SelectTermForReportScreen from '../teacher/SelectTermForReportScreen';
-import ProfessionalDevelopmentScreen from '../teacher/ProfessionalDevelopmentScreen';
-import AIPerformanceSummaryScreen from '../teacher/AIPerformanceSummaryScreen';
-import EducationalGamesScreen from '../teacher/EducationalGamesScreen';
-import LessonContentScreen from '../teacher/LessonContentScreen';
-import AssignmentViewScreen from '../teacher/AssignmentViewScreen';
+// Lazy load all view components
+const GlobalSearchScreen = lazy(() => import('../shared/GlobalSearchScreen'));
+const TeacherOverview = lazy(() => import('../teacher/TeacherOverview'));
+const ClassDetailScreen = lazy(() => import('../teacher/ClassDetailScreen'));
+const StudentProfileScreen = lazy(() => import('../teacher/StudentProfileScreen'));
+const TeacherExamManagement = lazy(() => import('../teacher/TeacherExamManagement'));
+const LibraryScreen = lazy(() => import('../shared/LibraryScreen'));
+const PhotoGalleryScreen = lazy(() => import('../teacher/PhotoGalleryScreen'));
+const AddExamScreen = lazy(() => import('../admin/AddExamScreen'));
+const CreateAssignmentScreen = lazy(() => import('../teacher/CreateAssignmentScreen'));
+const TeacherAssignmentsListScreen = lazy(() => import('../teacher/TeacherAssignmentsListScreen'));
+const ClassAssignmentsScreen = lazy(() => import('../teacher/ClassAssignmentsScreen'));
+const AssignmentSubmissionsScreen = lazy(() => import('../teacher/AssignmentSubmissionsScreen'));
+const GradeSubmissionScreen = lazy(() => import('../teacher/GradeSubmissionScreen'));
+const CurriculumScreen = lazy(() => import('../shared/CurriculumScreen'));
+const TeacherCurriculumSelectionScreen = lazy(() => import('../teacher/TeacherCurriculumSelectionScreen'));
+const GradeEntryScreen = lazy(() => import('../teacher/GradeEntryScreen'));
+const TeacherMessagesScreen = lazy(() => import('../teacher/TeacherMessagesScreen'));
+const TeacherCommunicationScreen = lazy(() => import('../teacher/TeacherCommunicationScreen'));
+const CalendarScreen = lazy(() => import('../shared/CalendarScreen'));
+const ReportCardInputScreen = lazy(() => import('../teacher/ReportCardInputScreen'));
+const CollaborationForumScreen = lazy(() => import('../teacher/CollaborationForumScreen'));
+const ForumTopicScreen = lazy(() => import('../teacher/ForumTopicScreen'));
+const TimetableScreen = lazy(() => import('../shared/TimetableScreen'));
+const ChatScreen = lazy(() => import('../shared/ChatScreen'));
+const TeacherReportsScreen = lazy(() => import('../teacher/TeacherReportsScreen'));
+const TeacherSettingsScreen = lazy(() => import('../teacher/TeacherSettingsScreen'));
+const EditTeacherProfileScreen = lazy(() => import('../teacher/EditTeacherProfileScreen'));
+const TeacherNotificationSettingsScreen = lazy(() => import('../teacher/TeacherNotificationSettingsScreen'));
+const TeacherSecurityScreen = lazy(() => import('../teacher/TeacherSecurityScreen'));
+const TeacherChangePasswordScreen = lazy(() => import('../teacher/TeacherChangePasswordScreen'));
+const NewChatScreen = lazy(() => import('../teacher/NewChatScreen'));
+const TeacherReportCardPreviewScreen = lazy(() => import('../teacher/TeacherReportCardPreviewScreen'));
+const NotificationsScreen = lazy(() => import('../shared/NotificationsScreen'));
+const TeacherSelectClassForAttendance = lazy(() => import('../teacher/TeacherUnifiedAttendanceScreen'));
+const TeacherMarkAttendanceScreen = lazy(() => import('../teacher/TeacherAttendanceScreen'));
+const LessonPlannerScreen = lazy(() => import('../teacher/LessonPlannerScreen'));
+const LessonPlanDetailScreen = lazy(() => import('../teacher/LessonPlanDetailScreen'));
+const DetailedLessonNoteScreen = lazy(() => import('../teacher/DetailedLessonNoteScreen'));
+const SelectTermForReportScreen = lazy(() => import('../teacher/SelectTermForReportScreen'));
+const ProfessionalDevelopmentScreen = lazy(() => import('../teacher/ProfessionalDevelopmentScreen'));
+const AIPerformanceSummaryScreen = lazy(() => import('../teacher/AIPerformanceSummaryScreen'));
+const EducationalGamesScreen = lazy(() => import('../teacher/EducationalGamesScreen'));
+const LessonContentScreen = lazy(() => import('../teacher/LessonContentScreen'));
+const AssignmentViewScreen = lazy(() => import('../teacher/AssignmentViewScreen'));
+const AIGameCreatorScreen = lazy(() => import('../teacher/AIGameCreatorScreen'));
+const GamePlayerScreen = lazy(() => import('../shared/GamePlayerScreen'));
 
+const DashboardSuspenseFallback = () => (
+    <div className="flex justify-center items-center h-full p-8 pt-20">
+      <div className="w-10 h-10 border-4 border-t-4 border-gray-200 border-t-purple-600 rounded-full animate-spin"></div>
+    </div>
+  );
 
 interface ViewStackItem {
   view: string;
@@ -117,7 +125,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     navigateTo('notifications', 'Notifications', {});
   };
 
-  const viewComponents: { [key: string]: React.ComponentType<any> } = {
+  const viewComponents = React.useMemo(() => ({
     overview: TeacherOverview,
     classDetail: ClassDetailScreen,
     studentProfile: StudentProfileScreen,
@@ -142,7 +150,7 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     reportCardInput: ReportCardInputScreen,
     collaborationForum: CollaborationForumScreen,
     forumTopic: ForumTopicScreen,
-    timetable: (props) => <TimetableScreen {...props} context={{ userType: 'teacher', userId: LOGGED_IN_TEACHER_ID }} />,
+    timetable: (props: any) => <TimetableScreen {...props} context={{ userType: 'teacher', userId: LOGGED_IN_TEACHER_ID }} />,
     chat: (props: any) => <ChatScreen {...props} currentUserId={2} />,
     reports: TeacherReportsScreen,
     reportCardPreview: TeacherReportCardPreviewScreen,
@@ -161,10 +169,12 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
     professionalDevelopment: ProfessionalDevelopmentScreen,
     aiPerformanceSummary: AIPerformanceSummaryScreen,
     educationalGames: EducationalGamesScreen,
-  };
+    aiGameCreator: AIGameCreatorScreen,
+    gamePlayer: GamePlayerScreen,
+  }), []);
 
   const currentNavigation = viewStack[viewStack.length - 1];
-  const ComponentToRender = viewComponents[currentNavigation.view];
+  const ComponentToRender = viewComponents[currentNavigation.view as keyof typeof viewComponents];
   
   const commonProps = {
     navigateTo,
@@ -185,25 +195,29 @@ const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onLogout, setIsHome
         notificationCount={notificationCount}
         onSearchClick={() => setIsSearchOpen(true)}
       />
-      <div className="flex-grow overflow-y-auto">
-        <main className="min-h-full">
-            <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
-              {ComponentToRender ? (
-                  <ComponentToRender {...currentNavigation.props} {...commonProps} />
-              ) : (
-                   <div className="p-6">View not found: {currentNavigation.view}</div>
-              )}
-            </div>
+      <div className="flex-grow overflow-y-auto" style={{marginTop: '-5rem'}}>
+        <main className="min-h-full pt-20">
+            <Suspense fallback={<DashboardSuspenseFallback />}>
+                <div key={`${viewStack.length}-${version}`} className="animate-slide-in-up">
+                {ComponentToRender ? (
+                    <ComponentToRender {...currentNavigation.props} {...commonProps} />
+                ) : (
+                    <div className="p-6">View not found: {currentNavigation.view}</div>
+                )}
+                </div>
+            </Suspense>
         </main>
       </div>
       <TeacherBottomNav activeScreen={activeBottomNav} setActiveScreen={handleBottomNavClick} />
-      {isSearchOpen && (
-          <GlobalSearchScreen 
-              dashboardType={DashboardType.Teacher}
-              navigateTo={navigateTo}
-              onClose={() => setIsSearchOpen(false)}
-          />
-      )}
+      <Suspense>
+        {isSearchOpen && (
+            <GlobalSearchScreen 
+                dashboardType={DashboardType.Teacher}
+                navigateTo={navigateTo}
+                onClose={() => setIsSearchOpen(false)}
+            />
+        )}
+      </Suspense>
     </div>
   );
 };

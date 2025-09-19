@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
@@ -63,11 +64,13 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ adventureData, userAnswer
             <div className="text-center">
                 <h1 className="text-3xl font-bold text-gray-800">Quest Complete!</h1>
                 <div className="mt-4 bg-white p-4 rounded-xl shadow-sm">
-                    <div className="flex items-center space-x-2 text-teal-600">
+                     <div className="flex items-center space-x-2 text-teal-600">
                         <SparklesIcon className="h-5 w-5" />
                         <h2 className="font-bold">AI Summary</h2>
                     </div>
-                    {isLoadingSummary ? <p className="text-gray-600 mt-2">Calculating your epic performance...</p> : <p className="text-gray-600 mt-2 text-left">{aiSummary}</p>}
+                    <blockquote className="mt-2 text-left p-3 bg-teal-50 border-l-4 border-teal-300">
+                        {isLoadingSummary ? <p className="text-gray-600 italic">Calculating your epic performance...</p> : <p className="text-gray-700 italic">{aiSummary}</p>}
+                    </blockquote>
                 </div>
             </div>
 

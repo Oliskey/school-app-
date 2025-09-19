@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -20,24 +19,33 @@ const DocumentSection: React.FC<{ title: string; icon: React.ReactNode; children
 
 
 const LessonContentScreen: React.FC<{ lessonPlan: GeneratedLessonPlan; detailedNote?: DetailedNote }> = ({ lessonPlan, detailedNote }) => {
+  const lessonPlanMarkdown = `
+**Week:** ${lessonPlan.week}
+**Duration:** ${lessonPlan.duration}
+
+### Objectives
+${(lessonPlan.objectives || []).map(o => `- ${o}`).join('\n')}
+
+### Materials
+${(lessonPlan.materials || []).map(m => `- ${m}`).join('\n')}
+
+### Key Vocabulary
+${(lessonPlan.keyVocabulary || []).map(v => `- ${v}`).join('\n')}
+
+### Teaching Steps
+${(lessonPlan.teachingSteps || []).map((s, i) => `${i + 1}. **${s.step}:** ${s.description}`).join('\n')}
+
+### Assessment Methods
+${(lessonPlan.assessmentMethods || []).map(a => `- ${a}`).join('\n')}
+  `;
+
   return (
-    <div className="p-4 bg-gray-100 font-sans">
+    <div className="p-4 bg-gray-50 font-sans">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg printable-area">
         <div className="space-y-12">
           
           <DocumentSection title={`Lesson Plan: ${lessonPlan.topic}`} icon={<ClipboardListIcon className="w-7 h-7" />}>
-            <p><strong>Week:</strong> {lessonPlan.week}</p>
-            <p><strong>Duration:</strong> {lessonPlan.duration}</p>
-            <h4>Objectives</h4>
-            <ul>{(lessonPlan.objectives || []).map((o, i) => <li key={i}>{o}</li>)}</ul>
-            <h4>Materials</h4>
-            <p>{(lessonPlan.materials || []).join(', ')}</p>
-            <h4>Key Vocabulary</h4>
-            <p>{(lessonPlan.keyVocabulary || []).join(', ')}</p>
-            <h4>Teaching Steps</h4>
-            <ol>{(lessonPlan.teachingSteps || []).map((s, i) => <li key={i}><strong>{s.step}:</strong> {s.description}</li>)}</ol>
-            <h4>Assessment Methods</h4>
-            <p>{(lessonPlan.assessmentMethods || []).join(', ')}</p>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{lessonPlanMarkdown}</ReactMarkdown>
           </DocumentSection>
           
           <DocumentSection title="Detailed Lesson Note" icon={<BookOpenIcon className="w-7 h-7" />}>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { mockBadges, mockCertificates, mockAwards } from '../../data';
 import { CertificateIcon, AwardIcon } from '../../constants';
@@ -11,14 +12,17 @@ const AchievementsScreen: React.FC = () => {
                 <div>
                     <h2 className="text-xl font-bold text-gray-800 mb-3">My Badges</h2>
                     <div className="grid grid-cols-3 gap-4">
-                        {mockBadges.map(badge => (
-                            <div key={badge.id} className="bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center text-center space-y-2">
-                                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${badge.color}`}>
-                                    <badge.icon className="h-8 w-8" />
+                        {mockBadges.map(badge => {
+                            const Icon = badge.icon;
+                            return (
+                                <div key={badge.id} className="bg-white p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center text-center space-y-2">
+                                    <div className={`w-16 h-16 rounded-full flex items-center justify-center ${badge.color}`}>
+                                        <Icon className="h-8 w-8" />
+                                    </div>
+                                    <p className="font-bold text-xs text-gray-700 leading-tight">{badge.name}</p>
                                 </div>
-                                <p className="font-bold text-xs text-gray-700 leading-tight">{badge.name}</p>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 

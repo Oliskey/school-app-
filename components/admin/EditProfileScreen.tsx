@@ -73,7 +73,7 @@ const EditProfileScreen: React.FC = () => {
                         type="submit"
                         className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm font-medium text-white bg-sky-500 hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
                     >
-                        Save Changes
+                        Save
                     </button>
                 </div>
             </form>

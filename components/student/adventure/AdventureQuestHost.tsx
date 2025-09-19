@@ -83,8 +83,9 @@ const AdventureQuestHost: React.FC<{ handleBack: () => void }> = ({ handleBack }
                                 type: Type.OBJECT,
                                 properties: {
                                     title: { type: Type.STRING },
-                                    sections: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { title: { type: Type.STRING }, content: { type: Type.STRING } } } }
-                                }
+                                    sections: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { title: { type: Type.STRING }, content: { type: Type.STRING } }, required: ["title", "content"] } }
+                                },
+                                required: ["title", "sections"]
                             },
                             quiz: {
                                 type: Type.ARRAY,
@@ -98,10 +99,12 @@ const AdventureQuestHost: React.FC<{ handleBack: () => void }> = ({ handleBack }
                                         explanation: { type: Type.STRING },
                                         image_prompt: { type: Type.STRING },
                                         background_theme: { type: Type.STRING }
-                                    }
+                                    },
+                                    required: ["id", "question", "options", "correct_answer", "explanation", "image_prompt", "background_theme"]
                                 }
                             }
-                        }
+                        },
+                        required: ["study_guide", "quiz"]
                     }
                 }
             });

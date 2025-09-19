@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Student, Teacher, Conversation, RoleName } from '../../types';
 import { mockStudents, mockTeachers, mockParents, mockConversations } from '../../data';
@@ -45,7 +46,7 @@ const NewMessageScreen: React.FC<NewMessageScreenProps> = ({ navigateTo }) => {
     );
 
     const teachers = useMemo((): UserListItem[] => 
-        mockTeachers.map(t => ({
+        mockTeachers.filter(t => t.status === 'Active').map(t => ({
             id: t.id,
             name: t.name,
             avatarUrl: t.avatarUrl,

@@ -87,9 +87,11 @@ const GradeSubmissionScreen: React.FC<GradeSubmissionScreenProps> = ({ submissio
             properties: {
               suggestions: {
                 type: Type.ARRAY,
-                items: { type: Type.STRING }
+                items: { type: Type.STRING },
+                description: "An array of 3 distinct, constructive feedback comments."
               }
-            }
+            },
+            required: ["suggestions"]
           }
         }
       });

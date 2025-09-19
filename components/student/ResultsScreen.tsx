@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Student } from '../../types';
 import { mockStudents } from '../../data';
@@ -21,7 +22,7 @@ const TermTab: React.FC<{ term: string; isActive: boolean; onClick: () => void; 
 
 const ResultsScreen: React.FC<ResultsScreenProps> = ({ studentId }) => {
     const student = useMemo(() => mockStudents.find(s => s.id === studentId)!, [studentId]);
-    const publishedReports = useMemo(() => (student.reportCards || []).filter(rc => rc.isPublished), [student]);
+    const publishedReports = useMemo(() => (student.reportCards || []).filter(r => r.status === 'Published'), [student]);
 
     const availableTerms = useMemo(() => ["First Term", "Second Term", "Third Term"].filter(termName => 
         publishedReports.some(report => report.term === termName)

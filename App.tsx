@@ -1,13 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { DashboardType } from './types';
-import AdminDashboard from './components/dashboards/AdminDashboard';
-import TeacherDashboard from './components/dashboards/TeacherDashboard';
-import ParentDashboard from './components/dashboards/ParentDashboard';
-import StudentDashboard from './components/dashboards/StudentDashboard';
 import Login from './components/auth/Login';
 import AIChatWidget from './components/shared/AIChatWidget';
 import AIChatScreen from './components/shared/AIChatScreen';
+
+const AdminDashboard = lazy(() => import('./components/dashboards/AdminDashboard'));
+const TeacherDashboard = lazy(() => import('./components/dashboards/TeacherDashboard'));
+const ParentDashboard = lazy(() => import('./components/dashboards/ParentDashboard'));
+const StudentDashboard = lazy(() => import('./components/dashboards/StudentDashboard'));
 
 // A simple checkmark icon for the success animation, based on constants.tsx
 const CheckCircleIcon = ({className}: {className?: string}) => <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 ${className || ''}`.trim()} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>;
@@ -19,6 +20,13 @@ const SuccessScreen: React.FC = () => (
             <CheckCircleIcon className="w-20 h-20 text-white animate-checkmark-pop" />
         </div>
         <p className="mt-4 text-2xl font-bold text-white">Login Successful!</p>
+    </div>
+);
+
+const LoadingScreen: React.FC = () => (
+    <div className="flex flex-col items-center justify-center h-full bg-gray-100">
+        <div className="w-12 h-12 border-4 border-t-4 border-gray-200 border-t-sky-500 rounded-full animate-spin"></div>
+        <p className="mt-4 text-gray-600">Loading Dashboard...</p>
     </div>
 );
 
@@ -63,7 +71,7 @@ const App: React.FC = () => {
   };
   
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-2 sm:p-4 font-sans bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 print:p-0 print:bg-white">
+    <div className="flex flex-col items-center justify-center min-h-screen p-2 sm:p-4 font-sans bg-gradient-to-br from-slate-50 to-sky-100 dark:from-gray-800 dark:to-gray-900 print:p-0 print:bg-white">
         <div className="relative mx-auto border-black dark:border-gray-800 bg-black border-[8px] sm:border-[10px] rounded-[2.5rem] sm:rounded-[3rem] w-full max-w-sm h-[95vh] max-h-[850px] shadow-2xl print:border-none print:shadow-none print:h-auto print:w-full">
             {/* Dynamic Island */}
             <div className="absolute top-[10px] left-1/2 -translate-x-1/2 w-[120px] h-[30px] bg-black rounded-full z-20 flex justify-center items-center print:hidden">
@@ -83,7 +91,9 @@ const App: React.FC = () => {
                   <AIChatScreen onBack={() => setIsChatOpen(false)} dashboardType={activeDashboard} />
                 ) : (
                   <div className="flex-grow overflow-y-auto print:overflow-visible">
-                    {renderDashboard()}
+                    <Suspense fallback={<LoadingScreen />}>
+                      {renderDashboard()}
+                    </Suspense>
                   </div>
                 )}
             </div>

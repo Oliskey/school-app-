@@ -1,29 +1,31 @@
 
-
-
 import React, { useMemo } from 'react';
 import { PinIcon } from '../../constants';
 import { mockNotices } from '../../data';
-import { Notice } from '../../types';
+import { Notice, AnnouncementCategory } from '../../types';
 
 interface NoticeboardScreenProps {
-  userType: 'parent' | 'student';
+  userType: 'parent' | 'student' | 'teacher' | 'admin';
 }
 
-const categoryStyles: { [key in Notice['category']]: { bg: string, text: string, border: string } } = {
+const categoryStyles: { [key in AnnouncementCategory]: { bg: string, text: string, border: string } } = {
   Urgent: { bg: 'bg-red-50', text: 'text-red-800', border: 'border-red-200' },
   Event: { bg: 'bg-sky-50', text: 'text-sky-800', border: 'border-sky-200' },
   Holiday: { bg: 'bg-green-50', text: 'text-green-800', border: 'border-green-200' },
   General: { bg: 'bg-gray-50', text: 'text-gray-800', border: 'border-gray-200' },
+  'Homework': { bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-200' },
+  'Test Reminder': { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
 };
 
 const NoticeCard: React.FC<{ notice: Notice }> = ({ notice }) => {
-  const styles = categoryStyles[notice.category];
+  const styles = categoryStyles[notice.category] || categoryStyles['General'];
 
   return (
     <div className={`rounded-xl shadow-sm border ${styles.border} overflow-hidden`}>
       <div className={`${styles.bg} p-4`}>
-        {notice.imageUrl && (
+        {notice.videoUrl ? (
+            <video src={notice.videoUrl} controls className="w-full h-40 object-cover rounded-lg mb-3 bg-black"></video>
+        ) : notice.imageUrl && (
             <img src={notice.imageUrl} alt={notice.title} className="w-full h-32 object-cover rounded-lg mb-3" />
         )}
         <div className="flex justify-between items-start">
@@ -40,6 +42,9 @@ const NoticeCard: React.FC<{ notice: Notice }> = ({ notice }) => {
       </div>
       <div className="p-4 bg-white">
         <p className="text-gray-800">{notice.content}</p>
+        {notice.videoUrl && !notice.content && (
+            <p className="text-gray-800">Please watch the video announcement above.</p>
+        )}
       </div>
     </div>
   );
@@ -51,7 +56,7 @@ const NoticeboardScreen: React.FC<NoticeboardScreenProps> = ({ userType }) => {
     return mockNotices
       .filter(notice => 
           notice.audience.includes('all') || 
-          notice.audience.includes(`${userType}s` as 'parents' | 'students')
+          notice.audience.includes(`${userType}s` as 'parents' | 'students' | 'teachers')
       )
       .sort((a, b) => {
         // Pinned items first, then by date

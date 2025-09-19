@@ -21,8 +21,6 @@ const AIPerformanceSummaryScreen: React.FC<AIPerformanceSummaryScreenProps> = ({
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const ai = useMemo(() => new GoogleGenAI({ apiKey: process.env.API_KEY }), []);
-
     useEffect(() => {
         const generateSummary = async () => {
             if (students.length === 0) {
@@ -30,8 +28,9 @@ const AIPerformanceSummaryScreen: React.FC<AIPerformanceSummaryScreenProps> = ({
                 setIsLoading(false);
                 return;
             }
-
+            setIsLoading(true);
             try {
+                const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
                 const studentDataForPrompt = students.map(s => {
                     const latestGrades = s.academicPerformance?.slice(-3).map(p => `${p.subject}: ${p.score}%`).join(', ') || 'N/A';
                     const behavior = s.behaviorNotes?.map(n => `${n.type}: ${n.title}`).join(', ') || 'No notes';
@@ -55,22 +54,33 @@ const AIPerformanceSummaryScreen: React.FC<AIPerformanceSummaryScreenProps> = ({
                         responseSchema: {
                             type: Type.OBJECT,
                             properties: {
-                                overallSummary: { type: Type.STRING },
+                                overallSummary: { type: Type.STRING, description: "A brief, 2-3 sentence summary of the class's overall performance and atmosphere." },
                                 topPerformers: {
                                     type: Type.ARRAY,
                                     items: {
                                         type: Type.OBJECT,
-                                        properties: { name: { type: Type.STRING }, reason: { type: Type.STRING } }
-                                    }
+                                        properties: { 
+                                            name: { type: Type.STRING }, 
+                                            reason: { type: Type.STRING, description: "A short, specific reason why this student is a top performer." } 
+                                        },
+                                        required: ["name", "reason"]
+                                    },
+                                    description: "A list of 2-3 students who are excelling academically or behaviorally."
                                 },
                                 studentsNeedingSupport: {
                                     type: Type.ARRAY,
                                     items: {
                                         type: Type.OBJECT,
-                                        properties: { name: { type: Type.STRING }, reason: { type: Type.STRING } }
-                                    }
+                                        properties: { 
+                                            name: { type: Type.STRING }, 
+                                            reason: { type: Type.STRING, description: "A short, specific reason why this student might need support." } 
+                                        },
+                                        required: ["name", "reason"]
+                                    },
+                                    description: "A list of 2-3 students who might need extra attention, either academically or behaviorally."
                                 }
-                            }
+                            },
+                            required: ["overallSummary", "topPerformers", "studentsNeedingSupport"]
                         }
                     }
                 });
@@ -87,7 +97,7 @@ const AIPerformanceSummaryScreen: React.FC<AIPerformanceSummaryScreenProps> = ({
         };
 
         generateSummary();
-    }, [students, ai]);
+    }, [students]);
 
     if (isLoading) {
         return (

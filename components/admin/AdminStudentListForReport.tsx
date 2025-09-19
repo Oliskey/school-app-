@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Student } from '../../types';
 import { mockStudents } from '../../data';
@@ -19,7 +20,7 @@ const AdminStudentListForReport: React.FC<AdminStudentListForReportProps> = ({ c
         {studentsInClass.map(student => (
           <button 
             key={student.id} 
-            onClick={() => navigateTo('viewStudentReport', `${student.name}'s Report`, { student })}
+            onClick={() => navigateTo('adminSelectTermForReport', `Select Term for ${student.name}`, { student })}
             className="w-full bg-white rounded-xl shadow-sm p-3 flex items-center space-x-4 transition-all hover:shadow-md hover:ring-2 hover:ring-indigo-200"
             aria-label={`View report for ${student.name}`}
           >

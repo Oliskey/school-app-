@@ -1,5 +1,5 @@
 import React from 'react';
-import { Exam, Notice, CalendarEvent, Book, Driver, PickupPoint, Role, AuditLog, Photo, ClassInfo, Student, BehaviorNote, AcademicRecord, Assignment, Submission, Department, Teacher, StudentFeeInfo, Conversation, TimetableEntry, DigitalResource, StudentPerformanceData, SubjectAverage, AttendanceCorrelationPoint, StudentAttendance, Message, VideoLesson, Activity, ExtracurricularEvent, Badge, Certificate, Award, FeeBreakdownItem, PaymentHistoryItem, ProgressReport, BehaviorAlert, Parent, Complaint, Notification, PTAMeeting, LearningResource, SchoolPolicy, VolunteeringOpportunity, PermissionSlip, StoreProduct, StoreOrder, ForumTopic, AppointmentSlot, Quiz, LessonPlan, PDResource, HealthLogEntry, ActivityCategory } from './types';
+import { Exam, Notice, CalendarEvent, Book, Driver, PickupPoint, Role, AuditLog, Photo, ClassInfo, Student, BehaviorNote, AcademicRecord, Assignment, Submission, Department, Teacher, StudentFeeInfo, Conversation, TimetableEntry, DigitalResource, StudentPerformanceData, SubjectAverage, AttendanceCorrelationPoint, StudentAttendance, Message, VideoLesson, Activity, ExtracurricularEvent, Badge, Certificate, Award, FeeBreakdownItem, PaymentHistoryItem, ProgressReport, BehaviorAlert, Parent, Complaint, Notification, PTAMeeting, LearningResource, SchoolPolicy, VolunteeringOpportunity, PermissionSlip, StoreProduct, StoreOrder, ForumTopic, AppointmentSlot, Quiz, LessonPlan, PDResource, HealthLogEntry, ActivityCategory, AIGame, SavedTimetable, BusRoute, BusRosterEntry } from './types';
 // FIX: Added all required icons to the import statement.
 import { AdminIcon, TeacherNavIcon, ParentNavIcon, StudentNavIcon, FootballIcon, PaintBrushIcon, MusicNoteIcon, BookOpenIcon, BeakerIcon, TrophyIcon, MaskIcon, PerfectAttendanceIcon, StarStudentIcon, ScienceFairWinnerIcon, SportsmanshipIcon, ReadingChallengeIcon, HelpingHandIcon, MegaphoneIcon, UserGroupIcon } from './constants';
 import { getCurriculum } from './curriculumData';
@@ -59,7 +59,7 @@ export let mockStudents: Student[] = [
         {
             term: "First Term",
             session: "2023/2024",
-            isPublished: true,
+            status: 'Published',
             academicRecords: [
                 { subject: 'English Language', ca: 35, exam: 55, total: 90, grade: 'A', remark: 'Excellent grasp of literary concepts.' },
                 { subject: 'General Mathematics', ca: 32, exam: 53, total: 85, grade: 'B', remark: 'Good effort.' },
@@ -78,7 +78,7 @@ export let mockStudents: Student[] = [
         {
             term: "Second Term",
             session: "2023/2024",
-            isPublished: true,
+            status: 'Published',
             academicRecords: [
                 { subject: 'English Language', ca: 36, exam: 56, total: 92, grade: 'A', remark: 'Excellent.' },
                 { subject: 'General Mathematics', ca: 33, exam: 54, total: 87, grade: 'B', remark: 'Consistent improvement.' },
@@ -97,15 +97,15 @@ export let mockStudents: Student[] = [
         {
             term: "Third Term",
             session: "2023/2024",
-            isPublished: false,
+            status: 'Submitted',
             academicRecords: [
                 { subject: 'English Language', ca: 38, exam: 57, total: 95, grade: 'A', remark: 'Outstanding performance.' },
                 { subject: 'General Mathematics', ca: 35, exam: 55, total: 90, grade: 'A', remark: 'Excellent problem-solving.' },
-                { subject: 'Civic Education', ca: 0, exam: 0, total: 0, grade: '', remark: '' },
+                { subject: 'Civic Education', ca: 33, exam: 48, total: 81, grade: 'B', remark: 'Very good.' },
                 { subject: 'Computer Studies/ICT', ca: 39, exam: 59, total: 98, grade: 'A', remark: 'Exceptional talent.' },
                 { subject: 'Physics', ca: 33, exam: 54, total: 87, grade: 'B', remark: 'Very good understanding.' },
-                { subject: 'Chemistry', ca: 0, exam: 0, total: 0, grade: '', remark: '' },
-                { subject: 'Biology', ca: 0, exam: 0, total: 0, grade: '', remark: '' },
+                { subject: 'Chemistry', ca: 32, exam: 50, total: 82, grade: 'B', remark: 'Good.' },
+                { subject: 'Biology', ca: 34, exam: 53, total: 87, grade: 'B', remark: 'Great work.' },
             ],
             skills: { 'Neatness': 'A', 'Punctuality': 'A', 'Teamwork/Cooperation': 'A' },
             psychomotor: { 'Handwriting': 'A' },
@@ -122,7 +122,7 @@ export let mockStudents: Student[] = [
         {
             term: "First Term",
             session: "2023/2024",
-            isPublished: true,
+            status: 'Published',
             academicRecords: [
                 { subject: 'English', ca: 30, exam: 45, total: 75, grade: 'C', remark: 'Good effort.' },
                 { subject: 'Mathematics', ca: 28, exam: 48, total: 76, grade: 'C', remark: 'Satisfactory.' },
@@ -137,7 +137,7 @@ export let mockStudents: Student[] = [
         {
             term: "Second Term",
             session: "2023/2024",
-            isPublished: false,
+            status: 'Draft',
             academicRecords: [
                 { subject: 'English', ca: 32, exam: 48, total: 80, grade: 'B', remark: 'Shows marked improvement.' },
                 { subject: 'Mathematics', ca: 30, exam: 49, total: 79, grade: 'C', remark: 'Steady progress.' },
@@ -161,7 +161,7 @@ export let mockStudents: Student[] = [
       {
         term: "Second Term",
         session: "2023/2024",
-        isPublished: true,
+        status: 'Published',
         academicRecords: [
             { subject: 'Mathematics', ca: 28, exam: 40, total: 68, grade: 'D', remark: 'Needs to practice more regularly.' },
             { subject: 'English', ca: 30, exam: 42, total: 72, grade: 'C', remark: 'Good comprehension skills.' },
@@ -195,7 +195,7 @@ export let mockStudents: Student[] = [
         {
             term: "First Term",
             session: "2023/2024",
-            isPublished: true,
+            status: 'Published',
             academicRecords: [
                 { subject: 'English Language', ca: 30, exam: 55, total: 85, grade: 'B', remark: 'Solid performance.' },
                 { subject: 'General Mathematics', ca: 38, exam: 58, total: 96, grade: 'A', remark: 'Outstanding logical skills.' },
@@ -213,7 +213,7 @@ export let mockStudents: Student[] = [
         {
             term: "Second Term",
             session: "2023/2024",
-            isPublished: true,
+            status: 'Published',
             academicRecords: [
                 { subject: 'English Language', ca: 32, exam: 57, total: 89, grade: 'B', remark: 'Excellent analytical skills.' },
                 { subject: 'General Mathematics', ca: 37, exam: 56, total: 93, grade: 'A', remark: 'Very impressive work.' },
@@ -231,7 +231,7 @@ export let mockStudents: Student[] = [
         {
             term: "Third Term",
             session: "2023/2024",
-            isPublished: false, // This report is not published
+            status: 'Draft',
             academicRecords: [],
             skills: {},
             psychomotor: {},
@@ -277,7 +277,7 @@ export let mockStudents: Student[] = [
       {
             term: "Second Term",
             session: "2023/2024",
-            isPublished: true,
+            status: 'Published',
             academicRecords: [
                 { subject: 'English', ca: 36, exam: 55, total: 91, grade: 'A', remark: 'A pleasure to have in class.' },
             ],
@@ -314,11 +314,11 @@ export let mockStudents: Student[] = [
 ];
 
 export let mockTeachers: Teacher[] = [
-  { id: 1, name: 'Mr. John Adeoye', avatarUrl: 'https://i.pravatar.cc/150?u=adeoye', subjects: ['Mathematics', 'General Mathematics'], classes: ['10A', '10B', '11C'], email: 'j.adeoye@school.com', phone: '123-456-7890' },
-  { id: 2, name: 'Mrs. Funke Akintola', avatarUrl: 'https://i.pravatar.cc/150?u=funke', subjects: ['English', 'English Language', 'Literature-in-English'], classes: ['7A', '8A', '9A', '10A'], email: 'f.akintola@school.com', phone: '123-456-7891' },
-  { id: 3, name: 'Dr. Tunde Bello', avatarUrl: 'https://i.pravatar.cc/150?u=bello', subjects: ['Physics', 'Basic Technology'], classes: ['10A', '11C', '12A'], email: 't.bello@school.com', phone: '123-456-7892' },
-  { id: 4, name: 'Ms. Amina Sani', avatarUrl: 'https://i.pravatar.cc/150?u=amina', subjects: ['Chemistry', 'Basic Science'], classes: ['10B', '11A', '11C'], email: 'a.sani@school.com', phone: '123-456-7893' },
-  { id: 5, name: 'Mrs. Zainab Musa', avatarUrl: 'https://i.pravatar.cc/150?u=zainab', subjects: ['History', 'Social Studies'], classes: ['9A', '9B', '12A'], email: 'z.musa@school.com', phone: '123-456-7894' },
+  { id: 1, name: 'Mr. John Adeoye', avatarUrl: 'https://i.pravatar.cc/150?u=adeoye', subjects: ['Mathematics', 'General Mathematics'], classes: ['10A', '10B', '11C'], email: 'j.adeoye@school.com', phone: '123-456-7890', status: 'Active' },
+  { id: 2, name: 'Mrs. Funke Akintola', avatarUrl: 'https://i.pravatar.cc/150?u=funke', subjects: ['English', 'English Language', 'Literature-in-English'], classes: ['7A', '8A', '9A', '10A'], email: 'f.akintola@school.com', phone: '123-456-7891', status: 'Active' },
+  { id: 3, name: 'Dr. Tunde Bello', avatarUrl: 'https://i.pravatar.cc/150?u=bello', subjects: ['Physics', 'Basic Technology'], classes: ['10A', '11C', '12A'], email: 't.bello@school.com', phone: '123-456-7892', status: 'Active' },
+  { id: 4, name: 'Ms. Amina Sani', avatarUrl: 'https://i.pravatar.cc/150?u=amina', subjects: ['Chemistry', 'Basic Science'], classes: ['10B', '11A', '11C'], email: 'a.sani@school.com', phone: '123-456-7893', status: 'Active' },
+  { id: 5, name: 'Mrs. Zainab Musa', avatarUrl: 'https://i.pravatar.cc/150?u=zainab', subjects: ['History', 'Social Studies'], classes: ['9A', '9B', '12A'], email: 'z.musa@school.com', phone: '123-456-7894', status: 'Active' },
 ];
 
 export let mockParents: Parent[] = [
@@ -379,9 +379,9 @@ export let mockNotifications: Notification[] = [
     { id: 4, category: 'Message', title: 'New Message from Mr. Adeoye', summary: 'I would like to discuss Musa\'s progress in Mathematics...', timestamp: hoursAgo(2), isRead: false, audience: ['parent'], studentId: 3 },
     { id: 5, category: 'Homework', title: 'New Physics Assignment', summary: 'A new assignment on "Newton\'s Laws of Motion" has been posted.', timestamp: hoursAgo(8), isRead: true, audience: ['student'], studentId: 4 },
     { id: 6, category: 'Volunteering', title: 'Call for Volunteers', summary: 'We need parent volunteers for the upcoming school fair. Sign up now!', timestamp: daysAgo(3), isRead: true, audience: ['parent'] },
-// FIX: Changed 'General' to 'Event' to match the NotificationCategory type.
+    // FIX: Changed 'General' to 'Event' to match the NotificationCategory type.
     { id: 7, category: 'Event', title: 'Mid-term Break', summary: 'The school will be on mid-term break from Aug 5th to Aug 9th.', timestamp: daysAgo(10), isRead: true, audience: ['all']},
-// FIX: Changed 'Urgent' to 'Event' to match the NotificationCategory type.
+    // FIX: Changed 'Urgent' to 'Event' to match the NotificationCategory type.
     { id: 8, category: 'Event', title: 'School Closure', summary: 'Due to unforeseen circumstances, the school will be closed tomorrow.', timestamp: hoursAgo(1), isRead: false, audience: ['all']},
 ];
 
@@ -453,9 +453,9 @@ export let mockConversations: Conversation[] = [
         lastMessage: { text: 'Thank you for the update on his performance.', timestamp: hoursAgo(2) },
         unreadCount: 0,
         messages: [
-            { id: 'm1', senderId: 2, text: 'Hello, I wanted to discuss Musa\'s recent test scores.', timestamp: hoursAgo(3) },
-            { id: 'm2', senderId: 1001, text: 'Okay, I am available to chat now.', timestamp: hoursAgo(2.5) },
-            { id: 'm3', senderId: 1001, text: 'Thank you for the update on his performance.', timestamp: hoursAgo(2) },
+            { id: 'm1', senderId: 2, text: 'Hello, I wanted to discuss Musa\'s recent test scores.', timestamp: hoursAgo(3), type: 'text' },
+            { id: 'm2', senderId: 1001, text: 'Okay, I am available to chat now.', timestamp: hoursAgo(2.5), type: 'text' },
+            { id: 'm3', senderId: 1001, text: 'Thank you for the update on his performance.', timestamp: hoursAgo(2), type: 'text' },
         ]
     },
     {
@@ -464,7 +464,7 @@ export let mockConversations: Conversation[] = [
         lastMessage: { text: 'Good morning, ma. I have submitted the essay.', timestamp: hoursAgo(5) },
         unreadCount: 1,
         messages: [
-            { id: 'm4', senderId: 1, text: 'Good morning, ma. I have submitted the essay.', timestamp: hoursAgo(5) },
+            { id: 'm4', senderId: 1, text: 'Good morning, ma. I have submitted the essay.', timestamp: hoursAgo(5), type: 'text' },
         ]
     },
     {
@@ -482,14 +482,14 @@ export let mockAdminConversations: Conversation[] = [
         participant: { id: 2, name: 'Mrs. Funke Akintola', avatarUrl: 'https://i.pravatar.cc/150?u=funke', role: 'Teacher' },
         lastMessage: { text: 'The reports for JSS 1 have been submitted for review.', timestamp: hoursAgo(1) },
         unreadCount: 1,
-        messages: [{ id: 'adm1', senderId: 2, text: 'The reports for JSS 1 have been submitted for review.', timestamp: hoursAgo(1) }]
+        messages: [{ id: 'adm1', senderId: 2, text: 'The reports for JSS 1 have been submitted for review.', timestamp: hoursAgo(1), type: 'text' }]
     },
     {
         id: 'admin_conv_2',
         participant: { id: 1001, name: 'Mr. & Mrs. Ibrahim', avatarUrl: 'https://i.pravatar.cc/150?u=parent1', role: 'Parent' },
         lastMessage: { text: 'Good morning, I have a question about the school fees portal.', timestamp: hoursAgo(4) },
         unreadCount: 1,
-        messages: [{ id: 'adm2', senderId: 1001, text: 'Good morning, I have a question about the school fees portal.', timestamp: hoursAgo(4) }]
+        messages: [{ id: 'adm2', senderId: 1001, text: 'Good morning, I have a question about the school fees portal.', timestamp: hoursAgo(4), type: 'text' }]
     },
 ];
 
@@ -508,12 +508,6 @@ export let mockDigitalResources: (DigitalResource | VideoLesson)[] = [
   { id: 4, title: 'Shakespeare\'s "Macbeth" Analysis', type: 'Slides', subject: 'Literature-in-English', description: 'Presentation slides on key themes and characters.', thumbnailUrl: 'https://picsum.photos/seed/english/400/300' },
   { id: 5, title: 'The Laws of Motion', type: 'Video', subject: 'Physics', description: "An engaging video explaining Newton's three laws of motion.", thumbnailUrl: 'https://picsum.photos/seed/physics/400/300' },
 ];
-
-export const mockDriver: Driver = {
-  name: 'Mr. Tunde',
-  avatarUrl: 'https://i.pravatar.cc/150?u=driver',
-  phone: '+234 802 345 6789'
-};
 
 export const mockPickupPoints: PickupPoint[] = [
   { id: 1, name: 'School', position: { top: '8%', left: '10%' }, isUserStop: false },
@@ -714,4 +708,27 @@ export let mockExtracurricularEvents: ExtracurricularEvent[] = [
   { id: 1, title: 'Inter-House Football Match', date: toISODateString(daysFromNow(10)), category: 'Sport' },
   { id: 2, title: 'Annual Art Exhibition', date: toISODateString(daysFromNow(25)), category: 'Cultural' },
   { id: 3, title: 'Debate Club Tryouts', date: toISODateString(daysFromNow(5)), category: 'Club' },
+];
+
+export let mockCustomAIGames: AIGame[] = [];
+// FIX: Changed to an object wrapper to allow mutable reference across modules, resolving import assignment errors.
+export let mockSavedTimetable: { current: SavedTimetable | null } = { current: null };
+
+// --- NEW DATA FOR BUS ROSTER ---
+export const mockDrivers: Driver[] = [
+  { id: 1, name: 'Mr. Tunde Adekunle', avatarUrl: 'https://i.pravatar.cc/150?u=driver1', phone: '+234 802 345 6789' },
+  { id: 2, name: 'Mrs. Fatima Sani', avatarUrl: 'https://i.pravatar.cc/150?u=driver2', phone: '+234 803 123 4567' },
+  { id: 3, name: 'Mr. Emeka Okoro', avatarUrl: 'https://i.pravatar.cc/150?u=driver3', phone: '+234 804 987 6543' },
+];
+
+export const mockBusRoutes: BusRoute[] = [
+    { id: 'route-a', name: 'Route A', description: 'Ikoyi - Victoria Island' },
+    { id: 'route-b', name: 'Route B', description: 'Lekki Phase 1 - Ajah' },
+    { id: 'route-c', name: 'Route C', description: 'Surulere - Yaba' },
+];
+
+export let mockBusRoster: BusRosterEntry[] = [
+    // Pre-assign a driver for today for demo purposes
+    { routeId: 'route-a', driverId: 1, date: new Date().toISOString().split('T')[0] },
+    { routeId: 'route-b', driverId: 2, date: new Date().toISOString().split('T')[0] },
 ];

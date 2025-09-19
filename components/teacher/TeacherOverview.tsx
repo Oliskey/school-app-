@@ -1,22 +1,17 @@
-
-
 import React from 'react';
 import {
   BookOpenIcon,
   ChevronRightIcon,
-  CalendarIcon,
   ViewGridIcon,
   TeacherAttendanceIcon,
   ClipboardListIcon,
   BriefcaseIcon,
-  GameControllerIcon,
-  THEME_CONFIG,
-  SUBJECT_COLORS,
-  getFormattedClassName,
-  ClockIcon
+  ClockIcon,
+  SparklesIcon
 } from '../../constants';
 import { ClassInfo, Teacher } from '../../types';
 import { DashboardType } from '../../types';
+import { THEME_CONFIG, SUBJECT_COLORS, getFormattedClassName } from '../../constants';
 import { mockTeachers, mockClasses, mockTimetableData } from '../../data';
 
 const LOGGED_IN_TEACHER_ID = 2; // Mrs. Funke Akintola
@@ -24,6 +19,16 @@ const LOGGED_IN_TEACHER_ID = 2; // Mrs. Funke Akintola
 interface TeacherOverviewProps {
   navigateTo: (view: string, title: string, props?: any) => void;
 }
+
+const ActionCard: React.FC<{ label: string; icon: React.ReactNode; onClick: () => void }> = ({ label, icon, onClick }) => {
+    const theme = THEME_CONFIG[DashboardType.Teacher];
+    return (
+        <button onClick={onClick} className={`${theme.cardBg} p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-2 hover:bg-purple-200 transition-colors`}>
+            <div className={theme.iconColor}>{icon}</div>
+            <span className={`font-semibold ${theme.textColor} text-center text-sm`}>{label}</span>
+        </button>
+    );
+};
 
 const TeacherOverview: React.FC<TeacherOverviewProps> = ({ navigateTo }) => {
   const theme = THEME_CONFIG[DashboardType.Teacher];
@@ -36,15 +41,6 @@ const TeacherOverview: React.FC<TeacherOverviewProps> = ({ navigateTo }) => {
     .filter(e => e.day === today && teacher.classes.some(cls => e.className.includes(cls)))
     .sort((a,b) => a.startTime.localeCompare(b.startTime))
     .slice(0, 3);
-
-  const quickActions = [
-      { label: 'Attendance', icon: <TeacherAttendanceIcon className="h-7 w-7"/>, action: () => navigateTo('selectClassForAttendance', 'Select Class', {}) },
-      { label: 'Assignments', icon: <ClipboardListIcon className="h-7 w-7"/>, action: () => navigateTo('assignmentsList', 'Manage Assignments', {}) },
-      { label: 'AI Planner', icon: <BriefcaseIcon className="h-7 w-7"/>, action: () => navigateTo('lessonPlanner', 'AI Lesson Planner', {}) },
-      { label: 'Games Library', icon: <GameControllerIcon className="h-7 w-7"/>, action: () => navigateTo('educationalGames', 'Educational Games', {}) },
-      { label: 'Timetable', icon: <ViewGridIcon className="h-7 w-7"/>, action: () => navigateTo('timetable', 'My Timetable', {}) },
-      { label: 'Calendar', icon: <CalendarIcon className="h-7 w-7"/>, action: () => navigateTo('calendar', 'School Calendar', {}) },
-  ];
 
   const formatTime12Hour = (timeStr: string) => {
     if (!timeStr) return '';
@@ -63,44 +59,28 @@ const TeacherOverview: React.FC<TeacherOverviewProps> = ({ navigateTo }) => {
         <h3 className="text-2xl font-bold">Welcome, {teacher.name}!</h3>
         <p className="text-sm opacity-90 mt-1">Ready to inspire today?</p>
       </div>
-      
-      {/* Daily Wellness Check-in */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm flex items-center justify-between">
-          <div>
-              <p className="font-bold text-gray-800">Daily Wellness Check-in</p>
-              <p className="text-sm text-gray-500">How are you feeling today?</p>
-          </div>
-          <div className="flex space-x-2">
-              <button className="text-2xl p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Feeling happy">😊</button>
-              <button className="text-2xl p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Feeling neutral">😐</button>
-              <button className="text-2xl p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Feeling down">😕</button>
-          </div>
+
+      {/* Priority Actions */}
+      <div className="grid grid-cols-3 gap-4">
+        <ActionCard label="Mark Attendance" icon={<TeacherAttendanceIcon className="h-7 w-7"/>} onClick={() => navigateTo('selectClassForAttendance', 'Select Class', {})} />
+        <ActionCard label="Assignments" icon={<ClipboardListIcon className="h-7 w-7"/>} onClick={() => navigateTo('assignmentsList', 'Manage Assignments', {})} />
+        <ActionCard label="AI Planner" icon={<SparklesIcon className="h-7 w-7"/>} onClick={() => navigateTo('lessonPlanner', 'AI Lesson Planner', {})} />
       </div>
 
-      {/* Quick Actions Grid */}
-       <div className="grid grid-cols-3 gap-4">
-            {quickActions.map(item => (
-                <button key={item.label} onClick={item.action} className={`${theme.cardBg} p-4 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-2 hover:bg-purple-200 transition-colors`}>
-                    <div className={theme.iconColor}>{item.icon}</div>
-                    <span className={`font-semibold ${theme.textColor} text-center text-xs`}>{item.label}</span>
-                </button>
-            ))}
-        </div>
-
-        {/* Today's Schedule */}
-        <div>
+      {/* Today's Schedule */}
+      <div>
             <h3 className="text-lg font-bold text-gray-800 mb-2 px-1">Today's Schedule</h3>
             {todaySchedule.length > 0 ? (
                 <div className="space-y-3">
                     {todaySchedule.map((entry, i) => (
                         <div key={i} className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm">
+                            <div className="w-16 text-center">
+                                <p className="font-bold text-sm text-gray-800">{formatTime12Hour(entry.startTime)}</p>
+                                <p className="text-xs text-gray-500">({entry.className})</p>
+                            </div>
                             <div className={`w-1 h-10 rounded-full ${SUBJECT_COLORS[entry.subject]}`}></div>
                             <div>
                                 <p className="font-semibold text-gray-800">{entry.subject}</p>
-                                <p className="text-sm text-gray-500">{entry.className}</p>
-                            </div>
-                            <div className="ml-auto text-right">
-                                <p className="font-semibold text-sm text-gray-700">{formatTime12Hour(entry.startTime)}</p>
                             </div>
                         </div>
                     ))}

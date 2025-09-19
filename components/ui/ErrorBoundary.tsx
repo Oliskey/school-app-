@@ -1,3 +1,4 @@
+
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
@@ -10,12 +11,7 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Added constructor to initialize state and bind event handlers, correcting the 'this' context for class methods.
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false, error: undefined };
-    this.handleGoBack = this.handleGoBack.bind(this);
-  }
+  public state: State = { hasError: false, error: undefined };
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -25,7 +21,7 @@ class ErrorBoundary extends Component<Props, State> {
     console.error("Uncaught error:", error, errorInfo);
   }
   
-  private handleGoBack() {
+  private handleGoBack = (): void => {
     this.setState({ hasError: false, error: undefined });
     window.history.back();
   }

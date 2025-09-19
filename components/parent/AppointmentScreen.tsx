@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo } from 'react';
 import { Teacher, AppointmentSlot } from '../../types';
 import { mockTeachers, mockAppointmentSlots } from '../../data';
@@ -11,6 +10,8 @@ const AppointmentScreen: React.FC = () => {
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [reason, setReason] = useState('');
     const [isBooked, setIsBooked] = useState(false);
+
+    const activeTeachers = useMemo(() => mockTeachers.filter(t => t.status === 'Active'), []);
 
     // In a real app, this would be an API call based on teacher and date
     const availableSlots = useMemo(() => {
@@ -56,7 +57,7 @@ const AppointmentScreen: React.FC = () => {
                         className="mt-2 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 text-gray-900"
                     >
                         <option value="">-- Select Teacher --</option>
-                        {mockTeachers.map(t => <option key={t.id} value={t.id}>{t.name} - {t.subjects.join(', ')}</option>)}
+                        {activeTeachers.map(t => <option key={t.id} value={t.id}>{t.name} - {t.subjects.join(', ')}</option>)}
                     </select>
                 </div>
                 

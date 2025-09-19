@@ -1,5 +1,4 @@
 
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { DashboardType, Student, BehaviorNote, StudentAttendance, AttendanceStatus, StudentAssignment } from '../../types';
 import { 
@@ -76,7 +75,7 @@ interface ViewStackItem {
   title: string;
 }
 
-const StatItem = ({ icon, label, value, colorClass }: { icon: React.ReactNode, label: string, value: string, colorClass: string }) => (
+const StatItem = ({ icon, label, value, colorClass }: { icon: React.ReactNode, label: string, value: string | React.ReactNode, colorClass: string }) => (
     <div className="flex items-center space-x-3">
         <div className={`p-2 rounded-lg ${colorClass}`}>
             {icon}
@@ -89,15 +88,18 @@ const StatItem = ({ icon, label, value, colorClass }: { icon: React.ReactNode, l
 );
 
 const ChildStatCard: React.FC<{ data: any, navigateTo: (view: string, title: string, props?: any) => void, colorTheme: { bg: string, text: string } }> = ({ data, navigateTo, colorTheme }) => {
-    const { student, feeInfo, nextHomework, recentGrades, attendancePercentage } = data;
-    const theme = THEME_CONFIG[DashboardType.Parent];
+    const { student, feeInfo, nextHomework, attendancePercentage } = data;
     const formattedClassName = getFormattedClassName(student.grade, student.section);
 
-    const feeStatus = feeInfo ? `${new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(feeInfo.totalFee - feeInfo.paidAmount)} due ${new Date(feeInfo.dueDate).toLocaleDateString('en-GB', {day:'numeric', month:'short'})}` : "All fees paid";
+    const feeStatus = feeInfo ? (
+        <span className={feeInfo.status === 'Overdue' ? 'text-red-600' : ''}>
+            {new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', minimumFractionDigits: 0 }).format(feeInfo.totalFee - feeInfo.paidAmount)} due
+        </span>
+    ) : "All Paid";
     
     return (
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden border-t-4" style={{borderColor: colorTheme.bg}}>
-            <div className="p-4">
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+            <div className="p-4" style={{ backgroundColor: `${colorTheme.bg}1A` }}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <img src={student.avatarUrl} alt={student.name} className="w-14 h-14 rounded-full object-cover border-2" style={{borderColor: colorTheme.bg}}/>
@@ -106,21 +108,22 @@ const ChildStatCard: React.FC<{ data: any, navigateTo: (view: string, title: str
                             <p className="text-sm font-semibold" style={{color: colorTheme.text}}>{formattedClassName}</p>
                         </div>
                     </div>
-                    <button onClick={() => navigateTo('childDetail', student.name, { student: student })} className="bg-gray-100 p-2 rounded-full hover:bg-gray-200">
+                    <button onClick={() => navigateTo('childDetail', student.name, { student: student })} className="bg-white p-2 rounded-full shadow-sm hover:bg-gray-100">
                         <ChevronRightIcon className="text-gray-600"/>
                     </button>
                 </div>
             </div>
 
-            <div className="px-4 pb-4 grid grid-cols-2 gap-4">
+            <div className="px-4 py-3 grid grid-cols-2 gap-4 border-t border-gray-100">
                 <StatItem icon={<AttendanceSummaryIcon className="h-5 w-5 text-green-600"/>} label="Attendance" value={`${attendancePercentage}%`} colorClass="bg-green-100" />
-                <StatItem icon={<ReceiptIcon className="h-5 w-5 text-red-600"/>} label="Upcoming Fees" value={feeStatus} colorClass="bg-red-100" />
-                {recentGrades.length > 0 && <StatItem icon={<ChartBarIcon className="h-5 w-5 text-sky-600"/>} label="Recent Grade" value={`${recentGrades[0].subject}: ${recentGrades[0].score}%`} colorClass="bg-sky-100" />}
-                {nextHomework && <StatItem icon={<ClipboardListIcon className="h-5 w-5 text-purple-600"/>} label="Next Homework" value={`${nextHomework.subject} due ${new Date(nextHomework.dueDate).toLocaleDateString('en-GB', {day:'numeric', month:'short'})}`} colorClass="bg-purple-100" />}
+                <StatItem icon={<ReceiptIcon className="h-5 w-5 text-red-600"/>} label="Fees Due" value={feeStatus} colorClass="bg-red-100" />
+                {nextHomework && <StatItem icon={<ClipboardListIcon className="h-5 w-5 text-purple-600"/>} label="Homework" value={`${nextHomework.subject}`} colorClass="bg-purple-100" />}
+                <StatItem icon={<ReportIcon className="h-5 w-5 text-sky-600"/>} label="Report Card" value="View" colorClass="bg-sky-100" />
             </div>
         </div>
     );
 };
+
 
 const getHomeworkStatus = (assignment: StudentAssignment) => {
     const dueDate = new Date(assignment.dueDate);
@@ -144,7 +147,7 @@ const AcademicsTab = ({ student, navigateTo }: { student: Student; navigateTo: (
 
     // Memoized data processing
     const { latestTerm, latestGrades, averageScore, studentHomework, progressReport } = useMemo(() => {
-        const publishedReport = student.reportCards?.find(rc => rc.isPublished);
+        const publishedReport = student.reportCards?.find(rc => rc.status === 'Published');
 
         let term = 'N/A';
         let grades: { subject: string; score: number; teacherRemark?: string; }[] = [];
@@ -424,50 +427,35 @@ const Dashboard = ({ navigateTo }: { navigateTo: (view: string, title: string, p
 
     const quickAccessItems = [
         { label: 'Bus Route', icon: <BusVehicleIcon className="h-7 w-7"/>, action: () => navigateTo('busRoute', 'Bus Route') },
-        { label: 'Fees', icon: <ReceiptIcon className="h-7 w-7"/>, action: () => navigateTo('feeStatus', 'Fee Status', { childrenIds: parentChildrenIds }) },
-        { label: 'Reports', icon: <ReportIcon className="h-7 w-7"/>, action: () => navigateTo('selectReport', 'Select Report Card') },
+        { label: 'Calendar', icon: <CalendarIcon className="h-7 w-7"/>, action: () => navigateTo('calendar', 'School Calendar') },
+        { label: 'Noticeboard', icon: <MegaphoneIcon className="h-7 w-7"/>, action: () => navigateTo('noticeboard', 'Noticeboard') },
         { label: 'Appointments', icon: <CalendarPlusIcon className="h-7 w-7"/>, action: () => navigateTo('appointments', 'Book Appointment') },
     ];
     
-    const latestNotice = mockNotices.filter(n => n.audience.includes('all') || n.audience.includes('parents')).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
-
     const childColorThemes = [{bg: '#3b82f6', text: '#1e40af'}, {bg: '#ec4899', text: '#831843'}];
 
     return (
         <div className="p-4 space-y-5 bg-gray-50">
-            {/* Quick Actions */}
-            <div className="grid grid-cols-4 gap-3">
-                {quickAccessItems.map((item, index) => (
-                    <button key={item.label} onClick={item.action} className={`${theme.cardBg} p-3 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-2 hover:bg-green-200 transition-colors`}>
-                        <div className={theme.iconColor}>{item.icon}</div>
-                        <span className={`font-semibold ${theme.textColor} text-center text-xs`}>{item.label}</span>
-                    </button>
-                ))}
-            </div>
-
             {/* Children Cards */}
             <div className="space-y-4">
                 {childrenData.map((data, index) => (
                     <ChildStatCard key={data.student.id} data={data} navigateTo={navigateTo} colorTheme={childColorThemes[index % childColorThemes.length]} />
                 ))}
             </div>
-            
-             {/* School Notice */}
-             {latestNotice && (
-                <div className="bg-white p-4 rounded-2xl shadow-sm">
-                    <div className="flex items-center space-x-3 mb-2">
-                        <div className="bg-amber-100 p-2 rounded-lg">
-                            <MegaphoneIcon className="h-5 w-5 text-amber-600"/>
-                        </div>
-                        <h4 className="font-bold text-gray-800">School Notice</h4>
-                    </div>
-                    <div className="border-l-4 border-amber-300 pl-3">
-                         <h5 className="font-semibold text-gray-700">{latestNotice.title}</h5>
-                         <p className="text-sm text-gray-800">{latestNotice.content.substring(0, 100)}...</p>
-                         <button onClick={() => navigateTo('noticeboard', 'Noticeboard')} className="text-sm font-semibold text-green-600 mt-2">Read More</button>
-                    </div>
+
+            {/* Quick Actions */}
+            <div>
+                <h3 className="text-lg font-bold text-gray-800 mb-2 px-1">School Utilities</h3>
+                <div className="grid grid-cols-4 gap-3">
+                    {quickAccessItems.map((item) => (
+                        <button key={item.label} onClick={item.action} className="bg-white p-3 rounded-2xl shadow-sm flex flex-col items-center justify-center space-y-2 hover:bg-gray-100 transition-colors">
+                            <div className="text-gray-600">{item.icon}</div>
+                            <span className="font-semibold text-gray-700 text-center text-xs">{item.label}</span>
+                        </button>
+                    ))}
                 </div>
-             )}
+            </div>
+            
         </div>
     );
 };

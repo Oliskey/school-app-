@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedResources, TermResources, GeneratedLessonPlan, GeneratedAssessment, AssessmentQuestion, DetailedNote, GeneratedHistoryEntry } from '../../types';
-import { DocumentTextIcon, ShareIcon, BookOpenIcon, ClipboardListIcon, ChevronRightIcon, SparklesIcon } from '../../constants';
+import { DocumentTextIcon, ShareIcon, BookOpenIcon, ClipboardListIcon, ChevronRightIcon, SparklesIcon, FolderIcon, CheckCircleIcon } from '../../constants';
+
+const Toast: React.FC<{ message: string; onClear: () => void; }> = ({ message, onClear }) => {
+    useEffect(() => {
+        const timer = setTimeout(onClear, 3000);
+        return () => clearTimeout(timer);
+    }, [onClear]);
+
+    return (
+        <div className="fixed bottom-24 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 animate-slide-in-up z-50">
+            <CheckCircleIcon className="w-5 h-5 text-green-400" />
+            <span>{message}</span>
+        </div>
+    );
+};
 
 const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
     <h3 className="font-bold text-lg text-purple-800 border-b-2 border-purple-200 pb-1 mb-3">{title}</h3>
@@ -106,15 +120,47 @@ const TermContent: React.FC<{
 const LessonPlanDetailScreen: React.FC<{ resources: GeneratedResources; navigateTo: (view: string, title: string, props?: any) => void; }> = ({ resources, navigateTo }) => {
     const [currentResources, setCurrentResources] = useState<GeneratedResources>(resources);
     const [activeTerm, setActiveTerm] = useState<string>(resources.terms[0]?.term || '');
+    const [toastMessage, setToastMessage] = useState('');
     
     const activeTermData = currentResources.terms.find(t => t.term === activeTerm);
 
+    const handleSavePlan = () => {
+        const GENERATED_HISTORY_KEY = 'generatedLessonPlanHistory_v1';
+        try {
+            const savedHistoryRaw = localStorage.getItem(GENERATED_HISTORY_KEY);
+            const savedHistory: GeneratedHistoryEntry[] = savedHistoryRaw ? JSON.parse(savedHistoryRaw) : [];
+
+            const newEntry: GeneratedHistoryEntry = {
+                subject: currentResources.subject,
+                className: currentResources.className,
+                lastUpdated: new Date().toISOString(),
+                resources: currentResources,
+            };
+
+            // Prepend the new entry to the history
+            const newHistory = [newEntry, ...savedHistory];
+            localStorage.setItem(GENERATED_HISTORY_KEY, JSON.stringify(newHistory));
+            setToastMessage('Plan saved successfully!');
+        } catch (error) {
+            console.error("Failed to save plan to localStorage", error);
+            setToastMessage('Error: Could not save plan.');
+        }
+    };
+
     return (
         <div className="flex flex-col h-full bg-gray-100">
+            {toastMessage && <Toast message={toastMessage} onClear={() => setToastMessage('')} />}
             <div className="p-3 border-b border-gray-200 flex justify-between items-center flex-shrink-0 bg-white print:hidden">
                 <div>
                     <h2 className="text-lg font-bold text-gray-800">AI Plan: {resources.subject} ({resources.className})</h2>
                 </div>
+                 <button 
+                    onClick={handleSavePlan}
+                    className="flex items-center space-x-1.5 px-3 py-1.5 text-sm font-semibold text-green-700 bg-green-100 rounded-md hover:bg-green-200"
+                >
+                    <FolderIcon className="w-4 h-4"/>
+                    <span>Save Plan</span>
+                </button>
             </div>
 
             <main className="flex-grow overflow-y-auto p-4 printable-area">

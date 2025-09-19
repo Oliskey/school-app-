@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { SchoolLogoIcon, DocumentTextIcon } from '../../constants';
 import { Student, ReportCard } from '../../types';
@@ -108,7 +109,7 @@ const AdminStudentReportCardScreen: React.FC<AdminStudentReportCardScreenProps> 
                                     activeTerm === report.term ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-600'
                                 }`}
                             >
-                                {report.term} {report.isPublished ? '✓' : ' (Draft)'}
+                                {report.term} {report.status === 'Published' ? '✓' : ` (${report.status})`}
                             </button>
                         ))}
                     </div>

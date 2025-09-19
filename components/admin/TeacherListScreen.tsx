@@ -1,9 +1,11 @@
+
 import React, { useState, useMemo } from 'react';
 import { 
   SearchIcon,
   MailIcon,
   PhoneIcon,
-  SUBJECT_COLORS
+  SUBJECT_COLORS,
+  PlusIcon
 } from '../../constants';
 import { Teacher } from '../../types';
 import { mockTeachers } from '../../data';
@@ -58,7 +60,7 @@ const TeacherListScreen: React.FC<TeacherListScreenProps> = ({ navigateTo }) => 
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-100">
+    <div className="flex flex-col h-full bg-gray-100 relative">
       {/* Search Bar */}
       <div className="p-4 bg-gray-100 z-10">
         <div className="relative">
@@ -77,7 +79,7 @@ const TeacherListScreen: React.FC<TeacherListScreenProps> = ({ navigateTo }) => 
       </div>
 
       {/* Teacher List */}
-      <main className="flex-grow px-4 pb-4 space-y-3 overflow-y-auto">
+      <main className="flex-grow px-4 pb-24 space-y-3 overflow-y-auto">
         {filteredTeachers.length > 0 ? (
           filteredTeachers.map(teacher => (
             <TeacherCard key={teacher.id} teacher={teacher} onSelect={handleSelectTeacher} />
@@ -88,6 +90,12 @@ const TeacherListScreen: React.FC<TeacherListScreenProps> = ({ navigateTo }) => 
           </div>
         )}
       </main>
+      
+      <div className="absolute bottom-6 right-6">
+        <button onClick={() => navigateTo('addTeacher', 'Add New Teacher')} className="bg-sky-500 text-white p-4 rounded-full shadow-lg hover:bg-sky-600">
+            <PlusIcon className="h-6 w-6" />
+        </button>
+      </div>
     </div>
   );
 };
